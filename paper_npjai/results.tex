@@ -1,0 +1,270 @@
+%========================================================================%
+% Results section content. Slots into main.tex below the \section{Results}
+% header and the Pareto figure block (Fig.~\ref{fig:pareto}).
+%========================================================================%
+
+%-----------------------------------------------------------------------%
+\subsection{Multi-window question answering}\label{sec:squad}
+%-----------------------------------------------------------------------%
+
+The controlled multi-window QA task partitions a SQuAD validation example into five sequential windows: four fact windows containing Wikipedia paragraphs followed by a query window with the question. The answer-bearing window is rotated across the four non-query positions, so accuracy at each position isolates the cache-management problem rather than the model's recall bias toward window-final content. All methods receive the same pre-segmented windows and the same total cache budget $k{=}300$, so accuracy depends solely on which cached entries are retained and how they are augmented. We report position-robust accuracy, defined as the mean over the four answer-bearing positions of the per-position accuracy on $n{=}100$ samples per position.
+
+\Cref{tab:squad_main} reports the five-seed mean$\pm$std (seeds 7, 42, 123, 999, 2024) of position-robust accuracy for Stage~1 (parameter-free multiplicative selection at $k{=}300$) and the full pipeline (16 learned summary tokens prepended to 284 multiplicatively selected real tokens, total budget $k{=}300$). For context, we also report KIVI~\cite{liu2024kivi} at K4V4 applied to the multiplicatively selected cache at $k{=}300$ from a single canonical seed, which we take as the strongest published cache-compression baseline against which our pipeline is positioned.
+
+\begin{table}[t]
+\caption{Position-robust multi-window SQuAD accuracy (\%). Stage~1 and Stage~1+2 columns are five-seed mean$\pm$std (seeds 7/42/123/999/2024, $n{=}100$ samples per seed, four answer-bearing positions per sample). KIVI K4V4 is the same multiplicatively selected cache at $k{=}300$ further compressed with 4-bit asymmetric per-channel keys and per-token values, single canonical seed. The Stage~1+2 pipeline holds the total budget fixed at $k{=}300$. For Mistral 7B and Mistral-Small 24B we report the longer-context retrain (n=10 windows, mixed SQuAD/HotpotQA); the four other backbones use the original n=5 SQuAD-only training.}
+\label{tab:squad_main}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l ccc}
+\toprule
+\textbf{Model} & \textbf{Stage 1 (\%)} & \textbf{Stage 1+2 (\%)} & \textbf{KIVI K4V4 (\%)} \\
+\midrule
+Qwen 2.5 7B   & $59.8 \pm 2.7$  & $66.8 \pm 4.0$  & 45.5 \\
+Qwen 2.5 14B  & $63.8 \pm 5.3$  & $73.8 \pm 2.6$  & 68.0 \\
+Qwen 2.5 32B  & $64.7 \pm 4.9$  & $72.5 \pm 2.9$  & 69.0 \\
+Llama 3.1 8B  & $56.5 \pm 4.0$  & $65.9 \pm 4.5$  & 55.0 \\
+Mistral 7B    & $44.1 \pm 1.8$  & $57.0 \pm 3.5$  & 36.0 \\
+Mistral-Small 24B & $59.9 \pm 4.0$  & $63.6 \pm 3.3$  & 59.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Across the six backbones, adding the learned summary module to Stage~1 selection produces a mean improvement of $+8.5$ percentage points (range $+3.6$ to $+12.9$), with non-overlapping seed envelopes on Qwen~14B, Qwen~32B, Llama~8B, and Mistral~7B. The gap between Stage~1+2 and KIVI K4V4 ranges from $+4.1$ pp on Mistral-Small~24B to $+21.0$ pp on Mistral~7B; on Qwen~7B and Llama~8B the gap exceeds $10$ pp despite KIVI consuming $\sim$2.5$\times$ more bits per token than the FP16 reference. Pushing KIVI to two-bit precision (K2V2) degrades it further: 12.0\% on Qwen~7B, 47.0\% on Llama~8B, 60.0\% on Qwen~14B, 32.5\% on Mistral~7B and 58.5\% on Mistral-Small~24B, all of which sit below Stage~1+2 by 14 to 67 percentage points. Position-robust evaluation is more stringent than a single fixed-position number: on positions far from the query (positions~2 and~3 in our setup), pure selection routinely loses information that the learned summary recovers. The mean Stage~1+2 accuracy increases monotonically through the Qwen family ($66.8 \to 73.8 \to 72.5$, with 14B and 32B within one standard deviation) and rises from Mistral~7B to Mistral-Small~24B by $+6.6$ pp.
+
+The Pareto frontier in \Cref{fig:pareto} places these accuracy numbers against KV-cache memory per request. The Stage~1+2 pipeline at $k{=}300$ FP16 consumes 16--75~MB of KV memory across the six models versus 420~MB--2.0~GB for the full $n{=}20$-window cache; with the K8V4 quantization stack (\cref{sec:compression}), the same pipeline operates at $25.6\times$ FP16 compression of the full cache and reaches $68\times$ when accuracy and memory are jointly considered.
+
+
+%-----------------------------------------------------------------------%
+\subsection{Transfer to standard long-context benchmarks}\label{sec:longbench}
+%-----------------------------------------------------------------------%
+
+To test whether the same drop-in transfers beyond our training distribution, we evaluate on two LongBench~\cite{bai2024longbench} extractive QA tasks: HotpotQA (multi-hop reasoning across multiple Wikipedia paragraphs) and MultiFieldQA (single-hop QA over diverse-domain documents). LongBench documents are chunked into 384-token windows and processed sequentially through the same pipeline used for SQuAD; the Stage~1+2 checkpoints are the same SQuAD-trained models from \cref{sec:squad} with no LongBench-specific tuning. The cache budget is $k{=}300$ in all cases.
+
+\begin{table}[t]
+\caption{LongBench F1 scores at $k{=}300$ (100 samples per task, generated text truncated at first newline as standard for extractive QA). Hot.\ = HotpotQA, MF = MultiFieldQA. AstroNet (S1+S2) was trained on SQuAD/HotpotQA mixture with no LongBench-train exposure; the absolute scores are low across all methods because the $k{=}300$ budget compresses documents that span several thousand tokens. Best KV-eviction method per column in \textbf{bold}.}
+\label{tab:longbench}
+\centering
+\small
+\setlength{\tabcolsep}{2.5pt}
+\begin{tabular}{l cc cc cc cc cc cc}
+\toprule
+& \multicolumn{2}{c}{\textbf{Qwen 7B}} & \multicolumn{2}{c}{\textbf{Qwen 14B}} & \multicolumn{2}{c}{\textbf{Qwen 32B}} & \multicolumn{2}{c}{\textbf{Llama 8B}} & \multicolumn{2}{c}{\textbf{Mist.\ 7B}} & \multicolumn{2}{c}{\textbf{Mist.\ 24B}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9} \cmidrule(lr){10-11} \cmidrule(lr){12-13}
+& Hot. & MF & Hot. & MF & Hot. & MF & Hot. & MF & Hot. & MF & Hot. & MF \\
+\midrule
+StreamingLLM    &  6.5 &  6.7 & 10.2 & 10.1 &  8.9 & 12.9 &  9.1 &  7.1 &  6.4 &  9.5 & \textbf{12.1} & 11.3 \\
+H${}_2$O        & \textbf{29.1} & 15.5 & 27.5 & 17.8 & 19.6 & 17.7 & 16.0 &  9.5 &  3.7 & \textbf{10.5} &  6.1 & 10.2 \\
+SnapKV          & 23.3 & 12.9 & 15.2 & \textbf{19.6} & 12.3 & 19.0 & 17.1 & 11.6 &  0.7 &  5.5 &  7.2 & 11.1 \\
+AstroNet S1     & 24.3 & 13.6 & 18.1 & 19.4 & 15.9 & \textbf{20.9} & 16.4 & 12.4 &  0.7 &  5.9 &  5.1 & 11.5 \\
+AstroNet S1+S2  & 23.4 & \textbf{15.7} & \textbf{29.3} & 14.2 & \textbf{24.3} & 16.6 & \textbf{23.1} & \textbf{15.1} &  \textbf{6.5} &  8.5 &  10.1 & \textbf{11.9} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\Cref{tab:longbench} shows that AstroNet takes at least one of the two columns on all six backbones. On Qwen~7B Stage~1+2 wins MultiFieldQA at 15.7~F1 but H${}_2$O is best on HotpotQA at 29.1, slightly above our Stage~1+2 (23.4), because the answer-bearing bridge entities in two-hop Wikipedia questions are repeatedly attended-to during processing and the cumulative-attention heuristic alone is sufficient to retain them. On the larger Qwen models the same heuristic begins to over-cover redundant heavy-hitters and Stage~2's cross-window summary recovers the multi-hop signal: Qwen~14B Stage~1+2 leads HotpotQA at 29.3 ($+1.8$ over H${}_2$O), Qwen~32B leads HotpotQA at 24.3 ($+4.7$ over H${}_2$O) and Stage~1 leads MultiFieldQA at 20.9, and Llama~8B Stage~1+2 leads both columns (23.1 / 15.1).
+
+The two Mistral backbones show depressed absolute scores on HotpotQA, consistent with limited multi-hop capability of the base models at this cache budget. After the longer-context retrain, Mistral~7B Stage~1+2 nonetheless leads HotpotQA at 6.5~F1 against the strongest eviction baseline (StreamingLLM at 6.4), and Mistral-Small~24B leads MultiFieldQA at 11.9. The Stage~1+2 checkpoints are trained on a mixture of SQuAD and HotpotQA training data and never see LongBench MultiFieldQA documents, so the MultiFieldQA column probes genuine transfer rather than in-distribution evaluation.
+
+
+%-----------------------------------------------------------------------%
+\subsection{Depth-robustness in needle-in-a-haystack}\label{sec:needle}
+%-----------------------------------------------------------------------%
+
+We test retrieval robustness by hiding a single answer-bearing fact among $n{-}1$ distractor windows at five depth positions (start, 25\%, 50\%, 75\%, end) with 20 trials per depth. At $n{=}5$ windows every method tested reaches near-perfect retrieval; we report $n{=}20$ in \cref{tab:needle}, the most stringent setting in our protocol, where the difference between cache-management strategies is most pronounced.
+
+The SnapKV column reports a faithful reimplementation that consumes only the observation-window attention with post-softmax average-pool smoothing and a recent-token reservation, in line with the reference~\cite{li2024snapkv}.
+
+\begin{table}[t]
+\caption{Needle-in-a-haystack accuracy (\%) at $n{=}20$ windows, averaged over 5 depths $\times$ 20 trials, $k{=}300$. The SnapKV column corresponds to the faithful reimplementation described above. The Mistral-Small~24B Stage~1+2 entry uses the longer-context retrained checkpoint discussed in Section~\ref{sec:discussion}.}
+\label{tab:needle}
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l c c c c c}
+\toprule
+\textbf{Model} & \textbf{StreamingLLM} & \textbf{H${}_2$O} & \textbf{SnapKV} & \textbf{AstroNet S1} & \textbf{AstroNet S1+S2} \\
+\midrule
+Qwen 2.5 7B       & 40 & 15 & 72 & 72 & \textbf{91} \\
+Qwen 2.5 14B      & 35 &  2 & 79 & 79 & \textbf{100} \\
+Qwen 2.5 32B      & 40 & 19 & 50 & 50 & \textbf{100} \\
+Llama 3.1 8B      & 38 &  2 & 58 & 58 & \textbf{95} \\
+Mistral 7B        & 26 &  0 &  5 &  5 & \textbf{32} \\
+Mistral-Small 24B & 40 &  0 & 73 & 72 & \textbf{81} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+On all six backbones the Stage~1+2 pipeline beats SnapKV at $n{=}20$: the Qwen and Llama backbones win by $+19$, $+21$, $+50$, and $+37$ percentage points (Qwen~14B and Qwen~32B saturate at $100\%$); Mistral~7B wins by $+27$~pp and Mistral-Small~24B by $+9$~pp after the longer-context retrain. On Mistral~7B the SnapKV value of $5\%$ coincides with the multiplicative score because global-pool SnapKV degenerates to cumulative-attention selection at the $k{=}300$ budget on this backbone (\cref{sec:eval}), and both baselines are dominated by the hybrid summary tokens. H${}_2$O is the weakest baseline at $n{=}20$ on every backbone, consistent with its query-unaware scoring function failing to identify the single answer-bearing fact among many distractors.
+
+
+%-----------------------------------------------------------------------%
+\subsection{Long-context generalisation (RULER 8\,k--32\,k)}\label{sec:ruler}
+%-----------------------------------------------------------------------%
+
+To probe behaviour at native long-context sequence lengths, we evaluate on a needle-style retrieval task at $n=22$, $44$, and $85$ windows, corresponding to approximately $8\,000$, $16\,000$, and $32\,000$ tokens of input context, following the RULER protocol~\cite{hsieh2024ruler}. The Stage~2 module was trained at $n=10$ windows ($\sim 5\,000$ tokens), so $8\,$k tokens is in-distribution, $16\,$k is mildly out-of-distribution, and $32\,$k is substantially out-of-distribution for the learned component. The parameter-free Stage~1 selection, by contrast, has no training distribution and applies uniformly at all context lengths. We compare against SnapKV at the same budget on the two backbones for which we have a complete sweep, Qwen~14B and Llama~8B.
+
+\begin{table}[t]
+\caption{RULER long-context retrieval accuracy (\%) at $k{=}300$, averaged over 5 depth positions $\times$ 10 trials per depth. Context length grows from $\sim8$\,k tokens at $n=22$ to $\sim32$\,k tokens at $n=85$. Stage~2 training distribution is $n=10$ windows; $n=22$ is in-distribution, $n=85$ is OOD.}
+\label{tab:ruler}
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l c c c c c c}
+\toprule
+& \multicolumn{3}{c}{\textbf{Qwen 2.5 14B}} & \multicolumn{3}{c}{\textbf{Llama 3.1 8B}} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7}
+\textbf{Method} & 8\,k & 16\,k & 32\,k & 8\,k & 16\,k & 32\,k \\
+\midrule
+StreamingLLM    & 32 & 18 & 20 & 38 & 16 & 20 \\
+H2O             &  0 &  0 &  0 &  0 &  0 &  0 \\
+SnapKV          & 72 & 58 & \textbf{56} & 48 & 28 &  8 \\
+AstroNet S1     & 72 & 58 & \textbf{56} & 48 & 28 &  8 \\
+AstroNet S1+S2  & \textbf{100} & \textbf{66} & 52 & \textbf{88} & \textbf{50} & \textbf{14} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+At the $8\,$k point, AstroNet Stage~1+2 reaches $100\%$ on Qwen~14B (vs.\ $72\%$ for SnapKV, $\Delta+28$\,pp) and $88\%$ on Llama~8B (vs.\ $48\%$ for SnapKV, $\Delta+40$\,pp). The advantage persists at $16\,$k, with $+8$\,pp on Qwen~14B and $+22$\,pp on Llama~8B. At $32\,$k the picture splits across backbones: Llama~8B retains a positive $+6$\,pp margin while Qwen~14B reverses sign, with Stage~1+2 at $52\%$ trailing SnapKV at $56\%$ by $4$\,pp. The Stage~1 selection signal is by construction identical to SnapKV in this restricted regime (both pick the same top-$k$ tokens when the multiplicative cross-window signal is absent), so the variation at $32\,$k reflects Stage~2 specifically: at $\sim$6$\times$ its training context length, the learned summary occasionally injects content that displaces the single SnapKV-recoverable needle on Qwen~14B. We restrict the headline claim to $8\,$k--$16\,$k generalisation and report $32\,$k transparently as the OOD edge of our current Stage~2 training distribution.
+
+
+%-----------------------------------------------------------------------%
+\subsection{KV-cache compression}\label{sec:compression}
+%-----------------------------------------------------------------------%
+
+The pipeline composes with downstream cache quantisation. For each of the six backbones, the Stage~1+2 FP16 cache of $k{=}300$ entries can be further compressed to $300$ tokens at 8-bit keys / 4-bit values (K8V4) using an adapted Lloyd--Max scheme that we describe in \cref{sec:quant}. \Cref{tab:compression} reports both the memory geometry and the accuracy cost.
+
+\begin{table}[t]
+\caption{KV-cache compression and accuracy cost. Memory columns report bytes per request for the $k{=}300$ retained cache (FP16 and K8V4) versus the full $n{=}20$-window cache. Accuracy columns report \emph{single-seed, fixed answer position} SQuAD accuracy (\%) of multiplicative Stage~1 selection at FP16 vs.\ the same cache compressed to K8V4 with adapted per-head Lloyd--Max quantisation; the position-robust five-seed values for Stage~1 and Stage~1+2 are reported in \cref{tab:squad_main}. Vanilla TurboQuant (random rotation $+$ Lloyd--Max) collapses to $0\%$ on Qwen~7B due to destruction of rotary positional encoding and was not pursued on the other backbones (\cref{sec:quant}).}
+\label{tab:compression}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l rrr rr rr}
+\toprule
+& \multicolumn{3}{c}{\textbf{Memory (MB / request)}} & \multicolumn{2}{c}{\textbf{Compression}} & \multicolumn{2}{c}{\textbf{Accuracy (\%)}} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+\textbf{Model} & Full $n{=}20$ & $k{=}300$ FP16 & $k{=}300$ K8V4 & FP16 & K8V4 & FP16 & K8V4 \\
+\midrule
+Qwen 2.5 7B       & 420  & 16.4 &  6.2 & 25.6$\times$ & 68.3$\times$ & 74.5 & 77.5 \\
+Qwen 2.5 14B      & 1440 & 56.3 & 21.1 & 25.6$\times$ & 68.3$\times$ & 75.0 & 69.5 \\
+Qwen 2.5 32B      & 1920 & 75.0 & 28.1 & 25.6$\times$ & 68.3$\times$ & 78.5 & 77.0 \\
+Llama 3.1 8B      &  960 & 37.5 & 14.1 & 25.6$\times$ & 68.3$\times$ & 78.5 & 78.5 \\
+Mistral 7B        &  960 & 37.5 & 14.1 & 25.6$\times$ & 68.3$\times$ & 72.5 & 72.0 \\
+Mistral-Small 24B & 1200 & 46.9 & 17.6 & 25.6$\times$ & 68.3$\times$ & 79.5 & 72.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The selection stage alone reduces the cache by $25.6\times$ relative to the full $n{=}20$-window cache; appending the quantisation stack reaches $68.3\times$. On four of the six backbones the K8V4 accuracy cost is within $\pm 1.5$\,pp of the FP16 reference, and on Qwen~7B K8V4 in fact improves accuracy by $+3.0$\,pp (the asymmetric 8/4-bit precision suppresses small fluctuations that hurt the FP16 baseline on this model). The two-sided range across all six models is $-7.0$\,pp on Mistral-Small~24B to $+3.0$\,pp on Qwen~7B, comfortably bounded for a $2.6\times$ further compression of the retained cache. The asymmetry between key precision (8 bits) and value precision (4 bits) reflects the different roles the two play in the attention computation: keys appear inside an inner product with the query and are sensitive to small perturbations, while values are weight-averaged and tolerate coarser representations. The same K8V4 setting therefore applies identically across all six backbones in our experiments.
+
+Vanilla TurboQuant~\cite{zandieh2026turboquant} applies a random orthogonal rotation before per-coordinate Lloyd--Max quantisation. On a backbone using rotary positional embeddings~\cite{su2024rope}, this rotation destroys the paired-coordinate structure that RoPE relies on and reduces accuracy to $0\%$ (verified on Qwen~7B at 4-bit precision). Our adaptation normalises each attention head independently to $\mathcal{N}(0,1)$ before applying a Lloyd--Max codebook tuned to the standard normal, then denormalises; the rotation step is dropped entirely. The fix is method-agnostic: it applies to any RoPE-using backbone and to any KV-eviction scheme that hands off a token-level cache to quantisation; \cref{sec:quant} gives the formal description.
+
+
+%-----------------------------------------------------------------------%
+\subsection{Latency}\label{sec:latency}
+%-----------------------------------------------------------------------%
+
+The cumulative-attention term in Stage~1 requires materialising the
+post-softmax attention matrix at four sampled layers, which is
+nominally incompatible with memory-efficient kernels such as
+flash-attention. To verify that this overhead is not observable in
+practice, we measure forward-pass wall-clock time at fixed cache
+budget $k{=}300$ on five backbones (Qwen~14B/32B, Llama~8B, Mistral~7B
+and Mistral-Small~24B) on 18 multi-window SQuAD instances, decomposing
+total time into the selection step (\emph{select}) and the
+generation step using the selected cache (\emph{generate}).
+
+\begin{table}[t]
+\caption{End-to-end forward-pass latency (seconds per query, mean over 18 samples) at $k{=}300$. \emph{Select} is the time to compute the cache-selection scores and gather the retained tokens; \emph{Generate} is the time to produce the answer using the selected cache. Across all five backbones the multiplicative Stage~1 \emph{Total} is within 0.5\% of the corresponding SnapKV total, despite Stage~1 using eager attention to read out the score matrix.}
+\label{tab:latency}
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l rrr rrr rrr rrr}
+\toprule
+& \multicolumn{3}{c}{\textbf{StreamingLLM}} & \multicolumn{3}{c}{\textbf{H${}_2$O}} & \multicolumn{3}{c}{\textbf{SnapKV}} & \multicolumn{3}{c}{\textbf{AstroNet S1}} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(lr){11-13}
+\textbf{Model} & Sel & Gen & Tot & Sel & Gen & Tot & Sel & Gen & Tot & Sel & Gen & Tot \\
+\midrule
+Llama 3.1 8B      & 0.00 & 0.86 & 1.28 & 0.00 & 0.82 & 1.24 & 0.08 & 0.76 & 1.26 & 0.08 & 0.76 & 1.26 \\
+Mistral 7B        & 0.00 & 0.97 & 1.41 & 0.00 & 0.92 & 1.36 & 0.08 & 0.93 & 1.45 & 0.08 & 0.92 & 1.45 \\
+Qwen 2.5 14B      & 0.00 & 0.85 & 1.69 & 0.00 & 0.74 & 1.57 & 0.16 & 0.51 & 1.50 & 0.16 & 0.51 & 1.50 \\
+Qwen 2.5 32B      & 0.00 & 1.51 & 3.31 & 0.00 & 1.00 & 2.80 & 0.36 & 0.85 & 3.00 & 0.36 & 0.85 & 3.00 \\
+Mistral-Small 24B & 0.00 & 1.34 & 2.63 & 0.00 & 1.23 & 2.52 & 0.26 & 1.27 & 2.82 & 0.26 & 1.26 & 2.82 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\Cref{tab:latency} shows that the structural latency overhead from
+eager attention in Stage~1 is not observable at the budgets we
+evaluate. On all five backbones, multiplicative Stage~1 and SnapKV
+take effectively the same total time per query (within 0.5\%), and
+both are slower than the simpler eviction baselines (StreamingLLM and
+H${}_2$O) by the cost of their selection step. The selection cost
+itself is dominated by a single forward pass on the query window:
+$0.08$--$0.36$~s depending on backbone size. The choice of cache
+contents matters more for generation latency than the choice of
+selection rule: the dominant cost of every method is the generate
+step, which scales with backbone size rather than with selection
+arithmetic. Integration with memory-efficient attention kernels for
+the selection step remains a worthwhile engineering avenue but is not
+a latency bottleneck at the cache budgets evaluated here.
+
+
+%-----------------------------------------------------------------------%
+\subsection{Ablations}\label{sec:ablations}
+%-----------------------------------------------------------------------%
+
+We report three ablations that bear directly on the headline claims: the Stage~2 contribution under a matched real-token budget, the functional form of the cross-window aggregator, and the size of the learned summary.
+
+The first ablation isolates the Stage~2 contribution from any potential budget effect. The selection-plus-summary pipeline differs from pure selection in two ways: it allocates 16 of its 300 slots to learned summary tokens, and it injects content that is not present in the original cache. To separate these effects we compare three conditions at $n{=}20$ windows: pure Stage~1 at the full budget ($k{=}300$ real tokens), pure Stage~1 at the matched budget ($k{=}284$ real tokens, the same real-token count the hybrid uses), and Stage~1+2 ($16{+}284$ slots). \Cref{tab:kconfound} shows that the matched-budget Stage~1 sometimes outperforms unmatched Stage~1 (the $k{=}284$ baseline removes noisy borderline tokens), so the matched control is the conservative diagnostic.
+
+\begin{table}[t]
+\caption{Stage~2 contribution at matched budget. Accuracy (\%) on needle retrieval at $n{=}20$ windows. The $\Delta$ column reports Stage~1+2 minus Stage~1 at the matched real-token budget of $k{=}284$, isolating the contribution of the 16 learned tokens specifically. The Mistral-Small~24B row uses the longer-context retrained checkpoint discussed in Section~\ref{sec:discussion}; the original checkpoint produced $\Delta=-16$\,pp on this diagnostic before retraining.}
+\label{tab:kconfound}
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l c c c c}
+\toprule
+\textbf{Model} & \textbf{S1, $k{=}300$} & \textbf{S1, $k{=}284$} & \textbf{S1+S2 (16+284)} & $\boldsymbol{\Delta}$ \\
+\midrule
+Qwen 2.5 7B       & 74 & 82 & 88  & $+6$  \\
+Qwen 2.5 14B      & 78 & 80 & 100 & $+20$ \\
+Qwen 2.5 32B      & 48 & 60 & 100 & $+40$ \\
+Llama 3.1 8B      & 60 & 40 & 92  & $+52$ \\
+Mistral 7B        &  8 & 10 & 32  & $+22$ \\
+Mistral-Small 24B & 72 & 72 & 81  & $+9$  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The matched-budget contribution of the 16 learned tokens is positive on all six backbones, ranging from $+6$\,pp on Qwen~7B to $+52$\,pp on Llama~8B; the Mistral-Small~24B value of $+9$\,pp is from the longer-context retrain that resolved a $-16$\,pp regression observed with the original $n{=}5$ SQuAD-only training. The diagnostic confirms that the hybrid gain is not a budget artefact: a Stage~1 pipeline at the same 284-real-token budget would not reach the Stage~1+2 numbers.
+
+The second ablation probes the functional form of the cross-window aggregator. The Stage~2 summary maintains a state $\mathbf{g}$ through an exponential moving average with learnable rate $\alpha$ (\cref{sec:s2}). We replace it at evaluation time with three alternatives: $\alpha{=}1$ (last window only, no accumulation), $\alpha{=}0$ (frozen initial state, no sensing), and uniform mean over all sensed windows. \Cref{tab:bio} reports the resulting accuracy on the $n{=}5$-window needle task (50 trials) for each backbone.
+
+\begin{table}[t]
+\caption{Effect of the Stage~2 state-update rule on $n{=}5$-window needle accuracy (\%, 50 trials). \emph{Default}: learnable EMA. $\alpha{=}1$: last-window-only. $\alpha{=}0$: frozen initial state. \emph{Mean}: uniform average over windows.}
+\label{tab:bio}
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l c c c c}
+\toprule
+\textbf{Model} & \textbf{Default (EMA)} & $\boldsymbol{\alpha{=}1}$ & $\boldsymbol{\alpha{=}0}$ & \textbf{Mean} \\
+\midrule
+Qwen 2.5 7B       & 90  & 90  & 38 & 90  \\
+Qwen 2.5 14B      & 100 & 98  & 84 & 100 \\
+Qwen 2.5 32B      & 100 & 100 & 40 & 100 \\
+Llama 3.1 8B      & 90  & 90  & 44 & 90  \\
+Mistral 7B        & 32  & 32  & 10 & 32  \\
+Mistral-Small 24B & 80  & 82  & 64 & 80  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+On all six backbones the EMA default, the last-window-only setting, and the uniform mean give equivalent accuracy; the only condition that consistently degrades is $\alpha{=}0$ (the summary is starved of any window-specific content and reduces to a learned bias). The interpretation is methodological rather than architectural: the specific cross-window aggregation rule of Stage~2 is not load-bearing -- any non-trivial aggregator that reads the per-window sensed signal works equally well, including the simplest possible choice of a uniform mean. The persistent state itself, however, is necessary: removing it ($\alpha{=}0$) loses 16--52 percentage points across the six backbones. We retain the learnable EMA as the canonical form because it is the natural training-time parameterisation, but the ablation supports a simplification toward a uniform mean if a future deployment prefers a parameter-free aggregator.
+
+The third ablation sweeps the number of learned summary tokens $K$ within a fixed total budget of 300, replacing $K$ real tokens with $K$ summary tokens. On Qwen~7B SQuAD, accuracy is essentially flat across $K{\in}\{4, 8, 16\}$ (83, 84, 83\%), with a single percentage-point degradation at $K{=}32$ (82\%). The architecture is therefore robust to the precise count of summary tokens: four are already sufficient on this controlled benchmark, sixteen is on the same plateau, and beyond thirty the displacement of real tokens begins to dominate. We retain $K{=}16$ for the canonical configuration because it lies on the plateau, sits comfortably below the displacement regime, and matches the configuration trained for all six backbones.

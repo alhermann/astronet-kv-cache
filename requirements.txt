@@ -1,0 +1,29 @@
+# AstroNet runtime requirements.
+#
+# Tested with Python 3.8.10 on Linux + CUDA 11.8.
+# Install PyTorch matching your CUDA toolchain first, e.g.:
+#   pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cu118
+# then `pip install -r requirements.txt`.
+
+torch>=2.1
+transformers>=4.46,<5.0
+accelerate>=0.30
+bitsandbytes>=0.43
+sentencepiece
+protobuf
+
+# Datasets / tokenizers
+datasets>=2.16
+tokenizers>=0.20
+
+# Numerics / IO
+numpy
+pyyaml
+tqdm
+
+# Evaluation utilities
+scikit-learn
+
+# Optional: plotting / paper figures
+matplotlib
+seaborn

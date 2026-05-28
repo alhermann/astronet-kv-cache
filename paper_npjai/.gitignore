@@ -1,0 +1,7 @@
+*.aux
+*.bbl
+*.blg
+.env
+*.log
+*.out
+_overleaf_remote/

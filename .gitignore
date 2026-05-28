@@ -1,0 +1,111 @@
+# -----------------------------------------------------------------------------
+# AstroNet .gitignore
+# -----------------------------------------------------------------------------
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+*.egg
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# --- Virtual environments ---
+venv/
+.venv/
+env/
+.env/
+ENV/
+
+# --- Editor / OS ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- Secrets ---
+.env
+.env.*
+*.key
+*.pem
+secrets.*
+*credentials*
+
+# --- Large model artefacts (downloaded separately, NOT committed) ---
+# Match both directories and symlinks pointing elsewhere on disk.
+models
+models/
+checkpoints
+checkpoints/
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+*.gguf
+
+# --- Datasets / cached HF data ---
+data/cache/
+data/hf_cache/
+data/raw/
+*.parquet
+*.arrow
+.cache/
+.huggingface/
+
+# --- Logs ---
+logs/
+*.log
+wandb/
+runs/
+tb_runs/
+
+# --- Build artefacts ---
+*.zip
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.pdf
+*.aux
+*.bbl
+*.blg
+*.toc
+*.out
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# --- Claude Code / project state ---
+.claude/
+PLAN_PRIVATE.md
+NOTES_PRIVATE.md
+
+# --- Archived experiments and paper drafts ---
+archive/
+paper/
+paper_npjai/_overleaf_remote/
+paper_npjai/main.pdf
+paper_npjai/user-manual.pdf
+paper_npjai/figs/*.aux
+paper_npjai/figs/*.log
+
+# --- Project-specific drafts/notes that may contain personal context ---
+PAPER_NOTES.md
+PLAN.md
+docs/checkpoints/
+docs/logs/
+docs/project_log.*
+
+# --- Symlinks (defensive — even if path changes) ---
+# models and checkpoints are symlinks on the development machine

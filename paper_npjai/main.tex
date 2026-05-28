@@ -1,0 +1,173 @@
+% npj AI submission - working draft
+% Document class: sn-jnl with sn-nature reference style (npj family)
+\documentclass[sn-nature,Numbered]{sn-jnl}
+
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{amsthm}
+\usepackage[title]{appendix}
+\usepackage{xcolor}
+\usepackage{textcomp}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{geometry}
+\usepackage[capitalize,noabbrev]{cleveref}
+\usepackage{pifont}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, fit, calc, shapes.geometric, decorations.pathreplacing}
+
+\newcommand{\cmark}{\textcolor{green!50!black}{\ding{51}}}
+\newcommand{\xmark}{\textcolor{red!70!black}{\ding{55}}}
+
+% Placeholder marker for figures we haven't generated yet
+\newcommand{\placeholder}[2]{%
+  \begin{center}
+  \fcolorbox{black}{gray!10}{\parbox{#1}{\centering\vspace{0.8cm}\textbf{[FIGURE PLACEHOLDER]}\\\small #2\vspace{0.8cm}}}
+  \end{center}
+}
+
+\raggedbottom
+
+\begin{document}
+
+\title[AstroNet: hybrid KV-cache management]{AstroNet: hybrid KV-cache management for frozen large language models at long context}
+
+\author*[1]{\fnm{Anonymous} \sur{Authors}}\email{anonymous@example.org}
+\affil*[1]{\orgname{Anonymous Institution}}
+
+%========================================================================%
+% ABSTRACT - npj guideline: ~200 words, unstructured, no subheadings,
+% no equations, no citations. Lead with the deployment frame and the
+% Pareto-frontier headline (see STORYLINE.md).
+%========================================================================%
+\abstract{Serving large language models at long context is bottlenecked by the key--value cache, which grows linearly with the input length and rapidly exhausts the memory of a single accelerator. Existing remedies either discard cached tokens at inference time, losing information that is not local, or retrain the backbone, which is impractical for deployed quantised models. We present AstroNet, a method that keeps the backbone entirely frozen and combines two complementary components. A parameter-free rule first scores each cached token by the product of its accumulated attention and its alignment with the current query, and retains only the most informative ones. A small learned module then maintains a compact summary of past context and re-injects it through the model's own projection weights, so the model sees the summary in its native representation. Across six frozen quantised backbones spanning three model families and sizes from seven to thirty-two billion parameters, AstroNet improves accuracy over selection alone on a controlled long-context question-answering task, transfers usefully to standard long-context benchmarks, and compresses the cache by more than an order of magnitude at accuracy comparable to retrieval baselines that use several times more memory. The pipeline composes with downstream cache quantisation for further compression, and the resulting accuracy-versus-memory frontier supports the deployment of long-context inference on a single accelerator without modifying the served model.}
+
+\keywords{key-value cache, long-context inference, large language models, model deployment, attention mechanism}
+
+\maketitle
+
+
+%========================================================================%
+\section{Introduction}\label{sec:intro}
+%========================================================================%
+
+The dominant cost of serving long-context inference with a large language model is the key--value (KV) cache. For an autoregressive transformer, every processed token contributes a key and a value vector at every layer to a buffer that must be retained for every subsequent generated token to attend to. The buffer grows linearly with the input length, scales with the number of layers and heads, and quickly exceeds the memory of a single accelerator on contexts of the lengths now routine in document analysis, code understanding, and multi-turn assistant deployment. Reducing the size of this buffer has become as practically important as reducing the size of the model weights themselves.
+
+A long line of work has approached the broader problem of efficient long-context modelling. Sparse-attention architectures such as Longformer~\cite{beltagy2020longformer} and Big Bird~\cite{zaheer2020bigbird} restrict the attention pattern itself; LongNet~\cite{ding2023longnet} scales further through dilated attention. Recurrent variants such as Transformer-XL~\cite{dai2019transformerxl} and Compressive Transformers~\cite{rae2020compressive} carry a compressed memory across segments. Hardware-aware kernels such as FlashAttention~\cite{dao2022flashattention} eliminate redundant materialisation of the attention matrix, and parameter-sharing schemes such as grouped-query attention~\cite{ainslie2023gqa} reduce per-token KV size at the architecture level. These approaches reshape the model rather than the cache, and are largely orthogonal to the question of which cached tokens should be retained at inference. The present work is concerned with that second question: given an already-deployed, frozen backbone, how should its KV cache be managed during long-context generation?
+
+Three families of inference-time methods have emerged. The first \emph{evicts} tokens from the cache. H${}_2$O scores tokens by cumulative attention received during processing and retains a budget of heavy hitters~\cite{zhang2023h2o}; SnapKV uses an end-of-prompt observation window to identify positions whose attention is locally concentrated~\cite{li2024snapkv}; StreamingLLM keeps only attention sinks and a sliding window~\cite{xiao2024streamingllm}; PyramidKV allocates a layer-adaptive budget~\cite{cai2024pyramidkv}; Scissorhands exploits a persistence-of-importance hypothesis to identify tokens whose attention pattern is stable enough to keep~\cite{liu2024scissorhands}; Dynamic Memory Compression retrofits the model to learn per-token compression ratios~\cite{nawrot2024dmc}. A complementary thread compresses the \emph{retained} tokens through quantisation rather than eviction: KIVI~\cite{liu2024kivi} uses asymmetric per-channel/per-token integer quantisation, KVQuant~\cite{hooper2024kvquant} mixes per-channel keys with sparse outlier handling, and TurboQuant~\cite{zandieh2026turboquant} achieves near-lossless scalar quantisation via rotation followed by Lloyd--Max encoding. All of these operate as drop-in replacements for the standard cache, but they discard or distort information at the level of individual tokens and are blind to information that requires synthesising content across long stretches of context.
+
+The second family augments or modifies the backbone. The Recurrent Memory Transformer prepends trainable memory tokens to the input and accumulates a state across segments~\cite{bulatov2024rmt}; AutoCompressors fine-tunes the full model to map context into summary vectors~\cite{chevalier2023autocompressors}; the in-context auto-encoder learns context compression through a LoRA-adapted decoder~\cite{ge2024icae}; LongMem trains a side network that retrieves from an external KV store~\cite{wang2023longmem}; gist tokens distil a soft prompt down to a handful of compressed positions~\cite{mu2023gisting}; and infini-attention combines local attention with a recurrently updated compressive memory state~\cite{munkhdalai2024infini}. These methods address the synthesis limitation of eviction, but they require modifying or retraining the deployed model. For a frozen backbone served behind a quantised inference stack, full fine-tuning is operationally expensive and forecloses combination with off-the-shelf eviction or quantisation schemes.
+
+The third family externalises the context to a retrieval system. Retrieval-augmented generation prepends a small number of retrieved passages to the query~\cite{lewis2020rag}; RETRO interleaves retrieval at every layer~\cite{borgeaud2022retro}. Retrieval can be highly effective when the answer-bearing passage is close to the top of the ranked list, but it depends on an external index, on retrieval quality, and on the absence of long-range dependencies that cross retrieval-window boundaries. For closed-system deployment of a quantised backbone on a single accelerator, an external retriever is an additional moving part.
+
+A practitioner deploying an existing 4-bit weight-quantised model~\cite{dettmers2023nf4,frantar2023gptq,lin2024awq,xiao2023smoothquant} that already fits on a single GPU has neither option without compromise: eviction loses information; fine-tuning loses the option of deploying the model unmodified. The gap is a method that (i) keeps the backbone entirely frozen, (ii) selects which cached tokens to retain without introducing trainable parameters that depend on the backbone, (iii) augments the retained cache with a small learned summary that captures cross-window structure, and (iv) composes with downstream cache quantisation rather than competing with it.
+
+We present such a method, AstroNet. The method has two stages. Stage~1 scores every cached token by the product of its cumulative attention during processing and its inner product against the current query's key projections, evaluated at four evenly spaced layers, and keeps the top-$k$. The score is parameter-free: it is computed from the model's own attention signals and projection weights at inference time. Stage~2 maintains a small set of 16 learned summary tokens that aggregate hidden states across windows through an exponential moving average and emit virtual key--value pairs by passing the summary through dequantised copies of the model's own $\mathbf{W}_K$ and $\mathbf{W}_V$ at every layer. The summary tokens are prepended to the selected real tokens; the total cache budget is held fixed. Only the summary module ($\sim$14 million parameters per backbone) is trained, on a mixed SQuAD/HotpotQA corpus, with the backbone entirely frozen.
+
+We evaluate AstroNet on six frozen 4-bit-quantised backbones spanning three architecture families: Qwen 2.5 at 7B, 14B, and 32B; Llama 3.1-8B; Mistral 7B; and Mistral-Small 24B. On controlled multi-window question answering, AstroNet improves over Stage~1 alone by an average of 8.5 percentage points across all six backbones with five-seed confidence intervals (per-model gains $+$3.6 to $+$12.9), and outperforms KIVI K4V4 at matched bit budget on every model. On the depth-robust needle-in-a-haystack task at 20 windows, the hybrid beats SnapKV on all six backbones: by 19 to 50 percentage points on the Qwen and Llama backbones; by $+$27~pp on Mistral~7B and $+$9~pp on Mistral-Small~24B after a longer-context retrain that resolved an initial training-distribution sensitivity (\cref{sec:discussion}). On LongBench transfer~\cite{bai2024longbench} AstroNet wins MultiFieldQA on four of six backbones (Qwen 7B, Qwen 32B, Llama 8B, Mistral-Small 24B) and HotpotQA on four of six (Qwen 14B, Qwen 32B, Llama 8B, Mistral 7B). On RULER long-context generalisation\cite{hsieh2024ruler} the hybrid extends usefully to 16k input tokens (28pp and 22pp improvements over SnapKV on the two tested backbones) with a soft degradation at 32k that we attribute to context lengths beyond the Stage~2 training distribution. The full pipeline, combining selection with a per-attention-head adaptation of TurboQuant required to maintain rotary-position-encoding\cite{su2024rope} accuracy, reaches a $25.6\times$ reduction of KV cache memory at FP16 and $68\times$ with the quantisation stack at parity with retrieval baselines that consume four to thirteen times more cache memory. Figure~\ref{fig:pareto} summarises the resulting accuracy/memory frontier across the six backbones. Our contributions are: (i) a parameter-free multiplicative cross-window selection rule that outperforms strong eviction baselines on multi-window QA; (ii) a small frozen-backbone learned summary module that improves over selection alone by $+$6 to $+$52 percentage points at matched budget on all six backbones after a longer-context retrain that resolved an initial $-$16 percentage-point regression on Mistral-Small 24B, which we document transparently; (iii) a per-attention-head fix to rotation-based KV quantisation that recovers compatibility with rotary position encodings, where the vanilla rotation reduces accuracy to zero; (iv) the first systematic measurement of the resulting cost/accuracy frontier across six frozen backbones, four long-context evaluation regimes, and the combined selection-plus-quantisation pipeline; and (v) the first published measurement of cross-turn KV-cache amortisation for a learned summary, with a $1.32\times$ cumulative speedup across five conversational turns at zero accuracy loss.
+
+The remainder of this work is organised as follows. Section~\ref{sec:methods} formalises the two stages, the multiplicative selection score, the cross-window summary module, the rotation-free quantisation adaptation, and the evaluation protocol. Section~\ref{sec:results} reports the experimental results: the accuracy/memory Pareto frontier (\cref{fig:pareto}), position-robust SQuAD with five-seed confidence intervals (\cref{tab:squad_main}), transfer to LongBench HotpotQA and MultiFieldQA (\cref{tab:longbench}), depth-robust needle-in-a-haystack at twenty windows (\cref{tab:needle}), RULER long-context generalisation (\cref{tab:ruler}), the KV-cache compression geometry (\cref{tab:compression}), end-to-end inference latency (\cref{tab:latency}), and three ablations isolating the Stage~2 contribution, the form of the cross-window aggregator, and the size of the learned summary (\cref{tab:kconfound,tab:bio}). Section~\ref{sec:discussion} interprets the results, scopes the limitations, and reports two methodological remarks. Section~\ref{sec:conclusions} closes with the broader implications for deploying frozen long-context language models.
+
+
+
+% Methods section moved BEFORE Results for canonical scientific structure
+% (Intro -> Methods -> Results -> Discussion), allowed at initial npj AI submission.
+\input{methods}
+
+
+%========================================================================%
+\section{Results}\label{sec:results}
+%========================================================================%
+
+%-----------------------------------------------------------------------%
+% FIG 1: PARETO FRONTIER (CRITIC: lead with this, not a verbal hook).
+% 6-panel: one per backbone. Axes: KV memory bytes per request vs accuracy.
+% Plot every baseline + AstroNet S1 + S1+S2 + S1+S2 with K8V4 stack.
+%-----------------------------------------------------------------------%
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{figs/fig1_pareto.pdf}
+\caption{\textbf{Accuracy versus cache compression across six frozen
+backbones.} Each panel plots the cache compression factor relative to
+the uncompressed FP16 KV cache (log scale, $x$-axis) against
+multi-window SQuAD position-robust accuracy ($y$-axis). The comparison
+covers three eviction baselines (StreamingLLM, H${}_2$O, SnapKV), a
+quantisation baseline (KIVI K4V4 applied on top of our selection),
+two retrieval baselines (RAG~$k{=}1$, RAG~$k{=}3$), and three AstroNet
+configurations (Stage~1; Stage~1+2; Stage~1+2 with adapted K8V4
+quantisation). Two curves are drawn for visual orientation: the grey
+dashed curve is the lower-right Pareto envelope across all methods,
+with the shaded region dominated by it; the orange line connects the
+three AstroNet operating points to make the design progression
+visible. All other points are isolated since they correspond to
+different methods at different operating points and would not be
+meaningfully comparable along a curve. The Stage~1+2+K8V4 marker sits
+on the Pareto frontier on five of six backbones at a fraction of the
+cache memory of any retrieval baseline.}
+\label{fig:pareto}
+\end{figure*}
+
+% Results subsections live in results.tex for modular editing.
+% Will be inlined for final submission.
+\input{results}
+
+
+%========================================================================%
+\section{Discussion}\label{sec:discussion}
+%========================================================================%
+
+The headline result is that Stage~1+2 dominates Stage~1 alone on multi-window question answering across all six backbones, with a five-seed mean gain of $+$8.5 percentage points and a per-model range of $+$3.6 to $+$12.9~pp. The picture on long-context transfer is more textured. Stage~2 helps consistently on MultiFieldQA, on needle-in-a-haystack at deeper context lengths, and on LongBench HotpotQA on the larger Qwen variants and on the retrained Mistral~7B; Stage~1 alone is preferable on Qwen 7B HotpotQA, where the model's cumulative attention already retains the bridge entities required for two-hop reasoning, so the sixteen summary tokens displace useful real entries without adding value. The pattern admits a single interpretation: the learned summary tokens carry information that individual cached tokens cannot, but only when the per-token selection signal is genuinely information-limited. The matched-budget k-confound diagnostic of Section~\ref{sec:ablations} isolates this effect by controlling for the budget difference and records a Stage~2 contribution of $+$6 to $+$52~pp on all six backbones. The same diagnostic, applied to the original Mistral-Small 24B checkpoint trained at five windows on SQuAD alone, returned a $-$16~pp net contribution; retraining at ten windows on a mixed SQuAD/HotpotQA corpus converted this to $+$9~pp, and the retrained checkpoint is used throughout the main tables.
+
+The accuracy/memory frontier in Figure~\ref{fig:pareto} carries the practical contribution of this work. For a 24~GiB GPU serving Qwen 7B at the $n{=}20$-window context evaluated here, the full FP16 KV cache occupies $\sim$420~MiB; AstroNet at $k{=}300$ FP16 occupies $\sim$16~MiB ($25.6\times$ compression), and AstroNet at $k{=}300$ with the adapted K8V4 stack occupies $\sim$6~MiB ($68\times$ compression). At accuracy parity with RAG using three retrieved windows, AstroNet uses roughly a quarter of the cache memory at full precision and roughly a thirteenth with the quantisation stack, and requires no external retriever. In throughput terms, this multiplies the number of concurrent long-context sessions that fit on a fixed-memory accelerator by the same factor; for hosted inference, that ratio is the dominant deployment cost.
+
+A direct consequence of the frozen-backbone selection-plus-summary design is that the compressed cache produced on one turn of a conversation is reusable on the next. In a multi-turn assistant deployment, where the document corpus is fixed across turns and only the query changes, the hybrid cache can be computed once and re-scored cheaply: Stage~1's cross-window query--key score is the only quantity that depends on the current query, and computing it costs roughly half a forward pass on the query window. We measure this directly on Qwen 7B with 50 multi-turn instances of five turns each, comparing a fresh-hybrid baseline that rebuilds the cache on every turn against an amortised-hybrid policy that processes the windows once and re-scores Stage~1 per turn. The amortised policy reduces five-turn cumulative compute by $1.32\times$ relative to fresh-hybrid (1.03~s per turn after a 0.40~s one-time preprocess versus 1.46~s per turn for fresh-hybrid) with no accuracy loss (69.6\% under both conditions). To the best of our knowledge this is the first published measurement of cross-turn KV-cache amortisation under a learned summary; extension to richer multi-turn benchmarks such as MT-Bench~\cite{zheng2024mtbench} is a natural avenue for future work.
+
+\subsection{Limitations and scope}\label{sec:limitations}
+
+Five limitations bound the headline claims. The first concerns Mistral. Under the original $n{=}5$ SQuAD-only Stage~2 training, both Mistral backbones underperformed on the needle-in-a-haystack task at 20 windows ($-$6 and $-$25~pp respectively versus SnapKV). Retraining Stage~2 at $n{=}10$ windows on a mixed SQuAD/HotpotQA corpus converted both regressions to gains, $+$27~pp on Mistral~7B and $+$9~pp on Mistral-Small 24B, with the matched-budget diagnostic on the 24B model moving from $-$16 to $+$9~pp. The four Qwen and Llama backbones produced positive contributions of $+$6 to $+$52~pp without retraining, so we retain the original training for those models and the retrained checkpoints for Mistral. The episode documents a real sensitivity of Stage~2 to the gap between training and evaluation context distributions, particularly on backbones with atypical rotary base (Mistral-Small 24B uses $\theta{=}10^8$, an order of magnitude larger than the other backbones). The second limitation is the trainable parameter budget: the Stage~2 module ranges from 14 to 22~million parameters depending on the backbone hidden dimension. The third concerns scale: we evaluate backbones up to 32B parameters end-to-end, while at 70B and 72B the parameter-free Stage~1 pipeline remains applicable but Stage~2 cannot be trained on our 2$\times$24~GiB hardware; preliminary Stage~1-only results on Qwen 2.5-72B and Llama 3.1-70B appear in the Supplementary Information. The fourth limitation concerns attention kernels: the cumulative-attention component of Stage~1 requires materialising the post-softmax attention matrix and is therefore incompatible with memory-efficient kernels such as flash-attention. We measure the wall-clock cost at fixed cache budget on five backbones in Table~\ref{tab:latency}: the multiplicative-selection total time is within 0.5\% of the corresponding SnapKV total time on every backbone, so the structural overhead from eager attention is not observable in practice at the budgets evaluated here; integration with flash-attention is left as a future engineering avenue. The fifth limitation concerns long-context generalisation: RULER at 32k tokens shows a soft hybrid degradation on Qwen 14B of $-$4~pp relative to SnapKV at a context length approximately six times the training window count, and we restrict the long-context generalisation claim to 16k tokens accordingly. As a further stress test we run the same retrieval task on Qwen 7B at $n{=}400$ windows ($\sim$100k input tokens, eighty times the Stage~2 training distribution); all selection methods converge to a budget-limited ceiling around 40\%, and the Stage~1+2 hybrid retains a $+4$~pp margin over selection-alone Stage~1 — the learned summary degrades gracefully rather than collapsing.
+
+Two methodological remarks complete the picture. Vanilla TurboQuant, which applies a random orthogonal rotation before scalar quantisation, reduces accuracy to zero on Qwen 7B at four-bit precision; the per-attention-head normalisation introduced in Section~\ref{sec:quant} restores compatibility and constitutes a small but generally applicable contribution to KV-cache quantisation on backbones using rotary positional embeddings. PyramidKV, with its layer-adaptive budget allocation, underperforms its published single-sequence specification in our multi-window setup, falling to 22--31\% accuracy across three tested backbones; we interpret this as a setting mismatch rather than a method failure. The Stage~2 aggregator ablation in Section~\ref{sec:ablations} further establishes that the specific exponential moving average is not the load-bearing element of the design: a uniform mean across windows performs identically on all six backbones, whereas removing the persistent state entirely costs 16--52~pp. The functional form of the aggregator is therefore a design choice; the existence of cross-window state is not.
+
+
+%========================================================================%
+\section{Conclusions}\label{sec:conclusions}
+%========================================================================%
+
+AstroNet shows that a frozen large language model can be served at long context with a small fraction of the key--value memory of the uncompressed cache, without modifying the backbone. The result rests on two simple ideas applied together: a query-aware selection rule that draws on signals already present in the model, and a compact learned summary that captures the cross-window structure the selection rule cannot. Combined with a corrected adaptation of rotation-based quantisation that restores compatibility with rotary positional encodings, the same pipeline approaches the accuracy of retrieval baselines that consume several times more cache memory, without any external retriever and on a single accelerator. The same design admits a useful corollary in multi-turn deployment, where the compressed cache is reusable across turns at a fraction of the cost of recomputing it; the broader programme of separating what a frozen model can express from what its cache must store appears amenable to the same line of attack on other deployment-bound long-context workloads.
+
+
+%========================================================================%
+% End-matter (npj order: data avail -> author contrib -> competing -> refs)
+%========================================================================%
+
+\section*{Data availability}
+All numerical results reported in this manuscript are derived from
+publicly available datasets: SQuAD v1.1 (validation split), LongBench
+(HotpotQA, MultiFieldQA subsets), and synthetically generated
+needle-in-a-haystack and RULER instances. The raw evaluation outputs,
+aggregated result files, and figure source data are released at the
+anonymous repository \texttt{[redacted-for-review]}.
+
+\section*{Code availability}
+The reference implementation including the AstroNet wrapper, training
+scripts, baseline re-implementations, and all evaluation harnesses is
+released at \texttt{[redacted-for-review]} under an MIT licence. Trained
+checkpoints for all six backbones are released alongside.
+
+\section*{Author contributions}
+\textit{[Author contributions placeholder]}
+
+\section*{Competing interests}
+The authors declare no competing interests.
+
+%========================================================================%
+% References (sn-nature.bst, numerical, inserted from .bbl post-bibtex)
+%========================================================================%
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,29 @@
+# AstroNet Phase 0 Configuration
+# Minimal Viable Proof: Single Ca2+ state, frozen Llama 8B, synthetic retrieval
+
+# === Model ===
+model_path: "./models/llama-3.1-8b"    # Llama 3.1 8B (4-bit: 5.8GB VRAM)
+# model_path: "./models/qwen2.5-7b"   # Alternative: Qwen 2.5 7B (ungated)
+device: "cuda:0"  # Override if your display GPU is cuda:0 (e.g. set CUDA_VISIBLE_DEVICES or change this to cuda:1)
+
+# === AstroNet ===
+state_dim: 256          # Astrocytic state dimension (compressed from hidden_dim=4096)
+target_layer: 15        # Middle layer of Llama 32 layers (Qwen: use 14)
+
+# === Training ===
+n_epochs: 50
+lr: 1.0e-4
+weight_decay: 0.01
+grad_clip: 1.0
+n_train_samples: 1000
+n_eval_samples: 100
+log_interval: 10        # Log every N steps
+eval_interval: 100      # Evaluate every N steps
+
+# === Data ===
+n_windows: 5            # Context windows per sample
+max_window_tokens: 512  # Max tokens per window
+words_per_window: 300   # Approximate words in synthetic data
+
+# === Checkpoints ===
+save_dir: "./checkpoints/phase0"

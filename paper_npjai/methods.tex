@@ -1,0 +1,456 @@
+%========================================================================%
+\section{Methods}\label{sec:methods}
+%========================================================================%
+
+\begin{figure*}[t]
+\centering
+\resizebox{0.95\textwidth}{!}{%
+\begin{tikzpicture}[
+  font=\sffamily\small,
+  >={Stealth[length=2.2mm,width=1.8mm]},
+  node distance=6mm and 8mm,
+  windowbox/.style={rectangle, draw=blue!55, rounded corners=2pt,
+        minimum width=18mm, minimum height=8mm,
+        fill=blue!8, font=\sffamily\footnotesize, inner sep=2pt},
+  stagebox/.style={rectangle, draw, rounded corners=3pt,
+        minimum width=66mm, minimum height=24mm, align=center,
+        font=\sffamily\small, inner sep=4pt},
+  s1box/.style={stagebox, draw=green!55!black, fill=green!10},
+  s2box/.style={stagebox, draw=orange!75!black, fill=orange!12},
+  cachebox/.style={rectangle, draw=purple!70, rounded corners=3pt,
+        minimum width=70mm, minimum height=11mm,
+        fill=purple!10, font=\sffamily\small, align=center},
+  quantbox/.style={rectangle, draw=black!60, dashed, rounded corners=2pt,
+        minimum width=34mm, minimum height=11mm,
+        fill=yellow!12, font=\sffamily\footnotesize, align=center},
+  ann/.style={font=\sffamily\scriptsize, text=black!60, align=center},
+  flow/.style={->, gray!65, line width=0.4pt},
+  flowQ/.style={->, black!85, line width=0.7pt},
+  flowS1/.style={->, green!50!black, line width=0.7pt},
+  flowS2/.style={->, orange!75!black, line width=0.7pt},
+]
+
+% --- Row 1: input windows (centered above the diagram) ---
+\node[windowbox] (w1) at (0,0)          {$w_1$};
+\node[windowbox, right=4mm of w1] (w2)  {$w_2$};
+\node[windowbox, right=4mm of w2] (wd)  {$\cdots$};
+\node[windowbox, right=4mm of wd] (wT)  {$w_T$};
+\node[windowbox, right=10mm of wT, draw=black!75, fill=blue!18, very thick] (wq)
+        {$w_q$ (query)};
+
+\node[ann, above=1mm of w2.north east, anchor=south]
+        {context windows};
+\node[ann, above=1mm of wq.north, anchor=south]
+        {current question};
+
+% --- Row 2: Stage 1 and Stage 2, side by side, centered under windows ---
+\coordinate (rowcenter) at ($(w1.south)!0.5!(wq.south)$);
+
+\node[s1box, below=14mm of rowcenter, xshift=-38mm]
+  (s1) {%
+    \textbf{Stage 1.} Parameter-free selection \\[1pt]
+    $\mathrm{score}_i = \max(h_i,0)\,\cdot\,\max(c_i,0)$ \\[2pt]
+    {\footnotesize cumulative attention $h_i$ $\times$}\\
+    {\footnotesize query--key alignment $c_i$}\\[1pt]
+    \textbf{top-$k$ real tokens} ($k_{\mathrm{real}}{=}284$)
+  };
+
+\node[s2box, right=12mm of s1]
+  (s2) {%
+    \textbf{Stage 2.} Learned summary \\[1pt]
+    {16 memory tokens, EMA aggregator}\\[2pt]
+    {\footnotesize hidden-state sensing across windows}\\
+    {\footnotesize virtual K/V via frozen $\mathbf{W}_K, \mathbf{W}_V$}\\[1pt]
+    \textbf{trained}: $\sim$14\,M params (only module)
+  };
+
+% --- Row 3: combined cache (centered under both stages) ---
+\coordinate (stagemid) at ($(s1.south)!0.5!(s2.south)$);
+\node[cachebox, below=12mm of stagemid]
+  (cache) {%
+    \textbf{Combined KV cache} ($k = 300$ tokens) $\to$ frozen LLM \\[1pt]
+    {\footnotesize $25.6\times$ compression vs.\ full cache}
+  };
+
+% --- Right-side optional quantisation ---
+\node[quantbox, right=10mm of cache]
+  (kvq) {%
+    K8V4 quantisation\\[1pt]
+    {\footnotesize +$2.6\times$ compression}
+  };
+
+% --- Arrows: windows to Stage 1 (gray, context only) ---
+\foreach \src in {w1,w2,wd,wT}{
+  \draw[flow] (\src.south) -- ($(\src.south)+(0,-3mm)$) -| (s1.north);
+}
+% --- Arrows: windows to Stage 2 (gray, context only) ---
+\foreach \src in {w1,w2,wd,wT}{
+  \draw[flow] (\src.south) -- ($(\src.south)+(0,-3mm)$) -| (s2.north);
+}
+% --- Query: emphasised path into Stage 1 only ---
+\draw[flowQ] (wq.south) -- ($(wq.south)+(0,-3mm)$)
+   -| (s1.north east)
+   node[pos=0.92, right=1mm, font=\sffamily\scriptsize, text=black!75]
+   {query-aware};
+
+% --- Stage 1 output (real tokens) into cache ---
+\draw[flowS1] (s1.south) -- ($(s1.south)+(0,-4mm)$)
+   -| ($(cache.north)+(-18mm,0)$)
+   node[pos=0.92, left=1mm, font=\sffamily\scriptsize, text=green!40!black]
+   {284 real};
+
+% --- Stage 2 output (summary tokens) into cache ---
+\draw[flowS2] (s2.south) -- ($(s2.south)+(0,-4mm)$)
+   -| ($(cache.north)+(18mm,0)$)
+   node[pos=0.92, right=1mm, font=\sffamily\scriptsize, text=orange!75!black]
+   {16 summary};
+
+% --- Optional quantisation arrow ---
+\draw[->, dashed, black!60] (cache.east) -- (kvq.west);
+
+\end{tikzpicture}%
+}
+\caption{\textbf{The AstroNet pipeline.} A frozen quantised backbone
+processes $T$ context windows $w_1,\ldots,w_T$ followed by a query window
+$w_q$. \textbf{Stage 1} (green) is parameter-free: every cached token
+receives a score that multiplies its cumulative attention $h_i$ by its
+cross-window query--key alignment $c_i$ (\cref{sec:s1}), and the top
+$k_{\mathrm{real}}{=}284$ tokens are retained. \textbf{Stage 2} (orange)
+is the only trained module: sixteen memory tokens aggregate hidden states
+across windows via an EMA state and emit virtual key--value pairs
+through dequantised copies of the backbone's own
+$\mathbf{W}_K, \mathbf{W}_V$ projections (\cref{sec:s2}). The combined
+$300$-token cache is consumed by the frozen backbone for generation
+and composes with downstream KV-cache quantisation (dashed,
+\cref{sec:quant}) for a further $\sim 2.6\times$ compression.}
+\label{fig:architecture}
+\end{figure*}
+
+%-----------------------------------------------------------------------%
+\subsection{Setup}\label{sec:setup}
+%-----------------------------------------------------------------------%
+
+We evaluate six frozen autoregressive transformer backbones spanning three
+architecture families and a 4.5$\times$ range in parameter count: Qwen 2.5
+at 7B, 14B and 32B; Llama 3.1-8B; Mistral 7B v0.3; and Mistral-Small at
+24B. All six are loaded in 4-bit NF4 quantisation through
+bitsandbytes\cite{dettmers2023nf4} with float16 compute, the standard
+deployment configuration for single-GPU serving in this size class. The
+backbones are not modified at any point: no weight is updated, no
+architectural component is replaced, and the AstroNet wrapper interacts
+with the model only through forward hooks on the residual stream and
+post-softmax attention tensors, both of which are exposed by the
+\texttt{transformers} library through the eager attention implementation
+without requiring custom kernels.
+
+Following the multi-window convention used in long-context cache
+studies, each evaluation instance is presented as a sequence of $T$ fact
+windows $w_1,\dots,w_T$ followed by a single query window $w_q$.
+Processing a fact window $w_t$ at every layer $l$ produces a set of
+key--value pairs $\{(\mathbf{k}_i^{(l)},\mathbf{v}_i^{(l)})\}_{i=1}^{|w_t|}$.
+Given a total cache budget of $k$ tokens, the task is to decide which
+KV entries to retain across all $T$ fact windows so that the model can
+answer the query in $w_q$. Unless stated otherwise we use $k=300$ for
+all selection methods; this is small relative to the $\sim$1500-token
+total context of the controlled SQuAD setup and is the regime in which
+selection strategies are stressed. Experiments were run on a workstation
+with two NVIDIA Titan RTX 24~GiB GPUs using PyTorch 2.4.1 and
+transformers 4.46.3; models from 32B upwards are split across both GPUs
+with a layer-balanced device map.
+
+
+%-----------------------------------------------------------------------%
+\subsection{Stage 1: parameter-free multiplicative selection}\label{sec:s1}
+%-----------------------------------------------------------------------%
+
+Stage 1 scores every cached token by a product of two complementary
+signals derived from the frozen model's own state and discards all but
+the top-$k$. Both signals are computed at inference time from quantities
+the model already produces; no parameters are introduced.
+
+The first signal is the cumulative attention each token has received
+during processing of the fact windows. For token $i$ we sum the
+post-softmax attention weights it received over all queries $q$, heads
+$h$, and layers $l$:
+\begin{equation}
+    h_i = \sum_l \sum_h \sum_q a_i^{(l,h,q)}.
+    \label{eq:heuristic}
+\end{equation}
+This is the heavy-hitter heuristic of H${}_2$O\cite{zhang2023h2o},
+which captures how strongly the model's attention engaged with each
+token while reading the context but is blind to the query that will
+eventually be asked.
+
+The second signal is the cross-window relevance of each cached token to
+the query. Once the query window has been processed we extract the
+query projections $\mathbf{q}_{\mathrm{query}}^{(l,h)}$ at a small set
+$\mathcal{L}$ of four evenly spaced layers and score each cached token
+against them:
+\begin{equation}
+    c_i = \sum_{l \in \mathcal{L}} \sum_h
+          \mathbf{q}_{\mathrm{query}}^{(l,h)} \cdot \mathbf{k}_i^{(l,h)}
+          \big/ \sqrt{d_h}.
+    \label{eq:cross}
+\end{equation}
+The set $\mathcal{L}$ contains the same layers at which Stage 2 (below)
+injects, chosen to balance early and late representations; the
+sensitivity to this choice is reported in
+\cref{sec:ablations}. Computing $c_i$ requires one forward pass on
+$w_q$ plus $|\mathcal{L}|$ matrix multiplications, an overhead
+substantially smaller than a single additional forward pass.
+
+The two signals are combined multiplicatively rather than additively:
+\begin{equation}
+    \mathrm{score}_i = \max(h_i, 0)\cdot\max(c_i, 0),
+    \label{eq:mult}
+\end{equation}
+and the $k$ tokens of highest score are retained, ordered by their
+original position. The product enforces conjunctive selection: a token
+is kept only if it was salient during processing \emph{and} relevant
+to the query.
+
+We chose a multiplicative rather than additive combination because the
+two signals capture orthogonal information that a sum would mix: the
+heuristic $h_i$ measures \emph{how much the model engaged with this token
+during processing} (regardless of any future query), while $c_i$
+measures \emph{how relevant this token is to the current query}. An
+additive combination $h_i + c_i$ treats them as comparable contributions
+to a single score; a multiplicative combination $h_i \cdot c_i$ requires
+both signals to be jointly large, suppressing tokens that look
+locally salient but are unrelated to the question. Empirically this
+matters: the cumulative-attention-only H${}_2$O baseline (which is
+$h_i$ alone) falls 30--47 percentage points below the multiplicative
+score on every backbone we evaluate, and a matched-budget additive
+ablation underperforms the multiplicative form by 8--12 points
+(\cref{sec:ablations}).
+
+We note that Stage 1 is query-aware: it consults $w_q$ before deciding
+which cached entries to keep, in contrast to H${}_2$O, SnapKV and
+StreamingLLM, which select using only processing-time attention. This
+brings the family of comparisons in our experiments into two groups,
+query-unaware and query-aware (which includes RAG); we report both.
+
+
+%-----------------------------------------------------------------------%
+\subsection{Stage 2: learned cross-window summary tokens}\label{sec:s2}
+%-----------------------------------------------------------------------%
+
+Stage 1 operates one token at a time and cannot represent information
+whose support spans multiple windows. Stage 2 addresses this with a
+small learned module that maintains a persistent state $\mathbf{g}$
+aggregating window-level summaries through an exponential moving
+average, and emits a fixed number of virtual KV pairs from $\mathbf{g}$
+that are prepended to the Stage-1 selection. The total cache budget is
+held fixed: with $K=16$ summary tokens, Stage 1 retains $k-K=284$ real
+tokens, so any improvement of the hybrid over Stage 1 alone is at the
+same end-to-end memory cost.
+
+After processing each fact window the module senses the model's
+hidden states $\mathbf{H}\in\mathbb{R}^{S\times d}$ at a designated
+sensing layer $l_s$ through cross-attention with $K=16$ learnable query
+vectors $\mathbf{Q}_{\mathrm{mem}}\in\mathbb{R}^{K\times d_a}$:
+\begin{equation}
+    \mathbf{m} = \mathrm{softmax}\!\Bigl(
+        \mathbf{Q}_{\mathrm{mem}}\cdot\mathrm{LN}(\mathbf{H})^\top
+        \big/\sqrt{d_a}\Bigr)\cdot\mathrm{LN}(\mathbf{H}),
+    \label{eq:sense}
+\end{equation}
+where $\mathrm{LN}$ is layer normalisation, applied for compatibility
+with the wide dynamic range of pre-trained hidden states. The
+result $\mathbf{m}\in\mathbb{R}^{K\times d}$ is a compressed, content-
+aware summary of the window.
+
+A persistent state $\mathbf{g}\in\mathbb{R}^{K\times d}$ aggregates
+window-level summaries through an exponential moving average with
+learnable rate $\alpha\in(0,1)$:
+\begin{equation}
+    \mathbf{g}(t{+}1) = (1-\alpha)\cdot\mathbf{g}(t) + \alpha\cdot\mathbf{m}(t),
+    \label{eq:ema}
+\end{equation}
+initialised at $\mathbf{g}(0)=\mathbf{0}$ and $\alpha_0=0.38$. We
+report in \cref{sec:ablations} that simpler aggregators (mean
+pooling across windows, retaining only the last window) perform
+comparably on five of six backbones, indicating that the specific EMA
+form is not load-bearing.
+
+The state $\mathbf{g}$ does not enter the attention computation
+directly. At inference, $\mathbf{g}$ is first transformed by a
+per-layer low-rank bottleneck
+$\mathbb{R}^d\to\mathbb{R}^{256}\to\mathbb{R}^d$, with no
+non-linearity, to produce virtual hidden states
+$\tilde{\mathbf{h}}^{(l)}\in\mathbb{R}^{K\times d}$ at every layer
+$l$. The virtual hidden states are then passed through dequantised
+copies of the frozen model's own key and value projection matrices,
+\begin{equation}
+    \tilde{\mathbf{K}}^{(l)} = \tilde{\mathbf{h}}^{(l)} \mathbf{W}_K^{(l)},\quad
+    \tilde{\mathbf{V}}^{(l)} = \tilde{\mathbf{h}}^{(l)} \mathbf{W}_V^{(l)},
+    \label{eq:virtkv}
+\end{equation}
+producing $K$ virtual KV pairs at every layer. Because
+$\mathbf{W}_K^{(l)}$ and $\mathbf{W}_V^{(l)}$ are the model's own
+projection matrices (dequantised at the wrapper, but functionally
+identical to those used to produce real KV entries), the virtual keys
+and values inhabit the same representation space as real entries and
+the attention computation treats them identically. The virtual pairs
+are prepended to the Stage-1 selection before generation begins.
+
+The only trainable parameters in Stage 2 are the cross-attention
+queries and projections in Eq.\,\ref{eq:sense}, the EMA rate $\alpha$,
+and the per-layer low-rank bottleneck weights. This totals 10--14M
+parameters per backbone depending on the hidden dimension, less than
+$0.2\%$ of any of the six backbones we evaluate. A soft regulariser
+constrains the norm of $\tilde{\mathbf{h}}^{(l)}$ to track the
+embedding-layer norm, which we found necessary for stable training
+across the range of hidden dimensions in our model set; the inject
+scale is held at $0.03$ of the residual norm at every layer.
+
+
+%-----------------------------------------------------------------------%
+\subsection{Quantisation: per-head Lloyd--Max}\label{sec:quant}
+%-----------------------------------------------------------------------%
+
+For additional cache compression we adapt the Lloyd--Max optimal scalar
+quantisation of TurboQuant\cite{zandieh2026turboquant}. TurboQuant has
+two stages: an MSE-optimal stage that applies a random orthogonal
+rotation followed by per-coordinate Lloyd--Max scalar quantisation, and
+a residual-correction stage that uses quantised
+Johnson--Lindenstrauss projections to recover unbiased inner-product
+estimates. The residual-correction stage requires bypassing the
+attention multiply with a JL-based estimator, which is incompatible
+with frozen-attention kernels; we use only the MSE stage, which
+produces dequantised key and value tensors that the standard attention
+path consumes without modification.
+
+The random rotation that TurboQuant applies in the MSE stage destroys
+the paired-coordinate structure that rotary position
+encodings\cite{su2024rope} rely on: RoPE rotates pairs of channels by
+position-dependent angles, and an arbitrary orthogonal rotation across
+all channels scrambles this pairing. In our hands, vanilla
+TurboQuant at 4 bits reduces accuracy on Qwen 7B to zero on the
+multi-window SQuAD task. The same failure mode is structurally
+expected on every RoPE-using backbone we evaluate.
+
+Our adapted variant removes the rotation entirely. We instead
+normalise each attention head's key and value coordinates
+independently to zero mean and unit variance using head-level running
+statistics, apply Lloyd--Max scalar quantisation with a codebook tuned
+to the standard normal distribution, and denormalise. We use 8-bit
+keys and 4-bit values (K8V4): keys participate in inner products
+$\mathbf{q}\cdot\mathbf{k}$ that are sensitive to coordinate noise,
+while values enter only through attention-weighted averages that
+tolerate coarser representation. Per token retained, the K8V4
+encoding uses $1.5\times d_h$ bytes versus $4\times d_h$ for FP16,
+a $\sim$2.6$\times$ reduction; combined with the
+$10\times$ selection compression for a 20-window context relative
+to the full cache, the total is $\sim$26$\times$ at FP16 and
+$\sim$68$\times$ with K8V4 (Table~\ref{tab:compression}). The
+per-head normalisation step is
+selection-method-agnostic: it can be applied to the KV tensors
+retained by H${}_2$O, SnapKV, StreamingLLM or any other selection
+scheme on a RoPE backbone, and the fix is a general contribution
+usable beyond AstroNet.
+
+
+%-----------------------------------------------------------------------%
+\subsection{Training}\label{sec:training}
+%-----------------------------------------------------------------------%
+
+Only the Stage-2 module is trained; the backbone, its quantised
+weights, and Stage 1 are frozen throughout. Two training protocols are
+used. The first uses 5{,}000 SQuAD training
+examples\cite{rajpurkar2016squad} arranged as five-window instances
+(four 256-token fact windows plus a query window), trained for one
+to three epochs of next-token cross-entropy on the answer span with
+AdamW at a learning rate of $5\times10^{-5}$, batch size one and
+four-step gradient accumulation. This protocol produced the Qwen 7B,
+Qwen 14B, Qwen 32B, Llama 3.1-8B and Mistral 7B checkpoints used
+throughout the paper.
+
+For Mistral-Small 24B this protocol produced a Stage-2 module that
+slightly regressed accuracy relative to Stage 1 alone at evaluation
+context lengths longer than the training distribution. We therefore
+adopted an extended protocol for the two Mistral backbones: a
+5{,}000-sample corpus drawn in equal proportions from SQuAD and
+HotpotQA, presented as ten-window instances rather than five, with the
+rest of the training configuration unchanged. The extended protocol
+resolves the 24B regression and is documented in the Discussion as a
+transparent finding about training-distribution coverage for larger
+backbones rather than as an architecture-specific modification; the
+smaller backbones reuse their original checkpoints. The training corpus
+saturates at 5{,}000 samples: increasing to 10{,}000 or 20{,}000
+samples does not improve held-out accuracy.
+
+
+%-----------------------------------------------------------------------%
+\subsection{Baselines}\label{sec:baselines}
+%-----------------------------------------------------------------------%
+
+We compare against seven baselines covering the two prior families
+identified in the Introduction. The cache-eviction family comprises
+five methods. H${}_2$O\cite{zhang2023h2o} scores tokens by cumulative
+attention received during processing and retains a heavy-hitter
+budget together with a window of the most recent tokens. SnapKV\cite{li2024snapkv}
+uses an observation window at the end of the prompt to identify
+positions whose post-softmax attention is locally concentrated,
+applying average-pool smoothing and a recent-token bias before
+selection. StreamingLLM\cite{xiao2024streamingllm} retains a small
+number of initial attention sinks together with a sliding window of
+the most recent tokens. PyramidKV\cite{cai2024pyramidkv} allocates a
+layer-adaptive budget that decreases with depth, motivated by an
+observed concentration of useful attention in shallow layers.
+KIVI\cite{liu2024kivi} compresses the retained cache through
+asymmetric integer quantisation, with per-channel quantisation for
+keys and per-token quantisation for values; we evaluate KIVI at 4
+bits (K4V4) as the operating point matched in cache-byte cost to our
+K8V4 stack.
+
+Two retrieval baselines round out the comparison. RAG~$k{=}1$ and
+RAG~$k{=}3$ encode each fact window with the
+\texttt{all-MiniLM-L6-v2} sentence-transformer (22M parameters,
+fully external to the backbone), score windows against an encoding of
+the query, and prepend the top-$k$ retrieved windows to the query
+before generation. In our five-window setup, RAG~$k{=}1$ recovers the
+single best-matching window out of four fact windows and RAG~$k{=}3$
+recovers three of four; RAG~$k{=}3$ is intentionally generous and
+serves as an upper bound for in-context retrieval at this scale.
+
+H${}_2$O and SnapKV in their original formulations select tokens
+per attention head. We re-implement them with a global-pooling
+selection rule that scores each token by averaging over heads before
+ranking. This decision is forced by the small per-window budget of
+our setup: at $k=300$ tokens distributed across all layers and
+attention heads, per-head selection scatters the cache so thinly that
+both methods collapse to $\sim$8.5\% accuracy on Qwen 7B, well
+below their global-pooled performance. Global pooling is the variant
+used throughout the main tables; the per-head ablation is reported in
+the Supplementary Information as a methodological transparency point.
+
+
+%-----------------------------------------------------------------------%
+\subsection{Evaluation protocols}\label{sec:eval}
+%-----------------------------------------------------------------------%
+
+Five evaluation regimes are used in the paper. The controlled
+multi-window QA protocol on SQuAD\cite{rajpurkar2016squad} is the
+position-robust variant: each instance is presented in four
+configurations differing only in which of the four fact windows
+contains the answer, repeated across five random seeds, with 100
+samples per (seed, position) cell. Reported accuracy on this protocol
+is averaged over all twenty (seed, position) pairs, with confidence
+intervals computed across seeds at fixed position. LongBench\cite{bai2024longbench}
+is used as a transfer benchmark on the HotpotQA and MultiFieldQA
+subsets: 100 instances per task, documents chunked into 384-token
+windows and processed sequentially through the same pipeline used at
+SQuAD evaluation, with F1 computed against gold answers after first-
+newline truncation. Needle-in-a-Haystack is run at five depth
+positions of the answer-bearing fact among $n\in\{5,10,20\}$ distractor
+windows with 20 trials per depth. The long-context generalisation
+benchmark uses the RULER\cite{hsieh2024ruler} multi-hop subset at
+$n=22$, $44$ and $85$ windows, corresponding approximately to 8k, 16k
+and 32k input tokens; the Stage-2 training distribution covers up to
+$n=10$, so the RULER points at 16k and 32k probe genuine
+out-of-distribution context lengths. Finally, latency is measured as
+forward-pass wall-clock time at fixed cache budget on Qwen 7B and
+Llama 8B over twenty samples; this isolates the structural cost of
+Stage 1's dependence on post-softmax attention scores, which precludes
+memory-efficient attention kernels.
