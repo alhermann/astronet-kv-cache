@@ -1,0 +1,13 @@
+{
+  "model": "qwen2.5-7b",
+  "n_samples": 200,
+  "seed": 42,
+  "k": 300,
+  "results": {
+    "streaming_llm": 0.055,
+    "h2o": 0.295,
+    "snapkv": 0.65,
+    "multiplicative": 0.765,
+    "rag_k1": 0.775
+  }
+}

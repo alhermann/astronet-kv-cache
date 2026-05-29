@@ -1,0 +1,16 @@
+{
+  "model": "mistral-small-24b",
+  "k": 300,
+  "results": {
+    "hotpotqa": {
+      "streaming_llm": 12.105025846562091,
+      "h2o": 6.093982765662018,
+      "snapkv": 7.237791332335281
+    },
+    "multifieldqa_en": {
+      "streaming_llm": 11.295594122919757,
+      "h2o": 10.182245809917315,
+      "snapkv": 11.088789008106726
+    }
+  }
+}

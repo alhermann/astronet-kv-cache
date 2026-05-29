@@ -1,0 +1,21 @@
+{
+  "model": "qwen2.5-7b",
+  "method": "PyramidKV (per-layer H2O budgets, linear from top to bottom)",
+  "n_samples": 200,
+  "seed": 42,
+  "avg_budget_per_layer": 300,
+  "results": {
+    "ratio_0.5": {
+      "avg_budget": 300,
+      "ratio": 0.5,
+      "accuracy": 0.225,
+      "elapsed_s": 152.6313545703888
+    },
+    "ratio_0.7": {
+      "avg_budget": 300,
+      "ratio": 0.7,
+      "accuracy": 0.245,
+      "elapsed_s": 156.09473824501038
+    }
+  }
+}

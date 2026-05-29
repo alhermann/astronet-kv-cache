@@ -1,0 +1,12 @@
+{
+  "model": "mistral-7b-v0.3",
+  "n_samples": 200,
+  "seed": 42,
+  "k": 300,
+  "method": "multiplicative + adapted TurboQuant K8V4 Lloyd-Max",
+  "results": {
+    "multiplicative_fp16": 0.725,
+    "multiplicative_k8v4_lm": 0.72,
+    "rag_k1": 0.69
+  }
+}

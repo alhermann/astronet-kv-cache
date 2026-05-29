@@ -1,0 +1,115 @@
+{
+  "paper": "From Calcium to Cache: Astrocyte-Inspired KV Memory for Language Models",
+  "target": "NeurIPS 2026",
+  "date_compiled": "2026-04-29",
+  "note": "Authoritative aggregate. Per-experiment files in this directory are the primary sources; this file is a unified view that matches the paper tables.",
+
+  "squad_multiwindow": {
+    "description": "SQuAD validation, 5 windows per sample, k=300 KV budget, single seed",
+    "n_samples": 200,
+    "seed": 42,
+    "results": {
+      "qwen2.5-7b":    {"no_memory": 0.150, "streaming_llm": 0.055, "h2o": 0.295, "snapkv": 0.650, "multiplicative": 0.745, "rag_k1": 0.775, "rag_k3": 0.800, "hybrid": 0.820},
+      "qwen2.5-14b":   {"no_memory": 0.230, "streaming_llm": 0.155, "h2o": 0.355, "snapkv": 0.710, "multiplicative": 0.750, "rag_k1": 0.810, "rag_k3": 0.765, "hybrid": 0.850},
+      "qwen2.5-32b":   {"no_memory": 0.155, "streaming_llm": 0.135, "h2o": 0.340, "snapkv": 0.685, "multiplicative": 0.785, "rag_k1": 0.835, "rag_k3": 0.795, "hybrid": 0.865},
+      "qwen2.5-72b":   {"streaming_llm": 0.190, "multiplicative": 0.760, "rag_k1": 0.860, "rag_k3": 0.850, "hybrid": "training infeasible on 2x24GB"},
+      "llama-3.1-8b":  {"no_memory": 0.170, "streaming_llm": 0.165, "h2o": 0.375, "snapkv": 0.600, "multiplicative": 0.785, "rag_k1": 0.815, "rag_k3": 0.835, "hybrid": 0.835},
+      "llama-3.1-70b": {"streaming_llm": 0.200, "multiplicative": 0.785, "rag_k1": 0.805, "rag_k3": 0.830, "hybrid": "training infeasible on 2x24GB"},
+      "mistral-7b-v0.3":   {"no_memory": 0.130, "streaming_llm": 0.140, "h2o": 0.350, "snapkv": 0.430, "multiplicative": 0.725, "rag_k1": 0.690, "rag_k3": 0.680, "hybrid": 0.855},
+      "mistral-small-24b": {"no_memory": 0.195, "streaming_llm": 0.195, "h2o": 0.455, "snapkv": 0.630, "multiplicative": 0.795, "rag_k1": 0.800, "rag_k3": 0.805, "hybrid": 0.885}
+    }
+  },
+
+  "longbench_v2": {
+    "description": "LongBench, chunked into 384-token windows, k=300, 100 samples, generated text truncated at first newline",
+    "metric": "F1",
+    "source_file": "longbench_v2_complete.json",
+    "hotpotqa": {
+      "qwen2.5-7b":   {"streaming_llm": 6.5,  "h2o": 29.1, "snapkv": 23.3, "multiplicative": 28.8, "hybrid": 21.4, "full_context": 2.9},
+      "qwen2.5-14b":  {"streaming_llm": 10.2, "h2o": 27.5, "snapkv": 15.2, "multiplicative": 16.6, "hybrid": 20.6, "full_context": 2.9},
+      "qwen2.5-32b":  {"streaming_llm": 8.9,  "h2o": 19.6, "snapkv": 12.3, "multiplicative": 23.6, "hybrid": 31.7, "full_context": 2.7},
+      "llama-3.1-8b": {"streaming_llm": 9.1,  "h2o": 16.0, "snapkv": 17.1, "multiplicative": 15.3, "hybrid": 16.0, "full_context": 2.0},
+      "mistral-7b-v0.3":   {"streaming_llm": 6.6,  "h2o": 1.3,  "snapkv": 0.8,  "multiplicative": 0.6, "hybrid": 3.1,  "full_context": 1.0},
+      "mistral-small-24b": {"streaming_llm": 10.1, "h2o": 3.6,  "snapkv": 6.2,  "multiplicative": 2.8, "hybrid": 4.1,  "full_context": 1.4}
+    },
+    "multifieldqa_en": {
+      "qwen2.5-7b":   {"streaming_llm": 6.7,  "h2o": 15.5, "snapkv": 12.9, "multiplicative": 18.2, "hybrid": 15.3, "full_context": 8.5},
+      "qwen2.5-14b":  {"streaming_llm": 10.1, "h2o": 17.8, "snapkv": 19.6, "multiplicative": 20.8, "hybrid": 16.0, "full_context": 10.7},
+      "qwen2.5-32b":  {"streaming_llm": 12.9, "h2o": 17.7, "snapkv": 19.0, "multiplicative": 18.0, "hybrid": 15.4, "full_context": 13.5},
+      "llama-3.1-8b": {"streaming_llm": 7.1,  "h2o": 9.5,  "snapkv": 11.6, "multiplicative": 13.8, "hybrid": 19.8, "full_context": 9.5},
+      "mistral-7b-v0.3":   {"streaming_llm": 9.9,  "h2o": 11.5, "snapkv": 6.3,  "multiplicative": 13.0, "hybrid": 14.4, "full_context": 9.0},
+      "mistral-small-24b": {"streaming_llm": 12.1, "h2o": 9.9,  "snapkv": 11.4, "multiplicative": 18.3, "hybrid": 15.3, "full_context": 9.3}
+    }
+  },
+
+  "needle_v2": {
+    "description": "Needle-in-a-Haystack, 5 depth positions x 20 trials per depth, k=300",
+    "source_file": "needle_v2_complete.json",
+    "qwen2.5-7b":  {"5w": {"streaming_llm": 100, "h2o": 100, "multiplicative": 100, "hybrid": 99},  "10w": {"streaming_llm": 79, "h2o": 40, "multiplicative": 78, "hybrid": 76}, "20w": {"streaming_llm": 40, "h2o": 15, "multiplicative": 35, "hybrid": 39}},
+    "qwen2.5-14b": {"5w": {"streaming_llm": 100, "h2o": 100, "multiplicative": 100, "hybrid": 100}, "10w": {"streaming_llm": 67, "h2o": 31, "multiplicative": 68, "hybrid": 77}, "20w": {"streaming_llm": 35, "h2o":  2, "multiplicative": 33, "hybrid": 40}},
+    "qwen2.5-32b": {"5w": {"streaming_llm": 100, "h2o": 100, "multiplicative": 100, "hybrid": 100}, "10w": {"streaming_llm": 80, "h2o": 45, "multiplicative": 81, "hybrid": 78}, "20w": {"streaming_llm": 40, "h2o": 19, "multiplicative": 39, "hybrid": 39}},
+    "llama-3.1-8b": {"5w": {"streaming_llm": 100, "h2o": 100, "multiplicative": 100, "hybrid": 99},  "10w": {"streaming_llm": 74, "h2o": 35, "multiplicative": 72, "hybrid": 75}, "20w": {"streaming_llm": 38, "h2o":  2, "multiplicative": 33, "hybrid": 38}},
+    "mistral-7b-v0.3":   {"5w": {"streaming_llm": 100, "h2o": 100, "multiplicative": 100, "hybrid": 100}, "10w": {"streaming_llm": 79, "h2o": 38, "multiplicative": 78, "hybrid": 60}, "20w": {"streaming_llm": 40, "h2o":  0, "multiplicative": 32, "hybrid": 30}},
+    "mistral-small-24b": {"5w": {"streaming_llm": 100, "h2o": 100, "multiplicative": 100, "hybrid":  96}, "10w": {"streaming_llm": 79, "h2o": 38, "multiplicative": 78, "hybrid": 74}, "20w": {"streaming_llm": 40, "h2o":  0, "multiplicative": 32, "hybrid": 36}}
+  },
+
+  "ablations_qwen7b": {
+    "n_mem_tokens": {
+      "description": "Total budget=300 fixed, vary learned-token count",
+      "results": {"4": 0.83, "8": 0.84, "16": 0.83, "32": 0.82}
+    },
+    "k_budget": {
+      "description": "n_mem=16 fixed, vary total budget",
+      "results": {"100": 0.60, "150": 0.73, "300": 0.83, "500": 0.80}
+    },
+    "bottleneck_dim": {
+      "description": "n_mem=16, k=284 real, vary bottleneck",
+      "source_file": "param_ablation_qwen7b.json",
+      "results": {"128": 0.825, "256": 0.820, "512": 0.850}
+    },
+    "score_combination": {
+      "description": "Multiplicative vs additive vs each signal alone",
+      "results": {"heuristic_only": 0.290, "cross_only": 0.525, "additive": 0.300, "multiplicative": 0.765}
+    },
+    "perhead_validation": {
+      "description": "Global vs per-head pooling for selection (Qwen 7B, n=200)",
+      "h2o_global": 0.295, "h2o_perhead": 0.085,
+      "snapkv_global": 0.650, "snapkv_perhead": 0.085
+    }
+  },
+
+  "compression": {
+    "naive_quantization": {
+      "description": "Qwen 7B, multiplicative selection k=300",
+      "fp16": 0.745, "int8": 0.750, "int4": 0.455, "int3": 0.080, "int2": 0.000
+    },
+    "vanilla_turboquant_mse_qwen7b_4bit": {
+      "description": "TurboQuant Stage 1 (random rotation + Lloyd-Max) used as drop-in cache replacement",
+      "accuracy": 0.000,
+      "note": "Stage 2 (QJL inner-product estimation) is not a drop-in cache replacement and is out of scope."
+    },
+    "adapted_turboquant_k8v4": {
+      "description": "Per-head normalization + Lloyd-Max optimal codebook (no rotation), 8-bit keys, 4-bit values",
+      "compression": "13x total (5x token selection + 2.6x quantization)",
+      "source_file": "turboquant_complete.json",
+      "squad_n200": {
+        "qwen2.5-7b":        {"fp16": 0.745, "k8v4": 0.775, "delta": 0.030},
+        "qwen2.5-14b":       {"fp16": 0.750, "k8v4": 0.695, "delta": -0.055},
+        "qwen2.5-32b":       {"fp16": 0.785, "k8v4": 0.770, "delta": -0.015},
+        "llama-3.1-8b":      {"fp16": 0.785, "k8v4": 0.785, "delta": 0.000},
+        "mistral-7b-v0.3":   {"fp16": 0.725, "k8v4": 0.720, "delta": -0.005},
+        "mistral-small-24b": {"fp16": 0.795, "k8v4": 0.725, "delta": -0.070}
+      }
+    }
+  },
+
+  "confidence_intervals": {
+    "description": "5 seeds (42, 123, 999, 7, 2024) x 200 SQuAD validation samples; mean and standard deviation",
+    "qwen2.5-7b":        {"s1_mean": 0.733, "s1_std": 0.032, "hybrid_mean": 0.796, "hybrid_std": 0.018},
+    "qwen2.5-14b":       {"s1_mean": 0.740, "s1_std": 0.013, "hybrid_mean": 0.835, "hybrid_std": 0.016},
+    "qwen2.5-32b":       {"s1_mean": 0.757, "s1_std": 0.035, "hybrid_mean": 0.857, "hybrid_std": 0.023},
+    "llama-3.1-8b":      {"s1_mean": 0.733, "s1_std": 0.024, "hybrid_mean": 0.823, "hybrid_std": 0.022},
+    "mistral-7b-v0.3":   {"s1_mean": 0.691, "s1_std": 0.033, "hybrid_mean": 0.838, "hybrid_std": 0.020},
+    "mistral-small-24b": {"s1_mean": 0.767, "s1_std": 0.020, "hybrid_mean": 0.878, "hybrid_std": 0.019}
+  }
+}

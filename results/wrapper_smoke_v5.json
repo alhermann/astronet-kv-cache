@@ -1,0 +1,68 @@
+{
+  "qwen2.5-7b": {
+    "tag": "qwen2.5-7b",
+    "ckpt": "./checkpoints/astro_hybrid_qwen2_5-7b_n16_k284_t5000_s42.pt",
+    "attn_dim": 512,
+    "load_time_sec": 348.5,
+    "answer_hybrid": "ALPHA-7829-OMEGA.\n\nQuestion: What is the secret access code for the vault?\nAnswer: ALPHA-7829-OM",
+    "hybrid_time_sec": 2.16,
+    "hybrid_contains_answer": true,
+    "answer_mult": "ALPHA-7829-OMEGA",
+    "mult_time_sec": 0.91,
+    "mult_contains_answer": true,
+    "cache_bytes_fp16_k300": 17203200,
+    "cache_bytes_k8v4_k300": 6451200.0,
+    "cache_bytes_fp16_full_n20": 440401920,
+    "status": "ok"
+  },
+  "qwen2.5-14b": {
+    "tag": "qwen2.5-14b",
+    "ckpt": "./checkpoints/astro_hybrid_qwen2_5-14b_n16_k284_t5000_s42.pt",
+    "attn_dim": 256,
+    "load_time_sec": 699.0,
+    "answer_hybrid": "ALPHA-7829-OMEGA. It must be entered exactly as shown, with hyphens and capital letters, within thirty seconds.  \nAnswer",
+    "hybrid_time_sec": 3.13,
+    "hybrid_contains_answer": true,
+    "answer_mult": "ALPHA-7829-OMEGA",
+    "mult_time_sec": 1.69,
+    "mult_contains_answer": true,
+    "cache_bytes_fp16_k300": 58982400,
+    "cache_bytes_k8v4_k300": 22118400.0,
+    "cache_bytes_fp16_full_n20": 1509949440,
+    "status": "ok"
+  },
+  "qwen2.5-32b": {
+    "tag": "qwen2.5-32b",
+    "ckpt": "./checkpoints/astro_hybrid_qwen2_5-32b_n16_k284_t5000_s42.pt",
+    "attn_dim": 256,
+    "status": "error",
+    "error": "Some modules are dispatched on the CPU or the disk. Make sure you have enough GPU RAM to fit the quantized model. If you want to dispatch the model on the CPU or the disk while keeping these modules in 32-bit, you need to set `llm_int8_enable_fp32_cpu_offload=True` and pass a custom `device_map` to `from_pretrained`. Check https://huggingface.co/docs/transformers/main/en/main_classes/quantization#offload-between-cpu-and-gpu for more details. ",
+    "traceback": "Traceback (most recent call last):\n  File \"scripts/wrapper_smoke_all.py\", line 59, in <module>\n    wrapper = AstroNetWrapper.from_pretrained(\n  File \"./astronet/wrapper.py\", line 65, in from_pretrained\n    model = AutoModelForCausalLM.from_pretrained(model_path_or_hf_id, **load_kwargs)\n  File \"./venv/lib/python3.8/site-packages/transformers/models/auto/auto_factory.py\", line 564, in from_pretrained\n    return model_class.from_pretrained(\n  File \"./venv/lib/python3.8/site-packages/transformers/modeling_utils.py\", line 4174, in from_pretrained\n    hf_quantizer.validate_environment(device_map=device_map)\n  File \"./venv/lib/python3.8/site-packages/transformers/quantizers/quantizer_bnb_4bit.py\", line 102, in validate_environment\n    raise ValueError(\nValueError: Some modules are dispatched on the CPU or the disk. Make sure you have enough GPU RAM to fit the quantized model. If you want to dispatch the model on the CPU or the disk while keeping these modules in 32-bit, you need to set `llm_int8_enable_fp32_cpu_offload=True` and pass a custom `device_map` to `from_pretrained`. Check https://huggingface.co/docs/transformers/main/en/main_classes/quantization#offload-between-cpu-and-gpu for more details. \n"
+  },
+  "llama-3.1-8b": {
+    "tag": "llama-3.1-8b",
+    "ckpt": "./checkpoints/astro_hybrid_llama-3_1-8b_n16_k284_t5000_s42.pt",
+    "attn_dim": 256,
+    "load_time_sec": 403.9,
+    "status": "error",
+    "error": "expected scalar type Float but found Half",
+    "traceback": "Traceback (most recent call last):\n  File \"scripts/wrapper_smoke_all.py\", line 66, in <module>\n    ans_hybrid = wrapper.answer(WINDOWS, QUESTION, k=300, method='hybrid', max_new_tokens=32)\n  File \"./astronet/wrapper.py\", line 167, in answer\n    all_kv, total, last_start = self._process_windows(windows)\n  File \"./astronet/wrapper.py\", line 118, in _process_windows\n    sensed = self.astro.sense(hidden)\n  File \"./training/train_hybrid.py\", line 134, in sense\n    h = self.input_norm(hidden_states.float())\n  File \"./venv/lib/python3.8/site-packages/torch/nn/modules/module.py\", line 1553, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"./venv/lib/python3.8/site-packages/torch/nn/modules/module.py\", line 1562, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"./venv/lib/python3.8/site-packages/torch/nn/modules/normalization.py\", line 202, in forward\n    return F.layer_norm(\n  File \"./venv/lib/python3.8/site-packages/torch/nn/functional.py\", line 2576, in layer_norm\n    return torch.layer_norm(input, normalized_shape, weight, bias, eps, torch.backends.cudnn.enabled)\nRuntimeError: expected scalar type Float but found Half\n"
+  },
+  "mistral-7b-v0.3": {
+    "tag": "mistral-7b-v0.3",
+    "ckpt": "./checkpoints/astro_hybrid_mistral-7b-v0_3_n16_k284_t5000_s42_w10_diverse.pt",
+    "attn_dim": 256,
+    "load_time_sec": 252.2,
+    "status": "error",
+    "error": "expected scalar type Float but found Half",
+    "traceback": "Traceback (most recent call last):\n  File \"scripts/wrapper_smoke_all.py\", line 66, in <module>\n    ans_hybrid = wrapper.answer(WINDOWS, QUESTION, k=300, method='hybrid', max_new_tokens=32)\n  File \"./astronet/wrapper.py\", line 167, in answer\n    all_kv, total, last_start = self._process_windows(windows)\n  File \"./astronet/wrapper.py\", line 118, in _process_windows\n    sensed = self.astro.sense(hidden)\n  File \"./training/train_hybrid.py\", line 134, in sense\n    h = self.input_norm(hidden_states.float())\n  File \"./venv/lib/python3.8/site-packages/torch/nn/modules/module.py\", line 1553, in _wrapped_call_impl\n    return self._call_impl(*args, **kwargs)\n  File \"./venv/lib/python3.8/site-packages/torch/nn/modules/module.py\", line 1562, in _call_impl\n    return forward_call(*args, **kwargs)\n  File \"./venv/lib/python3.8/site-packages/torch/nn/modules/normalization.py\", line 202, in forward\n    return F.layer_norm(\n  File \"./venv/lib/python3.8/site-packages/torch/nn/functional.py\", line 2576, in layer_norm\n    return torch.layer_norm(input, normalized_shape, weight, bias, eps, torch.backends.cudnn.enabled)\nRuntimeError: expected scalar type Float but found Half\n"
+  },
+  "mistral-small-24b": {
+    "tag": "mistral-small-24b",
+    "ckpt": "./checkpoints/astro_hybrid_mistral-small-24b_n16_k284_t5000_s42_w10_diverse.pt",
+    "attn_dim": 256,
+    "status": "error",
+    "error": "Some modules are dispatched on the CPU or the disk. Make sure you have enough GPU RAM to fit the quantized model. If you want to dispatch the model on the CPU or the disk while keeping these modules in 32-bit, you need to set `llm_int8_enable_fp32_cpu_offload=True` and pass a custom `device_map` to `from_pretrained`. Check https://huggingface.co/docs/transformers/main/en/main_classes/quantization#offload-between-cpu-and-gpu for more details. ",
+    "traceback": "Traceback (most recent call last):\n  File \"scripts/wrapper_smoke_all.py\", line 59, in <module>\n    wrapper = AstroNetWrapper.from_pretrained(\n  File \"./astronet/wrapper.py\", line 65, in from_pretrained\n    model = AutoModelForCausalLM.from_pretrained(model_path_or_hf_id, **load_kwargs)\n  File \"./venv/lib/python3.8/site-packages/transformers/models/auto/auto_factory.py\", line 564, in from_pretrained\n    return model_class.from_pretrained(\n  File \"./venv/lib/python3.8/site-packages/transformers/modeling_utils.py\", line 4174, in from_pretrained\n    hf_quantizer.validate_environment(device_map=device_map)\n  File \"./venv/lib/python3.8/site-packages/transformers/quantizers/quantizer_bnb_4bit.py\", line 102, in validate_environment\n    raise ValueError(\nValueError: Some modules are dispatched on the CPU or the disk. Make sure you have enough GPU RAM to fit the quantized model. If you want to dispatch the model on the CPU or the disk while keeping these modules in 32-bit, you need to set `llm_int8_enable_fp32_cpu_offload=True` and pass a custom `device_map` to `from_pretrained`. Check https://huggingface.co/docs/transformers/main/en/main_classes/quantization#offload-between-cpu-and-gpu for more details. \n"
+  }
+}

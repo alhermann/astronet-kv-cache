@@ -1,0 +1,14 @@
+{
+  "model": "mistral-small-24b",
+  "k": 300,
+  "results": {
+    "hotpotqa": {
+      "hybrid": 10.10188392746791,
+      "multiplicative": 5.100478893582341
+    },
+    "multifieldqa_en": {
+      "hybrid": 11.910100041360371,
+      "multiplicative": 11.541943046519142
+    }
+  }
+}

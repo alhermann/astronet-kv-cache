@@ -1,0 +1,21 @@
+{
+  "model": "llama-3.1-8b",
+  "method": "PyramidKV (per-layer H2O budgets, linear from top to bottom)",
+  "n_samples": 200,
+  "seed": 42,
+  "avg_budget_per_layer": 300,
+  "results": {
+    "ratio_0.5": {
+      "avg_budget": 300,
+      "ratio": 0.5,
+      "accuracy": 0.31,
+      "elapsed_s": 258.5156252384186
+    },
+    "ratio_0.7": {
+      "avg_budget": 300,
+      "ratio": 0.7,
+      "accuracy": 0.315,
+      "elapsed_s": 260.1811511516571
+    }
+  }
+}

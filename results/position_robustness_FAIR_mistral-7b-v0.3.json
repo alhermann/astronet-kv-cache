@@ -1,0 +1,33 @@
+{
+  "model": "mistral-7b-v0.3",
+  "n_samples": 100,
+  "seed": 42,
+  "k": 300,
+  "note": "Fact context placed at the position-th non-query window. pos=0 is the default setup; pos>=1 places fact deeper into the prefix. Distractors fill the remaining slots, query is always last.",
+  "results": {
+    "pos_0": {
+      "snapkv": 0.47,
+      "multiplicative": 0.43,
+      "streaming_llm": 0.13,
+      "h2o": 0.37
+    },
+    "pos_1": {
+      "snapkv": 0.47,
+      "multiplicative": 0.43,
+      "streaming_llm": 0.14,
+      "h2o": 0.36
+    },
+    "pos_2": {
+      "snapkv": 0.47,
+      "multiplicative": 0.43,
+      "streaming_llm": 0.42,
+      "h2o": 0.36
+    },
+    "pos_3": {
+      "snapkv": 0.4,
+      "multiplicative": 0.52,
+      "streaming_llm": 0.71,
+      "h2o": 0.45
+    }
+  }
+}

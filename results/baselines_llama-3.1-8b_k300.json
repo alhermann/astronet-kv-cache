@@ -1,0 +1,13 @@
+{
+  "model": "llama-3.1-8b",
+  "n_samples": 200,
+  "seed": 42,
+  "k": 300,
+  "results": {
+    "streaming_llm": 0.165,
+    "h2o": 0.375,
+    "snapkv": 0.6,
+    "multiplicative": 0.735,
+    "rag_k1": 0.815
+  }
+}

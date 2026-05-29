@@ -1,0 +1,33 @@
+{
+  "model": "qwen2.5-14b",
+  "n_samples": 100,
+  "seed": 42,
+  "k": 300,
+  "note": "Fact context placed at the position-th non-query window. pos=0 is the default setup; pos>=1 places fact deeper into the prefix. Distractors fill the remaining slots, query is always last.",
+  "results": {
+    "pos_0": {
+      "snapkv": 0.69,
+      "multiplicative": 0.69,
+      "streaming_llm": 0.11,
+      "h2o": 0.32
+    },
+    "pos_1": {
+      "snapkv": 0.69,
+      "multiplicative": 0.69,
+      "streaming_llm": 0.14,
+      "h2o": 0.32
+    },
+    "pos_2": {
+      "snapkv": 0.69,
+      "multiplicative": 0.69,
+      "streaming_llm": 0.53,
+      "h2o": 0.32
+    },
+    "pos_3": {
+      "snapkv": 0.43,
+      "multiplicative": 0.68,
+      "streaming_llm": 0.69,
+      "h2o": 0.55
+    }
+  }
+}

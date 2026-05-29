@@ -1,0 +1,21 @@
+{
+  "model": "qwen2.5-32b",
+  "method": "multiplicative_k300 + KIVI (per-channel keys, per-token values, group=32)",
+  "n_samples": 100,
+  "seed": 42,
+  "k": 300,
+  "results": {
+    "k4v4": {
+      "kbits": 4,
+      "vbits": 4,
+      "accuracy": 0.69,
+      "elapsed_s": 306.30540227890015
+    },
+    "k8v4": {
+      "kbits": 8,
+      "vbits": 4,
+      "accuracy": 0.7,
+      "elapsed_s": 312.2715873718262
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "model": "mistral-small-24b",
+  "checkpoint": "./checkpoints/astro_hybrid_mistral-small-24b_n16_k284_t5000_s42.pt",
+  "n_eval": 100,
+  "seed": 2024,
+  "k_real": 284,
+  "n_mem": 16,
+  "attn_dim": 256,
+  "results": {
+    "pos_0": {
+      "pure300": 0.67,
+      "hybrid": 0.66,
+      "delta": -0.010000000000000009
+    },
+    "pos_1": {
+      "pure300": 0.67,
+      "hybrid": 0.66,
+      "delta": -0.010000000000000009
+    },
+    "pos_2": {
+      "pure300": 0.67,
+      "hybrid": 0.67,
+      "delta": 0.0
+    },
+    "pos_3": {
+      "pure300": 0.54,
+      "hybrid": 0.54,
+      "delta": 0.0
+    }
+  },
+  "average": {
+    "pure300": 0.6375000000000001,
+    "hybrid": 0.6325000000000001,
+    "delta": -0.0050000000000000044
+  }
+}

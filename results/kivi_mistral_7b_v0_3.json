@@ -1,0 +1,33 @@
+{
+  "model": "mistral-7b-v0.3",
+  "method": "multiplicative_k300 + KIVI (per-channel keys, per-token values, group=32)",
+  "n_samples": 200,
+  "seed": 42,
+  "k": 300,
+  "results": {
+    "k2v2": {
+      "kbits": 2,
+      "vbits": 2,
+      "accuracy": 0.325,
+      "elapsed_s": 360.9027831554413
+    },
+    "k4v2": {
+      "kbits": 4,
+      "vbits": 2,
+      "accuracy": 0.365,
+      "elapsed_s": 365.2515661716461
+    },
+    "k4v4": {
+      "kbits": 4,
+      "vbits": 4,
+      "accuracy": 0.36,
+      "elapsed_s": 369.62392354011536
+    },
+    "k8v4": {
+      "kbits": 8,
+      "vbits": 4,
+      "accuracy": 0.37,
+      "elapsed_s": 369.0389473438263
+    }
+  }
+}

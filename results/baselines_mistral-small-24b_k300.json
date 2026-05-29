@@ -1,0 +1,13 @@
+{
+  "model": "mistral-small-24b",
+  "n_samples": 200,
+  "seed": 42,
+  "k": 300,
+  "results": {
+    "streaming_llm": 0.195,
+    "h2o": 0.455,
+    "snapkv": 0.63,
+    "multiplicative": 0.78,
+    "rag_k1": 0.8
+  }
+}

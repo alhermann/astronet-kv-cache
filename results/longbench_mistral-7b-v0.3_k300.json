@@ -1,0 +1,14 @@
+{
+  "model": "mistral-7b-v0.3",
+  "k": 300,
+  "results": {
+    "hotpotqa": {
+      "hybrid": 6.476156969965021,
+      "multiplicative": 0.6538461538461539
+    },
+    "multifieldqa_en": {
+      "hybrid": 8.48432679807749,
+      "multiplicative": 5.904697763919839
+    }
+  }
+}

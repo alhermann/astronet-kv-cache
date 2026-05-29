@@ -1,0 +1,12 @@
+{
+  "model": "qwen2.5-32b",
+  "n_samples": 200,
+  "seed": 42,
+  "k": 300,
+  "method": "multiplicative + adapted TurboQuant K8V4 Lloyd-Max",
+  "results": {
+    "multiplicative_fp16": 0.785,
+    "multiplicative_k8v4_lm": 0.77,
+    "rag_k1": 0.835
+  }
+}

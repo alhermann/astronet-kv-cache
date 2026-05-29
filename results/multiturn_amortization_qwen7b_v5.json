@@ -1,0 +1,2976 @@
+{
+  "config": {
+    "model_path": "./models/qwen2.5-7b",
+    "hybrid_checkpoint": "./checkpoints/astro_hybrid_qwen2_5-7b_n16_k284_t5000_s42.pt",
+    "device": "cuda:0",
+    "n_samples": 50,
+    "n_turns": 5,
+    "seed": 42,
+    "k": 300,
+    "attn_dim": 512,
+    "multi_gpu": false,
+    "save_path": "logs/results/multiturn_amortization_qwen7b_v5.json"
+  },
+  "instances": [
+    {
+      "idx": 0,
+      "turns": [],
+      "preprocess_time_sec": 0.3782486915588379,
+      "fresh": [
+        {
+          "time_sec": 1.8188996315002441,
+          "correct": true,
+          "answer": "24-08-67. This information should be retained for later use. This information should be retained"
+        },
+        {
+          "time_sec": 1.4224755764007568,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion:"
+        },
+        {
+          "time_sec": 1.424269199371338,
+          "correct": true,
+          "answer": "BG-6948. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.4198057651519775,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.4244744777679443,
+          "correct": true,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0428073406219482,
+          "correct": true,
+          "answer": "24-08-67. This information should be retained for later use. This information should be retained"
+        },
+        {
+          "time_sec": 1.0030243396759033,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion:"
+        },
+        {
+          "time_sec": 1.003772258758545,
+          "correct": true,
+          "answer": "BG-6948. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.0077519416809082,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.0049316883087158,
+          "correct": true,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        }
+      ]
+    },
+    {
+      "idx": 1,
+      "turns": [],
+      "preprocess_time_sec": 0.38054561614990234,
+      "fresh": [
+        {
+          "time_sec": 1.4172585010528564,
+          "correct": true,
+          "answer": "SN-78531. This information should be retained for later use. This information should be retained for later"
+        },
+        {
+          "time_sec": 1.4200987815856934,
+          "correct": true,
+          "answer": "MARBLE-8\nQuestion: What is the lock combination?\nAnswer: 12-47-93"
+        },
+        {
+          "time_sec": 1.4233951568603516,
+          "correct": true,
+          "answer": "GAMMA-2461-SIERRA. This information should be retained for later use. This information should"
+        },
+        {
+          "time_sec": 1.4162647724151611,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What is the passphrase?\nAnswer: MARBLE-8\nQuestion: What"
+        },
+        {
+          "time_sec": 1.4171934127807617,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.043590784072876,
+          "correct": true,
+          "answer": "SN-78531. This information should be retained for later use. This information should be retained for later"
+        },
+        {
+          "time_sec": 1.0013461112976074,
+          "correct": true,
+          "answer": "MARBLE-8\nQuestion: What is the lock combination?\nAnswer: 12-47-93"
+        },
+        {
+          "time_sec": 1.0030040740966797,
+          "correct": true,
+          "answer": "GAMMA-2461-SIERRA. This information should be retained for later use. This information should"
+        },
+        {
+          "time_sec": 0.9984903335571289,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What is the passphrase?\nAnswer: MARBLE-8\nQuestion: What"
+        },
+        {
+          "time_sec": 0.9997110366821289,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ]
+    },
+    {
+      "idx": 2,
+      "turns": [],
+      "preprocess_time_sec": 0.38118767738342285,
+      "fresh": [
+        {
+          "time_sec": 1.417729377746582,
+          "correct": true,
+          "answer": "MARBLE-8\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194-DELTA"
+        },
+        {
+          "time_sec": 1.418837547302246,
+          "correct": true,
+          "answer": "63-35-78\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4162912368774414,
+          "correct": false,
+          "answer": "MARBLE-8\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194-DELTA"
+        },
+        {
+          "time_sec": 1.421766996383667,
+          "correct": true,
+          "answer": "MARBLE-8\nQuestion: What is the lock combination?\nAnswer: 63-35-78"
+        },
+        {
+          "time_sec": 1.420515775680542,
+          "correct": false,
+          "answer": "SN-9716\nQuestion: What is the passphrase?\nAnswer: MARBLE-8\nQuestion: What"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0547430515289307,
+          "correct": true,
+          "answer": "MARBLE-8\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194-DELTA"
+        },
+        {
+          "time_sec": 1.0108330249786377,
+          "correct": true,
+          "answer": "63-35-78\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0091915130615234,
+          "correct": false,
+          "answer": "MARBLE-8\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194-DELTA"
+        },
+        {
+          "time_sec": 1.0141713619232178,
+          "correct": true,
+          "answer": "MARBLE-8\nQuestion: What is the lock combination?\nAnswer: 63-35-78"
+        },
+        {
+          "time_sec": 1.0127694606781006,
+          "correct": false,
+          "answer": "SN-9716\nQuestion: What is the passphrase?\nAnswer: MARBLE-8\nQuestion: What"
+        }
+      ]
+    },
+    {
+      "idx": 3,
+      "turns": [],
+      "preprocess_time_sec": 0.3831956386566162,
+      "fresh": [
+        {
+          "time_sec": 1.4317734241485596,
+          "correct": false,
+          "answer": "SN-65724\nQuestion: What is the passphrase?\nAnswer: SLATE-4\nQuestion:"
+        },
+        {
+          "time_sec": 1.4246916770935059,
+          "correct": true,
+          "answer": "SLATE-4\nQuestion: What is the lock combination?\nAnswer: 48-72-14"
+        },
+        {
+          "time_sec": 1.4362289905548096,
+          "correct": true,
+          "answer": "FOXTROT-6178-KILO\nAnswer: SN-65724\nQuestion:"
+        },
+        {
+          "time_sec": 1.4255282878875732,
+          "correct": true,
+          "answer": "SN-65724\nQuestion: What is the passphrase?\nAnswer: SLATE-4\nQuestion:"
+        },
+        {
+          "time_sec": 1.4245631694793701,
+          "correct": true,
+          "answer": "48-72-14\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.046623945236206,
+          "correct": false,
+          "answer": "SN-65724\nQuestion: What is the passphrase?\nAnswer: SLATE-4\nQuestion:"
+        },
+        {
+          "time_sec": 1.00994873046875,
+          "correct": true,
+          "answer": "SLATE-4\nQuestion: What is the lock combination?\nAnswer: 48-72-14"
+        },
+        {
+          "time_sec": 1.0144147872924805,
+          "correct": true,
+          "answer": "FOXTROT-6178-KILO\nAnswer: SN-65724\nQuestion:"
+        },
+        {
+          "time_sec": 1.015653371810913,
+          "correct": true,
+          "answer": "SN-65724\nQuestion: What is the passphrase?\nAnswer: SLATE-4\nQuestion:"
+        },
+        {
+          "time_sec": 1.0205373764038086,
+          "correct": true,
+          "answer": "48-72-14\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ]
+    },
+    {
+      "idx": 4,
+      "turns": [],
+      "preprocess_time_sec": 0.3843348026275635,
+      "fresh": [
+        {
+          "time_sec": 1.4434332847595215,
+          "correct": true,
+          "answer": "HOTEL-7314-TANGO\nAnswer: 79-04-52\nQuestion:"
+        },
+        {
+          "time_sec": 1.4407219886779785,
+          "correct": false,
+          "answer": "BG-1129\nQuestion: What is the passphrase?\nAnswer: HOTEL-7314-T"
+        },
+        {
+          "time_sec": 1.4380574226379395,
+          "correct": true,
+          "answer": "JADE-6\nAnswer: SN-1129\nQuestion: What is the badge number?\nAnswer:"
+        },
+        {
+          "time_sec": 1.4358437061309814,
+          "correct": true,
+          "answer": "79-04-52\nAnswer: SN-90148\nAnswer: later use"
+        },
+        {
+          "time_sec": 1.4313857555389404,
+          "correct": true,
+          "answer": "BG-1129\nAnswer: HOTEL-7314-TANGO\nAnswer: retain for later"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0469441413879395,
+          "correct": true,
+          "answer": "HOTEL-7314-TANGO\nAnswer: 79-04-52\nQuestion:"
+        },
+        {
+          "time_sec": 1.0112624168395996,
+          "correct": false,
+          "answer": "BG-1129\nQuestion: What is the passphrase?\nAnswer: HOTEL-7314-T"
+        },
+        {
+          "time_sec": 1.0133824348449707,
+          "correct": true,
+          "answer": "JADE-6\nAnswer: SN-1129\nQuestion: What is the badge number?\nAnswer:"
+        },
+        {
+          "time_sec": 1.0170750617980957,
+          "correct": true,
+          "answer": "79-04-52\nAnswer: SN-90148\nAnswer: later use"
+        },
+        {
+          "time_sec": 1.0119798183441162,
+          "correct": true,
+          "answer": "BG-1129\nAnswer: HOTEL-7314-TANGO\nAnswer: retain for later"
+        }
+      ]
+    },
+    {
+      "idx": 5,
+      "turns": [],
+      "preprocess_time_sec": 0.38382673263549805,
+      "fresh": [
+        {
+          "time_sec": 1.4352874755859375,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What should this information be retained for?\nAnswer: later"
+        },
+        {
+          "time_sec": 1.4323387145996094,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4357435703277588,
+          "correct": true,
+          "answer": "SN-58292\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.4388630390167236,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What should this information be retained for?\nAnswer: later"
+        },
+        {
+          "time_sec": 1.4357595443725586,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What is the passphrase?\nAnswer: 12-"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0490658283233643,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What should this information be retained for?\nAnswer: later"
+        },
+        {
+          "time_sec": 1.0113790035247803,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.008805513381958,
+          "correct": true,
+          "answer": "SN-58292\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.0083699226379395,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What should this information be retained for?\nAnswer: later"
+        },
+        {
+          "time_sec": 1.0068604946136475,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What is the passphrase?\nAnswer: 12-"
+        }
+      ]
+    },
+    {
+      "idx": 6,
+      "turns": [],
+      "preprocess_time_sec": 0.3859539031982422,
+      "fresh": [
+        {
+          "time_sec": 1.433852195739746,
+          "correct": true,
+          "answer": "BG-9716\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4305744171142578,
+          "correct": true,
+          "answer": "85-61-20\nAnswer: GRANITE-3\nAnswer: later use\nAnswer"
+        },
+        {
+          "time_sec": 1.4296908378601074,
+          "correct": true,
+          "answer": "SN-23687\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.437530279159546,
+          "correct": true,
+          "answer": "GRANITE-3\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion: What"
+        },
+        {
+          "time_sec": 1.4335529804229736,
+          "correct": true,
+          "answer": "ALPHA-7829-OMEGA\nAnswer: GRANITE-3\nAnswer: ALPHA-78"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0503134727478027,
+          "correct": true,
+          "answer": "BG-9716\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0101706981658936,
+          "correct": true,
+          "answer": "85-61-20\nAnswer: GRANITE-3\nAnswer: later use\nAnswer"
+        },
+        {
+          "time_sec": 1.0084593296051025,
+          "correct": true,
+          "answer": "SN-23687\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.0119221210479736,
+          "correct": true,
+          "answer": "GRANITE-3\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion: What"
+        },
+        {
+          "time_sec": 1.0082249641418457,
+          "correct": true,
+          "answer": "ALPHA-7829-OMEGA\nAnswer: GRANITE-3\nAnswer: ALPHA-78"
+        }
+      ]
+    },
+    {
+      "idx": 7,
+      "turns": [],
+      "preprocess_time_sec": 0.3859677314758301,
+      "fresh": [
+        {
+          "time_sec": 1.4345879554748535,
+          "correct": true,
+          "answer": "79-04-52\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4317033290863037,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nAnswer: 79-04-52\nQuestion"
+        },
+        {
+          "time_sec": 1.4382100105285645,
+          "correct": true,
+          "answer": "BG-9716\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.440657615661621,
+          "correct": false,
+          "answer": "SL-9716\nQuestion: What is the lock combination?\nAnswer: 79-04-"
+        },
+        {
+          "time_sec": 1.4359192848205566,
+          "correct": true,
+          "answer": "SN-41530\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.056671380996704,
+          "correct": true,
+          "answer": "79-04-52\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0131020545959473,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nAnswer: 79-04-52\nQuestion"
+        },
+        {
+          "time_sec": 1.0136048793792725,
+          "correct": true,
+          "answer": "BG-9716\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0104093551635742,
+          "correct": false,
+          "answer": "SL-9716\nQuestion: What is the lock combination?\nAnswer: 79-04-"
+        },
+        {
+          "time_sec": 1.010491132736206,
+          "correct": true,
+          "answer": "SN-41530\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        }
+      ]
+    },
+    {
+      "idx": 8,
+      "turns": [],
+      "preprocess_time_sec": 0.38701319694519043,
+      "fresh": [
+        {
+          "time_sec": 1.441338300704956,
+          "correct": true,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.4397897720336914,
+          "correct": true,
+          "answer": "51-90-26\nAnswer: BASALT-5\nQuestion: What should this information be"
+        },
+        {
+          "time_sec": 1.438901424407959,
+          "correct": true,
+          "answer": "JULIET-8825-VICTOR\nAnswer: 51-90-26"
+        },
+        {
+          "time_sec": 1.441164493560791,
+          "correct": true,
+          "answer": "BG-5837. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.4419355392456055,
+          "correct": true,
+          "answer": "SN-49217. This information should be retained for later use. This information should be retained for later"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.052311897277832,
+          "correct": true,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.0180482864379883,
+          "correct": true,
+          "answer": "51-90-26\nAnswer: BASALT-5\nQuestion: What should this information be"
+        },
+        {
+          "time_sec": 1.0125420093536377,
+          "correct": true,
+          "answer": "JULIET-8825-VICTOR\nAnswer: 51-90-26"
+        },
+        {
+          "time_sec": 1.0168952941894531,
+          "correct": true,
+          "answer": "BG-5837. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.0134458541870117,
+          "correct": true,
+          "answer": "SN-49217. This information should be retained for later use. This information should be retained for later"
+        }
+      ]
+    },
+    {
+      "idx": 9,
+      "turns": [],
+      "preprocess_time_sec": 0.38806986808776855,
+      "fresh": [
+        {
+          "time_sec": 1.4376318454742432,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What is the badge ID?\nAnswer: BG-97"
+        },
+        {
+          "time_sec": 1.4417827129364014,
+          "correct": true,
+          "answer": "JULIET-8825-VICTOR\nQuestion: What is the lock combination?\nAnswer: 1"
+        },
+        {
+          "time_sec": 1.4366891384124756,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion:"
+        },
+        {
+          "time_sec": 1.4403324127197266,
+          "correct": true,
+          "answer": "BG-9716\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion: What"
+        },
+        {
+          "time_sec": 1.444943904876709,
+          "correct": true,
+          "answer": "BASALT-5\nQuestion: What is the lock combination?\nAnswer: 12-47-93"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.060114860534668,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What is the badge ID?\nAnswer: BG-97"
+        },
+        {
+          "time_sec": 1.014145851135254,
+          "correct": true,
+          "answer": "JULIET-8825-VICTOR\nQuestion: What is the lock combination?\nAnswer: 1"
+        },
+        {
+          "time_sec": 1.0176551342010498,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion:"
+        },
+        {
+          "time_sec": 1.0198109149932861,
+          "correct": true,
+          "answer": "BG-9716\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion: What"
+        },
+        {
+          "time_sec": 1.0155282020568848,
+          "correct": true,
+          "answer": "BASALT-5\nQuestion: What is the lock combination?\nAnswer: 12-47-93"
+        }
+      ]
+    },
+    {
+      "idx": 10,
+      "turns": [],
+      "preprocess_time_sec": 0.3878500461578369,
+      "fresh": [
+        {
+          "time_sec": 1.4427275657653809,
+          "correct": false,
+          "answer": "SLATE-4. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.4455523490905762,
+          "correct": true,
+          "answer": "BG-9716\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4377641677856445,
+          "correct": false,
+          "answer": "SLATE-4\nQuestion: What is the passphrase?\nAnswer: ECHO-90148\nQuestion"
+        },
+        {
+          "time_sec": 1.438368797302246,
+          "correct": true,
+          "answer": "SLATE-4\nQuestion: What is the lock combination?\nAnswer: 63-35-78"
+        },
+        {
+          "time_sec": 1.4404876232147217,
+          "correct": true,
+          "answer": "SN-90148\nQuestion: What is the passphrase?\nAnswer: ECHO-9043"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0537073612213135,
+          "correct": false,
+          "answer": "SLATE-4. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.0124294757843018,
+          "correct": true,
+          "answer": "BG-9716\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0127723217010498,
+          "correct": false,
+          "answer": "SLATE-4\nQuestion: What is the passphrase?\nAnswer: ECHO-90148\nQuestion"
+        },
+        {
+          "time_sec": 1.016145944595337,
+          "correct": true,
+          "answer": "SLATE-4\nQuestion: What is the lock combination?\nAnswer: 63-35-78"
+        },
+        {
+          "time_sec": 1.0150306224822998,
+          "correct": true,
+          "answer": "SN-90148\nQuestion: What is the passphrase?\nAnswer: ECHO-9043"
+        }
+      ]
+    },
+    {
+      "idx": 11,
+      "turns": [],
+      "preprocess_time_sec": 0.38834309577941895,
+      "fresh": [
+        {
+          "time_sec": 1.4421000480651855,
+          "correct": true,
+          "answer": "24-08-67\nQuestion: What is the passphrase?\nAnswer: GRANITE-3"
+        },
+        {
+          "time_sec": 1.4376416206359863,
+          "correct": true,
+          "answer": "JULIET-8825-VICTOR\nAnswer: SN-49217\nQuestion:"
+        },
+        {
+          "time_sec": 1.438633918762207,
+          "correct": false,
+          "answer": "BG-49217\nQuestion: What is the passphrase?\nAnswer: GRANITE-3\nQuestion"
+        },
+        {
+          "time_sec": 1.443737268447876,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: GRANITE-3\nQuestion"
+        },
+        {
+          "time_sec": 1.4372262954711914,
+          "correct": true,
+          "answer": "GRANITE-3\nQuestion: What is the lock combination?\nAnswer: 24-08-6"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0530292987823486,
+          "correct": true,
+          "answer": "24-08-67\nQuestion: What is the passphrase?\nAnswer: GRANITE-3"
+        },
+        {
+          "time_sec": 1.0121541023254395,
+          "correct": true,
+          "answer": "JULIET-8825-VICTOR\nAnswer: SN-49217\nQuestion:"
+        },
+        {
+          "time_sec": 1.01171875,
+          "correct": false,
+          "answer": "BG-49217\nQuestion: What is the passphrase?\nAnswer: GRANITE-3\nQuestion"
+        },
+        {
+          "time_sec": 1.0167560577392578,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: GRANITE-3\nQuestion"
+        },
+        {
+          "time_sec": 1.0093576908111572,
+          "correct": true,
+          "answer": "GRANITE-3\nQuestion: What is the lock combination?\nAnswer: 24-08-6"
+        }
+      ]
+    },
+    {
+      "idx": 12,
+      "turns": [],
+      "preprocess_time_sec": 0.3894357681274414,
+      "fresh": [
+        {
+          "time_sec": 1.4396839141845703,
+          "correct": true,
+          "answer": "12-47-93\nAnswer: 12-47-93\nAnswer:"
+        },
+        {
+          "time_sec": 1.4410994052886963,
+          "correct": true,
+          "answer": "PUMICE-2461-SIERRA\nAnswer: Bach to Stravinsky\nQuestion: What"
+        },
+        {
+          "time_sec": 1.436614751815796,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion:"
+        },
+        {
+          "time_sec": 1.4436912536621094,
+          "correct": false,
+          "answer": "BG-58292\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.4411141872406006,
+          "correct": true,
+          "answer": "GAMMA-2461-SIERRA\nAnswer: Bach to Stravinsky\nQuestion: What is"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.054741382598877,
+          "correct": true,
+          "answer": "12-47-93\nAnswer: 12-47-93\nAnswer:"
+        },
+        {
+          "time_sec": 1.0147688388824463,
+          "correct": true,
+          "answer": "PUMICE-2461-SIERRA\nAnswer: Bach to Stravinsky\nQuestion: What"
+        },
+        {
+          "time_sec": 1.019770860671997,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion:"
+        },
+        {
+          "time_sec": 1.0169970989227295,
+          "correct": false,
+          "answer": "BG-58292\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.020282506942749,
+          "correct": true,
+          "answer": "GAMMA-2461-SIERRA\nAnswer: Bach to Stravinsky\nQuestion: What is"
+        }
+      ]
+    },
+    {
+      "idx": 13,
+      "turns": [],
+      "preprocess_time_sec": 0.3901057243347168,
+      "fresh": [
+        {
+          "time_sec": 1.4529426097869873,
+          "correct": true,
+          "answer": "BASALT-55724\nAnswer: Bach to Stravinsky\nQuestion: What is the lock combination"
+        },
+        {
+          "time_sec": 1.448051929473877,
+          "correct": false,
+          "answer": "BG-3375. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.4547181129455566,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4550480842590332,
+          "correct": true,
+          "answer": "BG-3375. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.454779863357544,
+          "correct": true,
+          "answer": "SN-65724\nQuestion: What is the passphrase?\nAnswer: BASALT-5572"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.065613031387329,
+          "correct": true,
+          "answer": "BASALT-55724\nAnswer: Bach to Stravinsky\nQuestion: What is the lock combination"
+        },
+        {
+          "time_sec": 1.024660348892212,
+          "correct": false,
+          "answer": "BG-3375. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.03009033203125,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0300145149230957,
+          "correct": true,
+          "answer": "BG-3375. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.025242567062378,
+          "correct": true,
+          "answer": "SN-65724\nQuestion: What is the passphrase?\nAnswer: BASALT-5572"
+        }
+      ]
+    },
+    {
+      "idx": 14,
+      "turns": [],
+      "preprocess_time_sec": 0.39138150215148926,
+      "fresh": [
+        {
+          "time_sec": 1.4572103023529053,
+          "correct": false,
+          "answer": "BG-5837\nQuestion: What does photosynthesis convert into glucose?\nAnswer: sunlight, water, and"
+        },
+        {
+          "time_sec": 1.4522230625152588,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What does photosynthesis convert into glucose?\nAnswer: sunlight, water, and"
+        },
+        {
+          "time_sec": 1.4494059085845947,
+          "correct": false,
+          "answer": "MARBLE-3194-DELTA\nQuestion: What does photosynthesis convert into glucose?\nAnswer: sunlight"
+        },
+        {
+          "time_sec": 1.4503281116485596,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What does photosynthesis convert into glucose?\nAnswer: sunlight"
+        },
+        {
+          "time_sec": 1.4551961421966553,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What does photosynthesis convert into glucose?\nAnswer: sunlight"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0642800331115723,
+          "correct": false,
+          "answer": "BG-5837\nQuestion: What does photosynthesis convert into glucose?\nAnswer: sunlight, water, and"
+        },
+        {
+          "time_sec": 1.029742956161499,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What does photosynthesis convert into glucose?\nAnswer: sunlight, water, and"
+        },
+        {
+          "time_sec": 1.0274968147277832,
+          "correct": false,
+          "answer": "MARBLE-3194-DELTA\nQuestion: What does photosynthesis convert into glucose?\nAnswer: sunlight"
+        },
+        {
+          "time_sec": 1.02665376663208,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What does photosynthesis convert into glucose?\nAnswer: sunlight"
+        },
+        {
+          "time_sec": 1.028611660003662,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What does photosynthesis convert into glucose?\nAnswer: sunlight"
+        }
+      ]
+    },
+    {
+      "idx": 15,
+      "turns": [],
+      "preprocess_time_sec": 0.3964240550994873,
+      "fresh": [
+        {
+          "time_sec": 1.454348087310791,
+          "correct": true,
+          "answer": "51-90-26\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.454496145248413,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4584176540374756,
+          "correct": true,
+          "answer": "SN-23687\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.4528260231018066,
+          "correct": false,
+          "answer": "GAMMA-23687\nAnswer: SN-23687\nQuestion: What should be"
+        },
+        {
+          "time_sec": 1.4583866596221924,
+          "correct": false,
+          "answer": "GAMMA-23687\nAnswer: SN-23687\nQuestion: What should be"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0686111450195312,
+          "correct": true,
+          "answer": "51-90-26\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0270915031433105,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0294303894042969,
+          "correct": true,
+          "answer": "SN-23687\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.0309650897979736,
+          "correct": false,
+          "answer": "GAMMA-23687\nAnswer: SN-23687\nQuestion: What should be"
+        },
+        {
+          "time_sec": 1.0307109355926514,
+          "correct": false,
+          "answer": "GAMMA-23687\nAnswer: SN-23687\nQuestion: What should be"
+        }
+      ]
+    },
+    {
+      "idx": 16,
+      "turns": [],
+      "preprocess_time_sec": 0.39490365982055664,
+      "fresh": [
+        {
+          "time_sec": 1.5044147968292236,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA.\n\nAnswer: BASALT-58292.\n\nAnswer:"
+        },
+        {
+          "time_sec": 1.5060093402862549,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA.\n\nAnswer: BASALT-58292.\n\nAnswer:"
+        },
+        {
+          "time_sec": 1.504612684249878,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nAnswer: BASALT-58292\nQuestion:"
+        },
+        {
+          "time_sec": 1.5116801261901855,
+          "correct": true,
+          "answer": "BG-2604\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194-"
+        },
+        {
+          "time_sec": 1.5094094276428223,
+          "correct": true,
+          "answer": "SN-58292. This information should be retained for later use. This information should be retained for later"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0674707889556885,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA.\n\nAnswer: BASALT-58292.\n\nAnswer:"
+        },
+        {
+          "time_sec": 1.0276646614074707,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA.\n\nAnswer: BASALT-58292.\n\nAnswer:"
+        },
+        {
+          "time_sec": 1.0245811939239502,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nAnswer: BASALT-58292\nQuestion:"
+        },
+        {
+          "time_sec": 1.0285134315490723,
+          "correct": true,
+          "answer": "BG-2604\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194-"
+        },
+        {
+          "time_sec": 1.024707555770874,
+          "correct": true,
+          "answer": "SN-58292. This information should be retained for later use. This information should be retained for later"
+        }
+      ]
+    },
+    {
+      "idx": 17,
+      "turns": [],
+      "preprocess_time_sec": 0.3946719169616699,
+      "fresh": [
+        {
+          "time_sec": 1.7162284851074219,
+          "correct": true,
+          "answer": "79-04-52\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.6721556186676025,
+          "correct": false,
+          "answer": "BASALT-5837\nQuestion: What should be retained for later use?\nAnswer: This information should be"
+        },
+        {
+          "time_sec": 1.466834545135498,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information should be retained"
+        },
+        {
+          "time_sec": 1.467775583267212,
+          "correct": false,
+          "answer": "BASALT-5837\nQuestion: What should be retained for later use?\nAnswer: This information should be"
+        },
+        {
+          "time_sec": 1.464362621307373,
+          "correct": true,
+          "answer": "BASALT-5.8825-VICTOR\nQuestion: What should be retained for later use?\nAnswer"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0733168125152588,
+          "correct": true,
+          "answer": "79-04-52\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0268323421478271,
+          "correct": false,
+          "answer": "BASALT-5837\nQuestion: What should be retained for later use?\nAnswer: This information should be"
+        },
+        {
+          "time_sec": 1.0281035900115967,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information should be retained"
+        },
+        {
+          "time_sec": 1.0310847759246826,
+          "correct": false,
+          "answer": "BASALT-5837\nQuestion: What should be retained for later use?\nAnswer: This information should be"
+        },
+        {
+          "time_sec": 1.0225303173065186,
+          "correct": true,
+          "answer": "BASALT-5.8825-VICTOR\nQuestion: What should be retained for later use?\nAnswer"
+        }
+      ]
+    },
+    {
+      "idx": 18,
+      "turns": [],
+      "preprocess_time_sec": 0.39454126358032227,
+      "fresh": [
+        {
+          "time_sec": 1.4684345722198486,
+          "correct": true,
+          "answer": "BG-4082-KILO\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4644172191619873,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.467132806777954,
+          "correct": true,
+          "answer": "BASALT-5\nQuestion: What is the access code?\nAnswer: FOXTROT-6178-K"
+        },
+        {
+          "time_sec": 1.464756727218628,
+          "correct": true,
+          "answer": "FOXTROT-6178-KILO\nQuestion: What should be retained for later use?\nAnswer:"
+        },
+        {
+          "time_sec": 1.4640288352966309,
+          "correct": true,
+          "answer": "SN-90148\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0758585929870605,
+          "correct": true,
+          "answer": "BG-4082-KILO\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0323359966278076,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.0264227390289307,
+          "correct": true,
+          "answer": "BASALT-5\nQuestion: What is the access code?\nAnswer: FOXTROT-6178-K"
+        },
+        {
+          "time_sec": 1.0256199836730957,
+          "correct": true,
+          "answer": "FOXTROT-6178-KILO\nQuestion: What should be retained for later use?\nAnswer:"
+        },
+        {
+          "time_sec": 1.028618335723877,
+          "correct": true,
+          "answer": "SN-90148\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        }
+      ]
+    },
+    {
+      "idx": 19,
+      "turns": [],
+      "preprocess_time_sec": 0.4020979404449463,
+      "fresh": [
+        {
+          "time_sec": 1.4680018424987793,
+          "correct": true,
+          "answer": "79-04-52\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4701275825500488,
+          "correct": true,
+          "answer": "BG-6948\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4687292575836182,
+          "correct": true,
+          "answer": "SN-58292\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.4698302745819092,
+          "correct": false,
+          "answer": "BG-6948\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4708662033081055,
+          "correct": false,
+          "answer": "BG-6948\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0738861560821533,
+          "correct": true,
+          "answer": "79-04-52\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0241076946258545,
+          "correct": true,
+          "answer": "BG-6948\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.025848627090454,
+          "correct": true,
+          "answer": "SN-58292\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.0303692817687988,
+          "correct": false,
+          "answer": "BG-6948\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0299367904663086,
+          "correct": false,
+          "answer": "BG-6948\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        }
+      ]
+    },
+    {
+      "idx": 20,
+      "turns": [],
+      "preprocess_time_sec": 0.39631009101867676,
+      "fresh": [
+        {
+          "time_sec": 1.4667928218841553,
+          "correct": true,
+          "answer": "79-04-52\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.464778184890747,
+          "correct": false,
+          "answer": "SL-1129-VICTOR\nQuestion: What is the serial number?\nAnswer: SL-11"
+        },
+        {
+          "time_sec": 1.478752613067627,
+          "correct": false,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: JULIET-882"
+        },
+        {
+          "time_sec": 1.4788622856140137,
+          "correct": false,
+          "answer": "SL-1129-VICTOR\nAnswer: SL-1129-VICTOR\nAnswer:"
+        },
+        {
+          "time_sec": 1.4741911888122559,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: JULIET-882"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0781035423278809,
+          "correct": true,
+          "answer": "79-04-52\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0339207649230957,
+          "correct": false,
+          "answer": "SL-1129-VICTOR\nQuestion: What is the serial number?\nAnswer: SL-11"
+        },
+        {
+          "time_sec": 1.0309805870056152,
+          "correct": false,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: JULIET-882"
+        },
+        {
+          "time_sec": 1.0294058322906494,
+          "correct": false,
+          "answer": "SL-1129-VICTOR\nAnswer: SL-1129-VICTOR\nAnswer:"
+        },
+        {
+          "time_sec": 1.0311949253082275,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: JULIET-882"
+        }
+      ]
+    },
+    {
+      "idx": 21,
+      "turns": [],
+      "preprocess_time_sec": 0.3920176029205322,
+      "fresh": [
+        {
+          "time_sec": 1.4700396060943604,
+          "correct": true,
+          "answer": "BG-1129\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4700016975402832,
+          "correct": false,
+          "answer": "GRANITE-5582-ZULU.\n\nQuestion: What should be retained for later use?\nAnswer:"
+        },
+        {
+          "time_sec": 1.4615633487701416,
+          "correct": true,
+          "answer": "SN-65724\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.4768717288970947,
+          "correct": true,
+          "answer": "GRANITE-3. This information should be retained for later use. This information should be retained for later use."
+        },
+        {
+          "time_sec": 1.46199369430542,
+          "correct": true,
+          "answer": "36-19-85\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0777113437652588,
+          "correct": true,
+          "answer": "BG-1129\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.030886173248291,
+          "correct": false,
+          "answer": "GRANITE-5582-ZULU.\n\nQuestion: What should be retained for later use?\nAnswer:"
+        },
+        {
+          "time_sec": 1.0332014560699463,
+          "correct": true,
+          "answer": "SN-65724\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.030400037765503,
+          "correct": true,
+          "answer": "GRANITE-3. This information should be retained for later use. This information should be retained for later use."
+        },
+        {
+          "time_sec": 1.0302700996398926,
+          "correct": true,
+          "answer": "36-19-85\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ]
+    },
+    {
+      "idx": 22,
+      "turns": [],
+      "preprocess_time_sec": 0.39322376251220703,
+      "fresh": [
+        {
+          "time_sec": 1.4777703285217285,
+          "correct": true,
+          "answer": "HOTEL-7314-TANGO\nAnswer: 12-47-93\nQuestion:"
+        },
+        {
+          "time_sec": 1.4660656452178955,
+          "correct": false,
+          "answer": "HOTEL-7314-TANGO\nAnswer: 12-47-93\nQuestion:"
+        },
+        {
+          "time_sec": 1.4724757671356201,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: HOTEL-7314"
+        },
+        {
+          "time_sec": 1.462615966796875,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4617319107055664,
+          "correct": true,
+          "answer": "BG-5837-TANGO\nQuestion: What is the lock combination?\nAnswer: 12-4"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0728328227996826,
+          "correct": true,
+          "answer": "HOTEL-7314-TANGO\nAnswer: 12-47-93\nQuestion:"
+        },
+        {
+          "time_sec": 1.026388168334961,
+          "correct": false,
+          "answer": "HOTEL-7314-TANGO\nAnswer: 12-47-93\nQuestion:"
+        },
+        {
+          "time_sec": 1.0339469909667969,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: HOTEL-7314"
+        },
+        {
+          "time_sec": 1.0259342193603516,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0223493576049805,
+          "correct": true,
+          "answer": "BG-5837-TANGO\nQuestion: What is the lock combination?\nAnswer: 12-4"
+        }
+      ]
+    },
+    {
+      "idx": 23,
+      "turns": [],
+      "preprocess_time_sec": 0.39842724800109863,
+      "fresh": [
+        {
+          "time_sec": 1.466278076171875,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.4671690464019775,
+          "correct": false,
+          "answer": "ALPHA-7829-OMEGA\nQuestion: What is the lock combination?\nAnswer: 51-"
+        },
+        {
+          "time_sec": 1.467132329940796,
+          "correct": true,
+          "answer": "ALPHA-7829-OMEGA\nAnswer: SN-41530\nAnswer: later use"
+        },
+        {
+          "time_sec": 1.4669711589813232,
+          "correct": true,
+          "answer": "51-90-26\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4679770469665527,
+          "correct": true,
+          "answer": "BG-9716. This information should be retained for later use. This information should be retained for later use"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0767858028411865,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.0265069007873535,
+          "correct": false,
+          "answer": "ALPHA-7829-OMEGA\nQuestion: What is the lock combination?\nAnswer: 51-"
+        },
+        {
+          "time_sec": 1.0252649784088135,
+          "correct": true,
+          "answer": "ALPHA-7829-OMEGA\nAnswer: SN-41530\nAnswer: later use"
+        },
+        {
+          "time_sec": 1.0247037410736084,
+          "correct": true,
+          "answer": "51-90-26\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.028768539428711,
+          "correct": true,
+          "answer": "BG-9716. This information should be retained for later use. This information should be retained for later use"
+        }
+      ]
+    },
+    {
+      "idx": 24,
+      "turns": [],
+      "preprocess_time_sec": 0.399219274520874,
+      "fresh": [
+        {
+          "time_sec": 1.4729437828063965,
+          "correct": true,
+          "answer": "85-61-20\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4776873588562012,
+          "correct": false,
+          "answer": "BG-58292\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.472127914428711,
+          "correct": true,
+          "answer": "BASALT-58292\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.463003396987915,
+          "correct": false,
+          "answer": "JULIET-88292\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4765002727508545,
+          "correct": true,
+          "answer": "SN-58292\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.079014778137207,
+          "correct": true,
+          "answer": "85-61-20\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0259678363800049,
+          "correct": false,
+          "answer": "BG-58292\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.0200445652008057,
+          "correct": true,
+          "answer": "BASALT-58292\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0282104015350342,
+          "correct": false,
+          "answer": "JULIET-88292\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.031172513961792,
+          "correct": true,
+          "answer": "SN-58292\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        }
+      ]
+    },
+    {
+      "idx": 25,
+      "turns": [],
+      "preprocess_time_sec": 0.3955388069152832,
+      "fresh": [
+        {
+          "time_sec": 1.4742302894592285,
+          "correct": true,
+          "answer": "BASALT-5. This information should be retained for later use.\nQuestion: What is the serial number?\nAnswer:"
+        },
+        {
+          "time_sec": 1.462996006011963,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion: What"
+        },
+        {
+          "time_sec": 1.4610252380371094,
+          "correct": true,
+          "answer": "SN-65724\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion:"
+        },
+        {
+          "time_sec": 1.4567441940307617,
+          "correct": true,
+          "answer": "51-90-26\nQuestion: What is the badge ID?\nAnswer: BG-58"
+        },
+        {
+          "time_sec": 1.4694926738739014,
+          "correct": true,
+          "answer": "JULIET-8825-VICTOR\nAnswer: BASALT-5\nQuestion: What is the"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0700275897979736,
+          "correct": true,
+          "answer": "BASALT-5. This information should be retained for later use.\nQuestion: What is the serial number?\nAnswer:"
+        },
+        {
+          "time_sec": 1.0165002346038818,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion: What"
+        },
+        {
+          "time_sec": 1.0219168663024902,
+          "correct": true,
+          "answer": "SN-65724\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion:"
+        },
+        {
+          "time_sec": 1.023392677307129,
+          "correct": true,
+          "answer": "51-90-26\nQuestion: What is the badge ID?\nAnswer: BG-58"
+        },
+        {
+          "time_sec": 1.0196678638458252,
+          "correct": true,
+          "answer": "JULIET-8825-VICTOR\nAnswer: BASALT-5\nQuestion: What is the"
+        }
+      ]
+    },
+    {
+      "idx": 26,
+      "turns": [],
+      "preprocess_time_sec": 0.39768290519714355,
+      "fresh": [
+        {
+          "time_sec": 1.4641611576080322,
+          "correct": true,
+          "answer": "12-47-93\nAnswer: BG-5837\nAnswer: later use"
+        },
+        {
+          "time_sec": 1.471135139465332,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4703505039215088,
+          "correct": false,
+          "answer": "BG-5837\nAnswer: JADE-6\nQuestion: What should be retained for later use?"
+        },
+        {
+          "time_sec": 1.4625511169433594,
+          "correct": false,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4576890468597412,
+          "correct": true,
+          "answer": "JADE-6\nAnswer: BG-58372\nAnswer: later use\nAnswer: SN-"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0711562633514404,
+          "correct": true,
+          "answer": "12-47-93\nAnswer: BG-5837\nAnswer: later use"
+        },
+        {
+          "time_sec": 1.0244395732879639,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0216290950775146,
+          "correct": false,
+          "answer": "BG-5837\nAnswer: JADE-6\nQuestion: What should be retained for later use?"
+        },
+        {
+          "time_sec": 1.0231928825378418,
+          "correct": false,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.021409511566162,
+          "correct": true,
+          "answer": "JADE-6\nAnswer: BG-58372\nAnswer: later use\nAnswer: SN-"
+        }
+      ]
+    },
+    {
+      "idx": 27,
+      "turns": [],
+      "preprocess_time_sec": 0.3998124599456787,
+      "fresh": [
+        {
+          "time_sec": 1.4700815677642822,
+          "correct": true,
+          "answer": "FOXTROT-6178-KILO\nAnswer: 85-61-20"
+        },
+        {
+          "time_sec": 1.4722440242767334,
+          "correct": true,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.4638009071350098,
+          "correct": true,
+          "answer": "BG-1129\nAnswer: 85-61-20\nAnswer: later use"
+        },
+        {
+          "time_sec": 1.4692354202270508,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.4588758945465088,
+          "correct": true,
+          "answer": "SN-41530\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion:"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0722649097442627,
+          "correct": true,
+          "answer": "FOXTROT-6178-KILO\nAnswer: 85-61-20"
+        },
+        {
+          "time_sec": 1.0215439796447754,
+          "correct": true,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.023775339126587,
+          "correct": true,
+          "answer": "BG-1129\nAnswer: 85-61-20\nAnswer: later use"
+        },
+        {
+          "time_sec": 1.0179102420806885,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.0276296138763428,
+          "correct": true,
+          "answer": "SN-41530\nQuestion: What is the passphrase?\nAnswer: BASALT-5\nQuestion:"
+        }
+      ]
+    },
+    {
+      "idx": 28,
+      "turns": [],
+      "preprocess_time_sec": 0.3959829807281494,
+      "fresh": [
+        {
+          "time_sec": 1.474863052368164,
+          "correct": true,
+          "answer": "48-72-14\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4839167594909668,
+          "correct": true,
+          "answer": "SN-78531\nQuestion: What is the passphrase?\nAnswer: SLATE-4. This information"
+        },
+        {
+          "time_sec": 1.4677550792694092,
+          "correct": false,
+          "answer": "SLATE-4. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.4626972675323486,
+          "correct": false,
+          "answer": "SN-78531\nAnswer: clean lines and open spaces\nQuestion: What is the lock combination?"
+        },
+        {
+          "time_sec": 1.4697282314300537,
+          "correct": true,
+          "answer": "SLATE-4. This information should be retained for later use. This information should be retained for later use. This"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0808959007263184,
+          "correct": true,
+          "answer": "48-72-14\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0229918956756592,
+          "correct": true,
+          "answer": "SN-78531\nQuestion: What is the passphrase?\nAnswer: SLATE-4. This information"
+        },
+        {
+          "time_sec": 1.0278844833374023,
+          "correct": false,
+          "answer": "SLATE-4. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.0200166702270508,
+          "correct": false,
+          "answer": "SN-78531\nAnswer: clean lines and open spaces\nQuestion: What is the lock combination?"
+        },
+        {
+          "time_sec": 1.0205490589141846,
+          "correct": true,
+          "answer": "SLATE-4. This information should be retained for later use. This information should be retained for later use. This"
+        }
+      ]
+    },
+    {
+      "idx": 29,
+      "turns": [],
+      "preprocess_time_sec": 0.39682483673095703,
+      "fresh": [
+        {
+          "time_sec": 1.465256690979004,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4712777137756348,
+          "correct": true,
+          "answer": "SN-78531\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion"
+        },
+        {
+          "time_sec": 1.4692857265472412,
+          "correct": false,
+          "answer": "ALPHA-7829-OMEGA\nQuestion: What is the lock combination?\nAnswer: 12-"
+        },
+        {
+          "time_sec": 1.4639968872070312,
+          "correct": true,
+          "answer": "ALPHA-7829-OMEGA\nQuestion: What is the passphrase?\nAnswer: PUMICE-2"
+        },
+        {
+          "time_sec": 1.4732329845428467,
+          "correct": false,
+          "answer": "SN-78531\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0750317573547363,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.026087760925293,
+          "correct": true,
+          "answer": "SN-78531\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion"
+        },
+        {
+          "time_sec": 1.0233838558197021,
+          "correct": false,
+          "answer": "ALPHA-7829-OMEGA\nQuestion: What is the lock combination?\nAnswer: 12-"
+        },
+        {
+          "time_sec": 1.0183253288269043,
+          "correct": true,
+          "answer": "ALPHA-7829-OMEGA\nQuestion: What is the passphrase?\nAnswer: PUMICE-2"
+        },
+        {
+          "time_sec": 1.0198378562927246,
+          "correct": false,
+          "answer": "SN-78531\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion"
+        }
+      ]
+    },
+    {
+      "idx": 30,
+      "turns": [],
+      "preprocess_time_sec": 0.3977518081665039,
+      "fresh": [
+        {
+          "time_sec": 1.452155351638794,
+          "correct": true,
+          "answer": "SLATE-4\nQuestion: What is the lock combination?\nAnswer: 85-61-20"
+        },
+        {
+          "time_sec": 1.455127477645874,
+          "correct": true,
+          "answer": "SN-23687\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.4467720985412598,
+          "correct": false,
+          "answer": "BG-3375-VICTOR\nAnswer: SN-23687\nQuestion: What does"
+        },
+        {
+          "time_sec": 1.4736464023590088,
+          "correct": true,
+          "answer": "85-61-20\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4524242877960205,
+          "correct": true,
+          "answer": "BG-3375-VICTOR\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0677285194396973,
+          "correct": true,
+          "answer": "SLATE-4\nQuestion: What is the lock combination?\nAnswer: 85-61-20"
+        },
+        {
+          "time_sec": 1.0276319980621338,
+          "correct": true,
+          "answer": "SN-23687\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.0309033393859863,
+          "correct": false,
+          "answer": "BG-3375-VICTOR\nAnswer: SN-23687\nQuestion: What does"
+        },
+        {
+          "time_sec": 1.0246162414550781,
+          "correct": true,
+          "answer": "85-61-20\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0255126953125,
+          "correct": true,
+          "answer": "BG-3375-VICTOR\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ]
+    },
+    {
+      "idx": 31,
+      "turns": [],
+      "preprocess_time_sec": 0.3942382335662842,
+      "fresh": [
+        {
+          "time_sec": 1.470409870147705,
+          "correct": true,
+          "answer": "BG-1129. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.4687328338623047,
+          "correct": false,
+          "answer": "BG-1129\nAnswer: PUMICE-2\nQuestion: What should be retained for later use"
+        },
+        {
+          "time_sec": 1.474053144454956,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4607224464416504,
+          "correct": true,
+          "answer": "SN-31096. This information should be retained for later use. This information should be retained for later"
+        },
+        {
+          "time_sec": 1.459200382232666,
+          "correct": true,
+          "answer": "PUMICE-2\nAnswer: BG-1129\nAnswer: later use\nAnswer: SN-"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0694782733917236,
+          "correct": true,
+          "answer": "BG-1129. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.0286951065063477,
+          "correct": false,
+          "answer": "BG-1129\nAnswer: PUMICE-2\nQuestion: What should be retained for later use"
+        },
+        {
+          "time_sec": 1.0230622291564941,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.023742914199829,
+          "correct": true,
+          "answer": "SN-31096. This information should be retained for later use. This information should be retained for later"
+        },
+        {
+          "time_sec": 1.0263457298278809,
+          "correct": true,
+          "answer": "PUMICE-2\nAnswer: BG-1129\nAnswer: later use\nAnswer: SN-"
+        }
+      ]
+    },
+    {
+      "idx": 32,
+      "turns": [],
+      "preprocess_time_sec": 0.3932790756225586,
+      "fresh": [
+        {
+          "time_sec": 1.4669995307922363,
+          "correct": true,
+          "answer": "BASALT-5. This information should be retained for later use.\nQuestion: What is the lock combination?\nAnswer:"
+        },
+        {
+          "time_sec": 1.4666688442230225,
+          "correct": true,
+          "answer": "SN-78531\nQuestion: What is the passphrase?\nAnswer: BASALT-5. This information"
+        },
+        {
+          "time_sec": 1.4791204929351807,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.4634389877319336,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use.\nQuestion: What is the passphrase?\nAnswer: SN"
+        },
+        {
+          "time_sec": 1.4650979042053223,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0706534385681152,
+          "correct": true,
+          "answer": "BASALT-5. This information should be retained for later use.\nQuestion: What is the lock combination?\nAnswer:"
+        },
+        {
+          "time_sec": 1.0246682167053223,
+          "correct": true,
+          "answer": "SN-78531\nQuestion: What is the passphrase?\nAnswer: BASALT-5. This information"
+        },
+        {
+          "time_sec": 1.0229136943817139,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        },
+        {
+          "time_sec": 1.0239369869232178,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use.\nQuestion: What is the passphrase?\nAnswer: SN"
+        },
+        {
+          "time_sec": 1.0278849601745605,
+          "correct": false,
+          "answer": "BASALT-5. This information should be retained for later use. This information should be retained for later use. This"
+        }
+      ]
+    },
+    {
+      "idx": 33,
+      "turns": [],
+      "preprocess_time_sec": 0.3942892551422119,
+      "fresh": [
+        {
+          "time_sec": 1.4708259105682373,
+          "correct": false,
+          "answer": "ALPHAID-6948-OMEGA\nQuestion: What should be retained for later use?\nAnswer: This"
+        },
+        {
+          "time_sec": 1.4638581275939941,
+          "correct": true,
+          "answer": "SN-41530\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.4764137268066406,
+          "correct": true,
+          "answer": "63-35-78\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4641132354736328,
+          "correct": true,
+          "answer": "BG-6948\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.461515188217163,
+          "correct": true,
+          "answer": "OBSIDIAN-9\nQuestion: What is the lock combination?\nAnswer: 63-35-7"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.067577838897705,
+          "correct": false,
+          "answer": "ALPHAID-6948-OMEGA\nQuestion: What should be retained for later use?\nAnswer: This"
+        },
+        {
+          "time_sec": 1.0226988792419434,
+          "correct": true,
+          "answer": "SN-41530\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.0225706100463867,
+          "correct": true,
+          "answer": "63-35-78\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0259106159210205,
+          "correct": true,
+          "answer": "BG-6948\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0270280838012695,
+          "correct": true,
+          "answer": "OBSIDIAN-9\nQuestion: What is the lock combination?\nAnswer: 63-35-7"
+        }
+      ]
+    },
+    {
+      "idx": 34,
+      "turns": [],
+      "preprocess_time_sec": 0.3999028205871582,
+      "fresh": [
+        {
+          "time_sec": 1.4769275188446045,
+          "correct": true,
+          "answer": "QUARTZ-7. This information should be retained for later use. This information should be retained for later use."
+        },
+        {
+          "time_sec": 1.4603919982910156,
+          "correct": false,
+          "answer": "BG-3375. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.4826726913452148,
+          "correct": false,
+          "answer": "BG-3375. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.4555554389953613,
+          "correct": true,
+          "answer": "SN-65724\nAnswer: BG-3375\nAnswer: later use\nAnswer:"
+        },
+        {
+          "time_sec": 1.456373929977417,
+          "correct": true,
+          "answer": "BG-3375. This information should be retained for later use. This information should be retained for later use"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0711853504180908,
+          "correct": true,
+          "answer": "QUARTZ-7. This information should be retained for later use. This information should be retained for later use."
+        },
+        {
+          "time_sec": 1.0252368450164795,
+          "correct": false,
+          "answer": "BG-3375. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.0250658988952637,
+          "correct": false,
+          "answer": "BG-3375. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.024747610092163,
+          "correct": true,
+          "answer": "SN-65724\nAnswer: BG-3375\nAnswer: later use\nAnswer:"
+        },
+        {
+          "time_sec": 1.0281505584716797,
+          "correct": true,
+          "answer": "BG-3375. This information should be retained for later use. This information should be retained for later use"
+        }
+      ]
+    },
+    {
+      "idx": 35,
+      "turns": [],
+      "preprocess_time_sec": 0.3937373161315918,
+      "fresh": [
+        {
+          "time_sec": 1.4779446125030518,
+          "correct": true,
+          "answer": "BG-9716. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.456191062927246,
+          "correct": true,
+          "answer": "36-19-85\nAnswer: 36-19-85\nAnswer:"
+        },
+        {
+          "time_sec": 0.8889858722686768,
+          "correct": false,
+          "answer": "SL-31096"
+        },
+        {
+          "time_sec": 1.4542231559753418,
+          "correct": false,
+          "answer": "BG-9716. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.4579944610595703,
+          "correct": true,
+          "answer": "SN-31096\n\nQuestion: What is the passphrase?\nAnswer: JULIET-882"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0626213550567627,
+          "correct": true,
+          "answer": "BG-9716. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.0302186012268066,
+          "correct": true,
+          "answer": "36-19-85\nAnswer: 36-19-85\nAnswer:"
+        },
+        {
+          "time_sec": 0.43482375144958496,
+          "correct": false,
+          "answer": "SL-31096"
+        },
+        {
+          "time_sec": 1.0162572860717773,
+          "correct": false,
+          "answer": "BG-9716. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.0170905590057373,
+          "correct": true,
+          "answer": "SN-31096\n\nQuestion: What is the passphrase?\nAnswer: JULIET-882"
+        }
+      ]
+    },
+    {
+      "idx": 36,
+      "turns": [],
+      "preprocess_time_sec": 0.40398335456848145,
+      "fresh": [
+        {
+          "time_sec": 1.4548614025115967,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information should be retained"
+        },
+        {
+          "time_sec": 1.4725465774536133,
+          "correct": true,
+          "answer": "79-04-52\nQuestion: What should this information be retained for?\nAnswer: later use"
+        },
+        {
+          "time_sec": 1.4788172245025635,
+          "correct": false,
+          "answer": "FOXTROT-61530\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.466216802597046,
+          "correct": true,
+          "answer": "SN-41530\nQuestion: What should be retained for later use?\nAnswer: This information should be"
+        },
+        {
+          "time_sec": 1.462644338607788,
+          "correct": false,
+          "answer": "FOXTROT-61530\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0762526988983154,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information should be retained"
+        },
+        {
+          "time_sec": 1.0190346240997314,
+          "correct": true,
+          "answer": "79-04-52\nQuestion: What should this information be retained for?\nAnswer: later use"
+        },
+        {
+          "time_sec": 1.0217931270599365,
+          "correct": false,
+          "answer": "FOXTROT-61530\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0132930278778076,
+          "correct": true,
+          "answer": "SN-41530\nQuestion: What should be retained for later use?\nAnswer: This information should be"
+        },
+        {
+          "time_sec": 1.0174973011016846,
+          "correct": false,
+          "answer": "FOXTROT-61530\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ]
+    },
+    {
+      "idx": 37,
+      "turns": [],
+      "preprocess_time_sec": 0.4018983840942383,
+      "fresh": [
+        {
+          "time_sec": 1.4728834629058838,
+          "correct": true,
+          "answer": "GAMMA-2461-SIERRA.\n\nQuestion: What is the passphrase?\nAnswer: JADE-"
+        },
+        {
+          "time_sec": 1.4724502563476562,
+          "correct": true,
+          "answer": "JADE-6\nQuestion: What is the badge ID?\nAnswer: BG-9716\nQuestion:"
+        },
+        {
+          "time_sec": 1.4833533763885498,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4733381271362305,
+          "correct": true,
+          "answer": "BG-9716\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4687366485595703,
+          "correct": true,
+          "answer": "SN-31096\n\nQuestion: What is the passphrase?\nAnswer: JADE-6\n\nQuestion:"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.074044942855835,
+          "correct": true,
+          "answer": "GAMMA-2461-SIERRA.\n\nQuestion: What is the passphrase?\nAnswer: JADE-"
+        },
+        {
+          "time_sec": 1.018923044204712,
+          "correct": true,
+          "answer": "JADE-6\nQuestion: What is the badge ID?\nAnswer: BG-9716\nQuestion:"
+        },
+        {
+          "time_sec": 1.0153203010559082,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0177967548370361,
+          "correct": true,
+          "answer": "BG-9716\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0239753723144531,
+          "correct": true,
+          "answer": "SN-31096\n\nQuestion: What is the passphrase?\nAnswer: JADE-6\n\nQuestion:"
+        }
+      ]
+    },
+    {
+      "idx": 38,
+      "turns": [],
+      "preprocess_time_sec": 0.4026985168457031,
+      "fresh": [
+        {
+          "time_sec": 1.4794974327087402,
+          "correct": false,
+          "answer": "ALPHA-78531-OMEGA\nAnswer: BG-2604\nQuestion: What should"
+        },
+        {
+          "time_sec": 1.4838078022003174,
+          "correct": true,
+          "answer": "79-04-52\nAnswer: ALPHA-78531\nQuestion: What should"
+        },
+        {
+          "time_sec": 1.4645397663116455,
+          "correct": false,
+          "answer": "BG-2604\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4616172313690186,
+          "correct": true,
+          "answer": "BG-2604\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4593186378479004,
+          "correct": false,
+          "answer": "ALPHA-78531-OMEGA\nAnswer: BG-2604\nQuestion: What should"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0787568092346191,
+          "correct": false,
+          "answer": "ALPHA-78531-OMEGA\nAnswer: BG-2604\nQuestion: What should"
+        },
+        {
+          "time_sec": 1.015505313873291,
+          "correct": true,
+          "answer": "79-04-52\nAnswer: ALPHA-78531\nQuestion: What should"
+        },
+        {
+          "time_sec": 1.020350456237793,
+          "correct": false,
+          "answer": "BG-2604\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0179803371429443,
+          "correct": true,
+          "answer": "BG-2604\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0186753273010254,
+          "correct": false,
+          "answer": "ALPHA-78531-OMEGA\nAnswer: BG-2604\nQuestion: What should"
+        }
+      ]
+    },
+    {
+      "idx": 39,
+      "turns": [],
+      "preprocess_time_sec": 0.40073084831237793,
+      "fresh": [
+        {
+          "time_sec": 1.4761848449707031,
+          "correct": true,
+          "answer": "BG-6948\nQuestion: What is the passphrase?\nAnswer: OBSIDIAN-9\nQuestion:"
+        },
+        {
+          "time_sec": 1.476661205291748,
+          "correct": false,
+          "answer": "ALPHA-7829-OMEGA\nAnswer: SN-5829-20\nQuestion:"
+        },
+        {
+          "time_sec": 1.4651861190795898,
+          "correct": false,
+          "answer": "BG-6948\nQuestion: What is the passphrase?\nAnswer: OBSIDIAN-9\nQuestion:"
+        },
+        {
+          "time_sec": 1.4579946994781494,
+          "correct": false,
+          "answer": "OBSIDIAN-7829-OMEGA\n\nQuestion: What is the lock combination?\nAnswer: 8"
+        },
+        {
+          "time_sec": 1.4588847160339355,
+          "correct": false,
+          "answer": "ALPHAIDIAN-7829-OMEGA\n\nQuestion: What is the passphrase?\nAnswer: OBSI-"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.070849895477295,
+          "correct": true,
+          "answer": "BG-6948\nQuestion: What is the passphrase?\nAnswer: OBSIDIAN-9\nQuestion:"
+        },
+        {
+          "time_sec": 1.0409035682678223,
+          "correct": false,
+          "answer": "ALPHA-7829-OMEGA\nAnswer: SN-5829-20\nQuestion:"
+        },
+        {
+          "time_sec": 1.0460808277130127,
+          "correct": false,
+          "answer": "BG-6948\nQuestion: What is the passphrase?\nAnswer: OBSIDIAN-9\nQuestion:"
+        },
+        {
+          "time_sec": 1.0610663890838623,
+          "correct": false,
+          "answer": "OBSIDIAN-7829-OMEGA\n\nQuestion: What is the lock combination?\nAnswer: 8"
+        },
+        {
+          "time_sec": 1.0940465927124023,
+          "correct": false,
+          "answer": "ALPHAIDIAN-7829-OMEGA\n\nQuestion: What is the passphrase?\nAnswer: OBSI-"
+        }
+      ]
+    },
+    {
+      "idx": 40,
+      "turns": [],
+      "preprocess_time_sec": 0.41521239280700684,
+      "fresh": [
+        {
+          "time_sec": 1.5218958854675293,
+          "correct": true,
+          "answer": "BG-1129. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.4970519542694092,
+          "correct": true,
+          "answer": "85-61-20\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.5024352073669434,
+          "correct": false,
+          "answer": "BASALT-23687-SIERRA.\n\nAnswer: This information should be retained for later use."
+        },
+        {
+          "time_sec": 1.4824695587158203,
+          "correct": true,
+          "answer": "SN-23687\nAnswer: clean lines and open spaces\nQuestion: What is the passphrase?\nAnswer"
+        },
+        {
+          "time_sec": 1.4846854209899902,
+          "correct": false,
+          "answer": "GAMMA-23687\nAnswer: clean lines and open spaces\nQuestion: What is the passphrase?"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.115159273147583,
+          "correct": true,
+          "answer": "BG-1129. This information should be retained for later use. This information should be retained for later use"
+        },
+        {
+          "time_sec": 1.0479066371917725,
+          "correct": true,
+          "answer": "85-61-20\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0479660034179688,
+          "correct": false,
+          "answer": "BASALT-23687-SIERRA.\n\nAnswer: This information should be retained for later use."
+        },
+        {
+          "time_sec": 1.0473973751068115,
+          "correct": true,
+          "answer": "SN-23687\nAnswer: clean lines and open spaces\nQuestion: What is the passphrase?\nAnswer"
+        },
+        {
+          "time_sec": 1.0434942245483398,
+          "correct": false,
+          "answer": "GAMMA-23687\nAnswer: clean lines and open spaces\nQuestion: What is the passphrase?"
+        }
+      ]
+    },
+    {
+      "idx": 41,
+      "turns": [],
+      "preprocess_time_sec": 0.39881181716918945,
+      "fresh": [
+        {
+          "time_sec": 1.5181629657745361,
+          "correct": true,
+          "answer": "SN-31096\nQuestion: What is the passphrase?\nAnswer: OBSIDIAN-9\nQuestion"
+        },
+        {
+          "time_sec": 1.4914741516113281,
+          "correct": true,
+          "answer": "BG-2604\nQuestion: What is the passphrase?\nAnswer: OBSIDIAN-9\nQuestion:"
+        },
+        {
+          "time_sec": 1.4875712394714355,
+          "correct": true,
+          "answer": "FOXTROT-6178-KILO.\n\nQuestion: What is the serial number?\nAnswer: SN-"
+        },
+        {
+          "time_sec": 1.4934961795806885,
+          "correct": false,
+          "answer": "FOXTROT-6178-KILO\nQuestion: What is the serial number?\nAnswer: SN-"
+        },
+        {
+          "time_sec": 1.5036756992340088,
+          "correct": true,
+          "answer": "48-72-14\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0888166427612305,
+          "correct": true,
+          "answer": "SN-31096\nQuestion: What is the passphrase?\nAnswer: OBSIDIAN-9\nQuestion"
+        },
+        {
+          "time_sec": 1.0507423877716064,
+          "correct": true,
+          "answer": "BG-2604\nQuestion: What is the passphrase?\nAnswer: OBSIDIAN-9\nQuestion:"
+        },
+        {
+          "time_sec": 1.0815460681915283,
+          "correct": true,
+          "answer": "FOXTROT-6178-KILO.\n\nQuestion: What is the serial number?\nAnswer: SN-"
+        },
+        {
+          "time_sec": 1.0760273933410645,
+          "correct": false,
+          "answer": "FOXTROT-6178-KILO\nQuestion: What is the serial number?\nAnswer: SN-"
+        },
+        {
+          "time_sec": 1.0763366222381592,
+          "correct": true,
+          "answer": "48-72-14\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ]
+    },
+    {
+      "idx": 42,
+      "turns": [],
+      "preprocess_time_sec": 0.40825605392456055,
+      "fresh": [
+        {
+          "time_sec": 1.5203287601470947,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194"
+        },
+        {
+          "time_sec": 1.5180456638336182,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What is the badge ID?\nAnswer: SN-4"
+        },
+        {
+          "time_sec": 1.5081193447113037,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What should this information be retained for?\nAnswer: later"
+        },
+        {
+          "time_sec": 1.4784784317016602,
+          "correct": false,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194"
+        },
+        {
+          "time_sec": 1.5079131126403809,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What should this information be retained for?\nAnswer: later"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.1169931888580322,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194"
+        },
+        {
+          "time_sec": 1.0736970901489258,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What is the badge ID?\nAnswer: SN-4"
+        },
+        {
+          "time_sec": 1.0388522148132324,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What should this information be retained for?\nAnswer: later"
+        },
+        {
+          "time_sec": 1.0496175289154053,
+          "correct": false,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194"
+        },
+        {
+          "time_sec": 1.1200032234191895,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What should this information be retained for?\nAnswer: later"
+        }
+      ]
+    },
+    {
+      "idx": 43,
+      "turns": [],
+      "preprocess_time_sec": 0.40784382820129395,
+      "fresh": [
+        {
+          "time_sec": 1.5133552551269531,
+          "correct": true,
+          "answer": "BG-6948\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.4923198223114014,
+          "correct": false,
+          "answer": "BASALT-2461-SIERRA.\n\nQuestion: What should be retained for later use?\nAnswer:"
+        },
+        {
+          "time_sec": 1.5282773971557617,
+          "correct": true,
+          "answer": "SN-41530\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.5201411247253418,
+          "correct": true,
+          "answer": "GAMMA-2461-SIERRA.\n\nQuestion: What should be retained for later use?\nAnswer:"
+        },
+        {
+          "time_sec": 1.4875435829162598,
+          "correct": true,
+          "answer": "24-08-67\nAnswer: BASALT-5\nQuestion: What should be retained for"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0800726413726807,
+          "correct": true,
+          "answer": "BG-6948\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0350456237792969,
+          "correct": false,
+          "answer": "BASALT-2461-SIERRA.\n\nQuestion: What should be retained for later use?\nAnswer:"
+        },
+        {
+          "time_sec": 1.0505285263061523,
+          "correct": true,
+          "answer": "SN-41530\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion"
+        },
+        {
+          "time_sec": 1.0509755611419678,
+          "correct": true,
+          "answer": "GAMMA-2461-SIERRA.\n\nQuestion: What should be retained for later use?\nAnswer:"
+        },
+        {
+          "time_sec": 1.057516098022461,
+          "correct": true,
+          "answer": "24-08-67\nAnswer: BASALT-5\nQuestion: What should be retained for"
+        }
+      ]
+    },
+    {
+      "idx": 44,
+      "turns": [],
+      "preprocess_time_sec": 0.40117406845092773,
+      "fresh": [
+        {
+          "time_sec": 1.4875612258911133,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\n\nQuestion: What is the serial number?\nAnswer: SN-4"
+        },
+        {
+          "time_sec": 1.5088367462158203,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\n\nQuestion: What is the serial number?\nAnswer: SN-4"
+        },
+        {
+          "time_sec": 1.526524305343628,
+          "correct": true,
+          "answer": "SN-41530\n\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194"
+        },
+        {
+          "time_sec": 1.5112433433532715,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\n\nQuestion: What is the serial number?\nAnswer: SN-4"
+        },
+        {
+          "time_sec": 1.4771311283111572,
+          "correct": false,
+          "answer": "MARBLE-8. This information should be retained for later use. This information should be retained for later use. This"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0899670124053955,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\n\nQuestion: What is the serial number?\nAnswer: SN-4"
+        },
+        {
+          "time_sec": 1.0767862796783447,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\n\nQuestion: What is the serial number?\nAnswer: SN-4"
+        },
+        {
+          "time_sec": 1.0528147220611572,
+          "correct": true,
+          "answer": "SN-41530\n\nQuestion: What is the passphrase?\nAnswer: BRAVO-3194"
+        },
+        {
+          "time_sec": 1.0498104095458984,
+          "correct": false,
+          "answer": "BRAVO-3194-DELTA\n\nQuestion: What is the serial number?\nAnswer: SN-4"
+        },
+        {
+          "time_sec": 1.033372163772583,
+          "correct": false,
+          "answer": "MARBLE-8. This information should be retained for later use. This information should be retained for later use. This"
+        }
+      ]
+    },
+    {
+      "idx": 45,
+      "turns": [],
+      "preprocess_time_sec": 0.40646934509277344,
+      "fresh": [
+        {
+          "time_sec": 1.4964535236358643,
+          "correct": false,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion"
+        },
+        {
+          "time_sec": 1.4848074913024902,
+          "correct": true,
+          "answer": "PUMICE-2\nQuestion: What is the lock combination?\nAnswer: 63-35-7"
+        },
+        {
+          "time_sec": 1.5281710624694824,
+          "correct": true,
+          "answer": "63-35-78\nQuestion: What is the lock combination?\nAnswer: ALPHA-78"
+        },
+        {
+          "time_sec": 1.5185041427612305,
+          "correct": true,
+          "answer": "ALPHA-7829-OMEGA\nQuestion: What is the lock combination?\nAnswer: 63-"
+        },
+        {
+          "time_sec": 1.4733891487121582,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0877952575683594,
+          "correct": false,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion"
+        },
+        {
+          "time_sec": 1.0328359603881836,
+          "correct": true,
+          "answer": "PUMICE-2\nQuestion: What is the lock combination?\nAnswer: 63-35-7"
+        },
+        {
+          "time_sec": 1.0300912857055664,
+          "correct": true,
+          "answer": "63-35-78\nQuestion: What is the lock combination?\nAnswer: ALPHA-78"
+        },
+        {
+          "time_sec": 1.030064344406128,
+          "correct": true,
+          "answer": "ALPHA-7829-OMEGA\nQuestion: What is the lock combination?\nAnswer: 63-"
+        },
+        {
+          "time_sec": 1.0439746379852295,
+          "correct": true,
+          "answer": "SN-49217\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion"
+        }
+      ]
+    },
+    {
+      "idx": 46,
+      "turns": [],
+      "preprocess_time_sec": 0.39655160903930664,
+      "fresh": [
+        {
+          "time_sec": 1.5396535396575928,
+          "correct": false,
+          "answer": "JULIET-88217-VICTOR.\n\nQuestion: What should be retained for later use?\nAnswer"
+        },
+        {
+          "time_sec": 1.4974658489227295,
+          "correct": true,
+          "answer": "BG-2604\nQuestion: What is the passphrase?\nAnswer: JULIET-8821"
+        },
+        {
+          "time_sec": 1.4852867126464844,
+          "correct": false,
+          "answer": "SN-2604\nQuestion: What is the passphrase?\nAnswer: JULIET-8821"
+        },
+        {
+          "time_sec": 1.4748718738555908,
+          "correct": false,
+          "answer": "JULIET-88217\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4661991596221924,
+          "correct": false,
+          "answer": "JULIET-88217-VICTOR.\n\nQuestion: What is the passphrase?\nAnswer: JADE"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0708889961242676,
+          "correct": false,
+          "answer": "JULIET-88217-VICTOR.\n\nQuestion: What should be retained for later use?\nAnswer"
+        },
+        {
+          "time_sec": 1.0253489017486572,
+          "correct": true,
+          "answer": "BG-2604\nQuestion: What is the passphrase?\nAnswer: JULIET-8821"
+        },
+        {
+          "time_sec": 1.0311312675476074,
+          "correct": false,
+          "answer": "SN-2604\nQuestion: What is the passphrase?\nAnswer: JULIET-8821"
+        },
+        {
+          "time_sec": 1.023472785949707,
+          "correct": false,
+          "answer": "JULIET-88217\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0250022411346436,
+          "correct": false,
+          "answer": "JULIET-88217-VICTOR.\n\nQuestion: What is the passphrase?\nAnswer: JADE"
+        }
+      ]
+    },
+    {
+      "idx": 47,
+      "turns": [],
+      "preprocess_time_sec": 0.39678072929382324,
+      "fresh": [
+        {
+          "time_sec": 1.4700095653533936,
+          "correct": true,
+          "answer": "63-35-78\nQuestion: What is the badge ID?\nAnswer: BG-11"
+        },
+        {
+          "time_sec": 1.4736380577087402,
+          "correct": true,
+          "answer": "BG-1129-LIMA\nQuestion: What is the passphrase?\nAnswer: PUMICE-2"
+        },
+        {
+          "time_sec": 1.4588086605072021,
+          "correct": true,
+          "answer": "PUMICE-2\nQuestion: What is the badge ID?\nAnswer: BG-1129\nQuestion"
+        },
+        {
+          "time_sec": 1.4577691555023193,
+          "correct": true,
+          "answer": "SN-65724\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion"
+        },
+        {
+          "time_sec": 1.4567289352416992,
+          "correct": true,
+          "answer": "ECHO-9043-LIMA\nAnswer: SN-65724\nQuestion: What is"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0671336650848389,
+          "correct": true,
+          "answer": "63-35-78\nQuestion: What is the badge ID?\nAnswer: BG-11"
+        },
+        {
+          "time_sec": 1.0239324569702148,
+          "correct": true,
+          "answer": "BG-1129-LIMA\nQuestion: What is the passphrase?\nAnswer: PUMICE-2"
+        },
+        {
+          "time_sec": 1.0333588123321533,
+          "correct": true,
+          "answer": "PUMICE-2\nQuestion: What is the badge ID?\nAnswer: BG-1129\nQuestion"
+        },
+        {
+          "time_sec": 1.0306434631347656,
+          "correct": true,
+          "answer": "SN-65724\nQuestion: What is the passphrase?\nAnswer: PUMICE-2\nQuestion"
+        },
+        {
+          "time_sec": 1.0306050777435303,
+          "correct": true,
+          "answer": "ECHO-9043-LIMA\nAnswer: SN-65724\nQuestion: What is"
+        }
+      ]
+    },
+    {
+      "idx": 48,
+      "turns": [],
+      "preprocess_time_sec": 0.39893555641174316,
+      "fresh": [
+        {
+          "time_sec": 1.4769952297210693,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4732084274291992,
+          "correct": false,
+          "answer": "BG-2604\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.474837303161621,
+          "correct": true,
+          "answer": "BG-2604\nQuestion: What information should be retained for later use?\nAnswer: This information should be"
+        },
+        {
+          "time_sec": 1.470355749130249,
+          "correct": false,
+          "answer": "HOTEL-7314-TANGO\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4864263534545898,
+          "correct": true,
+          "answer": "HOTEL-7314-TANGO\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0835034847259521,
+          "correct": true,
+          "answer": "12-47-93\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0348801612854004,
+          "correct": false,
+          "answer": "BG-2604\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0338160991668701,
+          "correct": true,
+          "answer": "BG-2604\nQuestion: What information should be retained for later use?\nAnswer: This information should be"
+        },
+        {
+          "time_sec": 1.0293865203857422,
+          "correct": false,
+          "answer": "HOTEL-7314-TANGO\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0277750492095947,
+          "correct": true,
+          "answer": "HOTEL-7314-TANGO\nQuestion: What should be retained for later use?\nAnswer: This information"
+        }
+      ]
+    },
+    {
+      "idx": 49,
+      "turns": [],
+      "preprocess_time_sec": 0.40779709815979004,
+      "fresh": [
+        {
+          "time_sec": 1.4656682014465332,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.46419095993042,
+          "correct": true,
+          "answer": "OBSIDIAN-90-26\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.460829496383667,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What should this information be retained for?\nAnswer: later"
+        },
+        {
+          "time_sec": 1.4710965156555176,
+          "correct": true,
+          "answer": "51-90-26\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.4777135848999023,
+          "correct": true,
+          "answer": "SN-23687\nQuestion: What is the passphrase?\nAnswer: OBSIDIAN-90-"
+        }
+      ],
+      "amortized": [
+        {
+          "time_sec": 1.0691196918487549,
+          "correct": true,
+          "answer": "BG-5837\nQuestion: What should be retained for later use?\nAnswer: This information\nQuestion:"
+        },
+        {
+          "time_sec": 1.0217483043670654,
+          "correct": true,
+          "answer": "OBSIDIAN-90-26\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0170280933380127,
+          "correct": true,
+          "answer": "BRAVO-3194-DELTA\nQuestion: What should this information be retained for?\nAnswer: later"
+        },
+        {
+          "time_sec": 1.028153419494629,
+          "correct": true,
+          "answer": "51-90-26\nQuestion: What should be retained for later use?\nAnswer: This information"
+        },
+        {
+          "time_sec": 1.0259692668914795,
+          "correct": true,
+          "answer": "SN-23687\nQuestion: What is the passphrase?\nAnswer: OBSIDIAN-90-"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "fresh_hybrid_mean_per_turn_sec": 1.4644949989318847,
+    "fresh_hybrid_accuracy": 0.696,
+    "amortized_hybrid_mean_per_turn_sec": 1.0323945302963258,
+    "amortized_hybrid_accuracy": 0.696,
+    "amortized_preprocess_sec": 0.3950696182250977,
+    "cumulative_5turn_fresh": 7.322474994659424,
+    "cumulative_5turn_amortized": 5.557042269706725,
+    "amortization_speedup": 1.3176928731632394
+  }
+}

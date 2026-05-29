@@ -1,0 +1,33 @@
+{
+  "model": "mistral-small-24b",
+  "method": "multiplicative_k300 + KIVI (per-channel keys, per-token values, group=32)",
+  "n_samples": 200,
+  "seed": 42,
+  "k": 300,
+  "results": {
+    "k2v2": {
+      "kbits": 2,
+      "vbits": 2,
+      "accuracy": 0.585,
+      "elapsed_s": 583.3699021339417
+    },
+    "k4v2": {
+      "kbits": 4,
+      "vbits": 2,
+      "accuracy": 0.58,
+      "elapsed_s": 591.596200466156
+    },
+    "k4v4": {
+      "kbits": 4,
+      "vbits": 4,
+      "accuracy": 0.595,
+      "elapsed_s": 601.9695398807526
+    },
+    "k8v4": {
+      "kbits": 8,
+      "vbits": 4,
+      "accuracy": 0.6,
+      "elapsed_s": 600.5853817462921
+    }
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "rows": [
+    {
+      "tag": "qwen7b",
+      "model": "qwen2.5-7b",
+      "pos_robust_pure": 0.6074999999999999,
+      "pos_robust_hybrid": 0.6925,
+      "needle_n20": {
+        "streaming_llm": 0.4,
+        "h2o": 0.15,
+        "snapkv": 0.74,
+        "multiplicative": 0.72,
+        "hybrid": 0.9099999999999999
+      },
+      "tq_squad": null,
+      "bytes_fp16_k300": 17203200,
+      "bytes_fp16_full_n20": 440401920,
+      "bytes_k8v4_k300": 6451200.0,
+      "bytes_k4v4_k300": 4300800.0,
+      "compression_vs_full": 25.6,
+      "compression_vs_full_k8v4": 68.26666666666667
+    },
+    {
+      "tag": "qwen14b",
+      "model": "qwen2.5-14b",
+      "pos_robust_pure": 0.6375,
+      "pos_robust_hybrid": 0.738,
+      "needle_n20": {
+        "streaming_llm": 0.35,
+        "h2o": 0.02,
+        "snapkv": 0.74,
+        "multiplicative": 0.79,
+        "hybrid": 1.0
+      },
+      "tq_squad": {
+        "multiplicative_fp16": 0.75,
+        "multiplicative_k8v4_lm": 0.695,
+        "rag_k1": 0.81
+      },
+      "bytes_fp16_k300": 58982400,
+      "bytes_fp16_full_n20": 1509949440,
+      "bytes_k8v4_k300": 22118400.0,
+      "bytes_k4v4_k300": 14745600.0,
+      "compression_vs_full": 25.6,
+      "compression_vs_full_k8v4": 68.26666666666667
+    },
+    {
+      "tag": "qwen32b",
+      "model": "qwen2.5-32b",
+      "pos_robust_pure": 0.647,
+      "pos_robust_hybrid": 0.725,
+      "needle_n20": {
+        "streaming_llm": 0.4,
+        "h2o": 0.19,
+        "snapkv": 0.45999999999999996,
+        "multiplicative": 0.5,
+        "hybrid": 1.0
+      },
+      "tq_squad": {
+        "multiplicative_fp16": 0.785,
+        "multiplicative_k8v4_lm": 0.77,
+        "rag_k1": 0.835
+      },
+      "bytes_fp16_k300": 78643200,
+      "bytes_fp16_full_n20": 2013265920,
+      "bytes_k8v4_k300": 29491200.0,
+      "bytes_k4v4_k300": 19660800.0,
+      "compression_vs_full": 25.6,
+      "compression_vs_full_k8v4": 68.26666666666667
+    },
+    {
+      "tag": "llama8b",
+      "model": "llama-3.1-8b",
+      "pos_robust_pure": 0.5645,
+      "pos_robust_hybrid": 0.659,
+      "needle_n20": {
+        "streaming_llm": 0.38,
+        "h2o": 0.02,
+        "snapkv": 0.63,
+        "multiplicative": 0.5800000000000001,
+        "hybrid": 0.95
+      },
+      "tq_squad": {
+        "multiplicative_fp16": 0.785,
+        "multiplicative_k8v4_lm": 0.785,
+        "rag_k1": 0.815
+      },
+      "bytes_fp16_k300": 39321600,
+      "bytes_fp16_full_n20": 1006632960,
+      "bytes_k8v4_k300": 14745600.0,
+      "bytes_k4v4_k300": 9830400.0,
+      "compression_vs_full": 25.6,
+      "compression_vs_full_k8v4": 68.26666666666667
+    },
+    {
+      "tag": "mistral7b",
+      "model": "mistral-7b-v0.3",
+      "pos_robust_pure": 0.4405,
+      "pos_robust_hybrid": 0.5844999999999999,
+      "needle_n20": {
+        "streaming_llm": 0.25999999999999995,
+        "h2o": 0.0,
+        "snapkv": 0.38,
+        "multiplicative": 0.05,
+        "hybrid": 0.32
+      },
+      "tq_squad": {
+        "multiplicative_fp16": 0.725,
+        "multiplicative_k8v4_lm": 0.72,
+        "rag_k1": 0.69
+      },
+      "bytes_fp16_k300": 39321600,
+      "bytes_fp16_full_n20": 1006632960,
+      "bytes_k8v4_k300": 14745600.0,
+      "bytes_k4v4_k300": 9830400.0,
+      "compression_vs_full": 25.6,
+      "compression_vs_full_k8v4": 68.26666666666667
+    },
+    {
+      "tag": "mistral24b",
+      "model": "mistral-small-24b",
+      "pos_robust_pure": 0.599,
+      "pos_robust_hybrid": 0.6295,
+      "needle_n20": {
+        "streaming_llm": 0.4,
+        "h2o": 0.0,
+        "snapkv": 0.79,
+        "multiplicative": 0.73,
+        "hybrid": 0.5399999999999999
+      },
+      "tq_squad": {
+        "multiplicative_fp16": 0.795,
+        "multiplicative_k8v4_lm": 0.725,
+        "rag_k1": 0.8
+      },
+      "bytes_fp16_k300": 49152000,
+      "bytes_fp16_full_n20": 1258291200,
+      "bytes_k8v4_k300": 18432000.0,
+      "bytes_k4v4_k300": 12288000.0,
+      "compression_vs_full": 25.6,
+      "compression_vs_full_k8v4": 68.26666666666667
+    }
+  ]
+}

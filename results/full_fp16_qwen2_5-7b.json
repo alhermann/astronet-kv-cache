@@ -1,0 +1,30 @@
+{
+  "model": "qwen2.5-7b",
+  "n_eval": 100,
+  "seed": 42,
+  "method": "full_fp16",
+  "note": "Whole concatenated multi-window context fed to the model in one pass; no KV compression, no eviction. Backbone is still 4-bit nf4 quantised, only the KV cache is FP16 (the natural state).",
+  "n_windows": 5,
+  "results": {
+    "pos_0": {
+      "full_fp16": 0.85,
+      "truncated": 0
+    },
+    "pos_1": {
+      "full_fp16": 0.85,
+      "truncated": 0
+    },
+    "pos_2": {
+      "full_fp16": 0.86,
+      "truncated": 0
+    },
+    "pos_3": {
+      "full_fp16": 0.87,
+      "truncated": 0
+    }
+  },
+  "average": {
+    "full_fp16": 0.8575,
+    "truncated_total": 0
+  }
+}

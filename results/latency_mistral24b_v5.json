@@ -1,0 +1,43 @@
+{
+  "k": 300,
+  "n_samples": 18,
+  "window_processing_mean_s": 1.2900430626339383,
+  "window_processing_std_s": 0.10008090337636323,
+  "streaming_llm": {
+    "select_mean_s": 0.0001868936750623915,
+    "generate_mean_s": 1.3445516294903226,
+    "total_mean_s": 2.634781585799323,
+    "total_std_s": 0.17397712770750867
+  },
+  "h2o": {
+    "select_mean_s": 0.0004360145992702908,
+    "generate_mean_s": 1.2272575166490343,
+    "total_mean_s": 2.5177365938822427,
+    "total_std_s": 0.34308829259708024
+  },
+  "snapkv": {
+    "select_mean_s": 0.2625240749782986,
+    "generate_mean_s": 1.2661919726265802,
+    "total_mean_s": 2.818759110238817,
+    "total_std_s": 0.286372854772389
+  },
+  "multiplicative": {
+    "select_mean_s": 0.2625540362464057,
+    "generate_mean_s": 1.2640320857365925,
+    "total_mean_s": 2.8166291846169367,
+    "total_std_s": 0.2877754808196942
+  },
+  "rag_k1": {
+    "select_mean_s": 0.0961910883585612,
+    "generate_mean_s": 1.048951612578498,
+    "total_mean_s": 1.1451427009370592,
+    "total_std_s": 0.437827749183603
+  },
+  "rag_k3": {
+    "select_mean_s": 0.09310534265306261,
+    "generate_mean_s": 1.6526023414399889,
+    "total_mean_s": 1.7457076840930514,
+    "total_std_s": 0.08737346741207927
+  },
+  "note": "AstroNet S1 reuses window_processing across methods. Reported total for KV methods = window_processing + select + generate. RAG total includes encoder forward + retrieval + a separate generation pass. AstroNet S1+S2 latency = AstroNet S1 + Stage-2 forward (negligible: small module)."
+}

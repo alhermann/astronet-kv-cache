@@ -1,0 +1,1389 @@
+{
+  "config": {
+    "model_path": "./models/llama-3.1-8b",
+    "hybrid_checkpoint": "./checkpoints/astro_hybrid_llama-3_1-8b_n16_k284_t5000_s42.pt",
+    "device": "cuda:1",
+    "task": "hotpotqa",
+    "n_samples": 50,
+    "k": 300,
+    "n_mem": 16,
+    "attn_dim": 256,
+    "chunk_size": 384,
+    "multi_gpu": false,
+    "save_path": "logs/results/hybrid_rag_longbench_hotpotqa_llama8b_v8.json"
+  },
+  "summary": {
+    "hybrid_only": {
+      "mean_f1": 0.49531578283399164,
+      "n": 50
+    },
+    "rag_k1": {
+      "mean_f1": 0.5416514915994971,
+      "n": 50
+    },
+    "rag_k3": {
+      "mean_f1": 0.5200753291698599,
+      "n": 50
+    },
+    "hybrid_plus_rag1": {
+      "mean_f1": 0.4674122510810318,
+      "n": 50
+    },
+    "hybrid_plus_rag3": {
+      "mean_f1": 0.48066147306854473,
+      "n": 50
+    }
+  },
+  "raw": [
+    {
+      "idx": 0,
+      "question": "Which case was brought to court first Miller v. California or Gates v. Collier ?",
+      "gold": [
+        "Miller v. California"
+      ],
+      "hybrid_only": {
+        "answer": "Miller v. California",
+        "f1": 1.0
+      },
+      "rag_k1": {
+        "answer": "Miller v. California",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "Miller v. California was brought to court first.",
+        "f1": 0.5882352941176471
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Miller v. California",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Miller v. California",
+        "f1": 1.0
+      }
+    },
+    {
+      "idx": 1,
+      "question": "The actor that plays Phileas Fogg in \"Around the World in 80 Days\", co-starred with Gary Cooper in a 1939 Goldwyn Productions film based on a novel by what author?",
+      "gold": [
+        "Charles L. Clifford"
+      ],
+      "hybrid_only": {
+        "answer": "Jules Verneuil",
+        "f1": 0.4242424242424242
+      },
+      "rag_k1": {
+        "answer": "Jackie Chan",
+        "f1": 0.39999999999999997
+      },
+      "rag_k3": {
+        "answer": "Jackie Chan",
+        "f1": 0.39999999999999997
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Jules Verne",
+        "f1": 0.3333333333333333
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Jules Verne",
+        "f1": 0.3333333333333333
+      }
+    },
+    {
+      "idx": 2,
+      "question": "Prior to playing for Michigan State, Keith Nichol played football for a school located in what city?",
+      "gold": [
+        "Norman"
+      ],
+      "hybrid_only": {
+        "answer": "Battle Creek, Michigan",
+        "f1": 0.21428571428571427
+      },
+      "rag_k1": {
+        "answer": "Lowell, Michigan",
+        "f1": 0.2727272727272727
+      },
+      "rag_k3": {
+        "answer": "Oklahoma",
+        "f1": 0.42857142857142855
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Lowell",
+        "f1": 0.16666666666666666
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Lowell, Michigan",
+        "f1": 0.2727272727272727
+      }
+    },
+    {
+      "idx": 3,
+      "question": "Gary L. Bennett was a part of the space missions that have a primary destination of what celestial body?",
+      "gold": [
+        "Sun"
+      ],
+      "hybrid_only": {
+        "answer": "the Sun",
+        "f1": 0.6
+      },
+      "rag_k1": {
+        "answer": "Jupiter",
+        "f1": 0.2
+      },
+      "rag_k3": {
+        "answer": "Jupiter",
+        "f1": 0.2
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Jupiter",
+        "f1": 0.2
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Mars",
+        "f1": 0
+      }
+    },
+    {
+      "idx": 4,
+      "question": "Was Atom Egoyans biggest commercial success on stage or on film?",
+      "gold": [
+        "erotic thriller film"
+      ],
+      "hybrid_only": {
+        "answer": "\"The Ventriloquist\" is a 2008 (2008)",
+        "f1": 0.4642857142857143
+      },
+      "rag_k1": {
+        "answer": "Atom Egoyan's biggest commercial success was the erotic thriller Chloe (2009).",
+        "f1": 0.3877551020408163
+      },
+      "rag_k3": {
+        "answer": "Atom Egoyan's biggest commercial success was on film. His film Chloe was a huge success and was his biggest commercial success.",
+        "f1": 0.2585034013605442
+      },
+      "hybrid_plus_rag1": {
+        "answer": "The Sweet Hereafter",
+        "f1": 0.5128205128205129
+      },
+      "hybrid_plus_rag3": {
+        "answer": "On stage, with his play The Sweet Hereafter, which was a huge success in Toronto and was later adapted into a film.",
+        "f1": 0.29629629629629634
+      }
+    },
+    {
+      "idx": 5,
+      "question": "Celebrity Fifteen to One has had more than one appearance by an English writer and former Conservative Member of what?",
+      "gold": [
+        "Parliament"
+      ],
+      "hybrid_only": {
+        "answer": "Parliament",
+        "f1": 1.0
+      },
+      "rag_k1": {
+        "answer": "Parliament",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "Parliament",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Parliament",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag3": {
+        "answer": "David Faber",
+        "f1": 0.47619047619047616
+      }
+    },
+    {
+      "idx": 6,
+      "question": "Thirukkalacherry is a village in which Indian town?",
+      "gold": [
+        "Tharangambadi"
+      ],
+      "hybrid_only": {
+        "answer": "Malappuram",
+        "f1": 0.4347826086956522
+      },
+      "rag_k1": {
+        "answer": "Tamil Nadu",
+        "f1": 0.5217391304347826
+      },
+      "rag_k3": {
+        "answer": "Thirukkalacherry is a village in Mayiladuthurai District, Tranquebar (Tharangambadi) Taluk, Tamil Nadu, India.",
+        "f1": 0.21138211382113822
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Mayiladuthurai",
+        "f1": 0.5185185185185186
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Mayiladuthurai",
+        "f1": 0.5185185185185186
+      }
+    },
+    {
+      "idx": 7,
+      "question": "Which is a flowering plant, Pueraria or Pleiospilos?",
+      "gold": [
+        "Pleiospilos"
+      ],
+      "hybrid_only": {
+        "answer": "Pueraria",
+        "f1": 0.3157894736842105
+      },
+      "rag_k1": {
+        "answer": "Pueraria",
+        "f1": 0.3157894736842105
+      },
+      "rag_k3": {
+        "answer": "Pueraria is a flowering plant. Pleiospilos is a genus of succulent flowering plants of the family Aizoaceae, native to South Africa.",
+        "f1": 0.15384615384615385
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Pueraria",
+        "f1": 0.3157894736842105
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Pueraria",
+        "f1": 0.3157894736842105
+      }
+    },
+    {
+      "idx": 8,
+      "question": "After Russell D. Moore served at the Southern Baptist Theological Seminary he became the President of The Ethics & Religious Liberty Commission (ERLC) in what year?",
+      "gold": [
+        "2013"
+      ],
+      "hybrid_only": {
+        "answer": "1971.",
+        "f1": 0.22222222222222224
+      },
+      "rag_k1": {
+        "answer": "2013",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "2013",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "2013",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag3": {
+        "answer": "2013",
+        "f1": 1.0
+      }
+    },
+    {
+      "idx": 9,
+      "question": "For which band, was the female member of Fitz and The Tantrums, the front woman for ten years ?",
+      "gold": [
+        "The Rebirth"
+      ],
+      "hybrid_only": {
+        "answer": "Noelle Scaggs",
+        "f1": 0.24999999999999994
+      },
+      "rag_k1": {
+        "answer": "No Doubt",
+        "f1": 0.3157894736842105
+      },
+      "rag_k3": {
+        "answer": "Noelle Scaggs",
+        "f1": 0.24999999999999994
+      },
+      "hybrid_plus_rag1": {
+        "answer": "The Go-Go's",
+        "f1": 0.36363636363636365
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Noelle Scaggs",
+        "f1": 0.24999999999999994
+      }
+    },
+    {
+      "idx": 10,
+      "question": "When was the American singer, songwriter, record producer, dancer and actress born who's second studio album is Chapter II?",
+      "gold": [
+        "October 13, 1980"
+      ],
+      "hybrid_only": {
+        "answer": "Madonna",
+        "f1": 0.08695652173913043
+      },
+      "rag_k1": {
+        "answer": "Ashanti was born on October 13, 1980.",
+        "f1": 0.6037735849056604
+      },
+      "rag_k3": {
+        "answer": "Ashanti was born on October 13, 1980.",
+        "f1": 0.6037735849056604
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Madonna",
+        "f1": 0.08695652173913043
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Ashanti",
+        "f1": 0.08695652173913043
+      }
+    },
+    {
+      "idx": 11,
+      "question": "The Greatest Event in Television History aired on the channel that was founded by whom?",
+      "gold": [
+        "Betty Cohen"
+      ],
+      "hybrid_only": {
+        "answer": "The Beatles",
+        "f1": 0.5454545454545454
+      },
+      "rag_k1": {
+        "answer": "The Greatest Event in Television History aired on the channel that was founded by Comedy Central.",
+        "f1": 0.18518518518518517
+      },
+      "rag_k3": {
+        "answer": "Ted Turner",
+        "f1": 0.380952380952381
+      },
+      "hybrid_plus_rag1": {
+        "answer": "The first episode of the series \"The Prisoner\" was aired on the channel that was founded by the BBC.",
+        "f1": 0.19819819819819817
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Cartoon Network",
+        "f1": 0.5384615384615385
+      }
+    },
+    {
+      "idx": 12,
+      "question": "Who starred in her final film role in the 1964 film directed by the man who also did Vera Cruz and Kiss Me Deadly?",
+      "gold": [
+        "Mary Astor"
+      ],
+      "hybrid_only": {
+        "answer": "Raquel Welch",
+        "f1": 0.1818181818181818
+      },
+      "rag_k1": {
+        "answer": "Vera Miles",
+        "f1": 0.5
+      },
+      "rag_k3": {
+        "answer": "Vera Cruz was directed by Robert Aldrich, who also directed Kiss Me Deadly. The actress who starred in her final film role in the 1964 film directed by Aldrich was Bette Davis.",
+        "f1": 0.1075268817204301
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Vera Cruz",
+        "f1": 0.4210526315789474
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Marilyn Monroe",
+        "f1": 0.5833333333333334
+      }
+    },
+    {
+      "idx": 13,
+      "question": "Finally includes the song that peaked at what on the US Hot 100",
+      "gold": [
+        "number five"
+      ],
+      "hybrid_only": {
+        "answer": "number 26",
+        "f1": 0.7000000000000001
+      },
+      "rag_k1": {
+        "answer": "26",
+        "f1": 0
+      },
+      "rag_k3": {
+        "answer": "Finally includes the song that peaked at number one on the US Hot 100",
+        "f1": 0.225
+      },
+      "hybrid_plus_rag1": {
+        "answer": "number 26",
+        "f1": 0.7000000000000001
+      },
+      "hybrid_plus_rag3": {
+        "answer": "\"Finally\" peaked at number 26 on the US Hot 100.",
+        "f1": 0.30508474576271183
+      }
+    },
+    {
+      "idx": 14,
+      "question": "What are some other areas that share a common deer species with the forests of Mara and Mondrem?",
+      "gold": [
+        "New Zealand, Canada, the United States, the Falkland Islands, and Peru."
+      ],
+      "hybrid_only": {
+        "answer": "the forests of the Serengeti and the forests of the Serengeti",
+        "f1": 0.5303030303030303
+      },
+      "rag_k1": {
+        "answer": "The forests of Mara and Mondrem are located in the United Kingdom, and they share a common deer species with the forests of Scotland and Ireland.",
+        "f1": 0.5555555555555556
+      },
+      "rag_k3": {
+        "answer": "The forests of Mara and Mondrem share a common deer species with the forests of Mara and Mondrem.",
+        "f1": 0.5714285714285714
+      },
+      "hybrid_plus_rag1": {
+        "answer": "The Forest of Mara is shared with the Forest of Delamere, and the Forest of Mondrem is shared with the Forest of Delamere and the Forest of Mara.",
+        "f1": 0.4907407407407408
+      },
+      "hybrid_plus_rag3": {
+        "answer": "The Forest of Mara and Mondrem is the only forest in England to have been disafforested in the 19th century. The Forest of Mara and Mondrem is the only forest in England to have been disafforested in the 19th century. The Forest of Mara and Mondrem is the only",
+        "f1": 0.35045317220543803
+      }
+    },
+    {
+      "idx": 15,
+      "question": "Professional cyclist Sara Symington competed in which Olympic Games held in Sydeney, Australia?",
+      "gold": [
+        "2000 Summer Olympic Games"
+      ],
+      "hybrid_only": {
+        "answer": "2000",
+        "f1": 0.2758620689655173
+      },
+      "rag_k1": {
+        "answer": "2000",
+        "f1": 0.2758620689655173
+      },
+      "rag_k3": {
+        "answer": "2000 Summer Olympics",
+        "f1": 0.888888888888889
+      },
+      "hybrid_plus_rag1": {
+        "answer": "2000",
+        "f1": 0.2758620689655173
+      },
+      "hybrid_plus_rag3": {
+        "answer": "2000 Summer Olympics",
+        "f1": 0.888888888888889
+      }
+    },
+    {
+      "idx": 16,
+      "question": "Which retired Argentine footballer who played as a forward was a main player for Valencia CF?",
+      "gold": [
+        "Claudio Javier L\u00f3pez"
+      ],
+      "hybrid_only": {
+        "answer": "Jos\u00e9 Daniel Valencia",
+        "f1": 0.55
+      },
+      "rag_k1": {
+        "answer": "Claudio L\u00f3pez",
+        "f1": 0.787878787878788
+      },
+      "rag_k3": {
+        "answer": "Jos\u00e9 Daniel Valencia",
+        "f1": 0.55
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Claudio L\u00f3pez",
+        "f1": 0.787878787878788
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Claudio L\u00f3pez",
+        "f1": 0.787878787878788
+      }
+    },
+    {
+      "idx": 17,
+      "question": "What actor was also a president that Richard Darman worked with when they were in office?",
+      "gold": [
+        "George H. W. Bush"
+      ],
+      "hybrid_only": {
+        "answer": "Ronald Reagan",
+        "f1": 0.26666666666666666
+      },
+      "rag_k1": {
+        "answer": "Ronald Reagan",
+        "f1": 0.26666666666666666
+      },
+      "rag_k3": {
+        "answer": "Ronald Reagan",
+        "f1": 0.26666666666666666
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Ronald Reagan",
+        "f1": 0.26666666666666666
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Ronald Reagan",
+        "f1": 0.26666666666666666
+      }
+    },
+    {
+      "idx": 18,
+      "question": "The song that came out ahead of The Wanted's \"Lightning\" on the UK Singles Chart was featured on which album?",
+      "gold": [
+        "\"Talk That Talk\""
+      ],
+      "hybrid_only": {
+        "answer": "\"All Time Low\" by The Strokes",
+        "f1": 0.4888888888888889
+      },
+      "rag_k1": {
+        "answer": "Rihanna's \"We Found Love\"",
+        "f1": 0.34146341463414637
+      },
+      "rag_k3": {
+        "answer": "Rihanna's \"We Found Love\"",
+        "f1": 0.34146341463414637
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Rihanna's \"We Found Love\"",
+        "f1": 0.34146341463414637
+      },
+      "hybrid_plus_rag3": {
+        "answer": "\"We Found Love\" by Rihanna",
+        "f1": 0.33333333333333337
+      }
+    },
+    {
+      "idx": 19,
+      "question": "Name a member of a British-American supergroup who recored a version of Nobody's child in 1990",
+      "gold": [
+        "Bob Dylan"
+      ],
+      "hybrid_only": {
+        "answer": "Sting",
+        "f1": 0.14285714285714285
+      },
+      "rag_k1": {
+        "answer": "Roy Orbison",
+        "f1": 0.5
+      },
+      "rag_k3": {
+        "answer": "Roy Orbison",
+        "f1": 0.5
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Tom Petty",
+        "f1": 0.3333333333333333
+      },
+      "hybrid_plus_rag3": {
+        "answer": "The Traveling Wilburys",
+        "f1": 0.3870967741935484
+      }
+    },
+    {
+      "idx": 20,
+      "question": "What Friday night programming block included what collective series that includes \"Whatever Happened to... Robot Jones?\"?",
+      "gold": [
+        "Cartoon Cartoon Fridays"
+      ],
+      "hybrid_only": {
+        "answer": "Cartoon Network's \"What a Cartoon Network\" block",
+        "f1": 0.5352112676056338
+      },
+      "rag_k1": {
+        "answer": "The Cartoon Cartoon Fridays block included the collective series of \"Whatever Happened to... Robot Jones?\".",
+        "f1": 0.35384615384615387
+      },
+      "rag_k3": {
+        "answer": "The Cartoon Cartoon Fridays block included the collective series of \"Whatever Happened to... Robot Jones?\".",
+        "f1": 0.35384615384615387
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Toonami",
+        "f1": 0.3333333333333333
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Toonami",
+        "f1": 0.3333333333333333
+      }
+    },
+    {
+      "idx": 21,
+      "question": "Where does the city situated where Kellyville Ridge is located?",
+      "gold": [
+        "on the Cumberland Plain"
+      ],
+      "hybrid_only": {
+        "answer": "the Civic Centre",
+        "f1": 0.5128205128205128
+      },
+      "rag_k1": {
+        "answer": "Sydney, in the state of New South Wales, Australia",
+        "f1": 0.4931506849315068
+      },
+      "rag_k3": {
+        "answer": "New South Wales, Australia",
+        "f1": 0.6122448979591837
+      },
+      "hybrid_plus_rag1": {
+        "answer": "41 kilometres north-west of the Sydney central business district in the local government area of City of Blacktown.",
+        "f1": 0.31884057971014496
+      },
+      "hybrid_plus_rag3": {
+        "answer": "New South Wales, Australia",
+        "f1": 0.6122448979591837
+      }
+    },
+    {
+      "idx": 22,
+      "question": "Oak Beach, New York and Great South Bay are both situated between what same island?",
+      "gold": [
+        "Long Island"
+      ],
+      "hybrid_only": {
+        "answer": "Fire Island",
+        "f1": 0.6363636363636364
+      },
+      "rag_k1": {
+        "answer": "Long Island",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "Jones Beach Island",
+        "f1": 0.6206896551724137
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Fire Island",
+        "f1": 0.6363636363636364
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Jones Beach Island",
+        "f1": 0.6206896551724137
+      }
+    },
+    {
+      "idx": 23,
+      "question": "Who is a guest in the final two episodes of season eighteen of South Park?",
+      "gold": [
+        "PewDiePie"
+      ],
+      "hybrid_only": {
+        "answer": "Jonathan Katz",
+        "f1": 0
+      },
+      "rag_k1": {
+        "answer": "The guest in the final two episodes of season eighteen of South Park is the character of Mr. Mackey.",
+        "f1": 0.12844036697247707
+      },
+      "rag_k3": {
+        "answer": "Bill Cosby",
+        "f1": 0.10526315789473685
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Eric Cartman's father is Kenny McCormick, a character from the episode \"Cartman's Mom Is a Dirty Slut\".",
+        "f1": 0.10714285714285714
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Bill Cosby",
+        "f1": 0.10526315789473685
+      }
+    },
+    {
+      "idx": 24,
+      "question": "Robbie Tucker plays in what series that follows a group of friends who run an Irish bar?",
+      "gold": [
+        "It's Always Sunny in Philadelphia"
+      ],
+      "hybrid_only": {
+        "answer": "\"It's Always Sunny in Philadelphia\"",
+        "f1": 0.9705882352941176
+      },
+      "rag_k1": {
+        "answer": "It's Always Sunny in Philadelphia",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "It's It's Always Sunny in Philadelphia.",
+        "f1": 0.9166666666666666
+      },
+      "hybrid_plus_rag1": {
+        "answer": "It's a comedy about a group of friends who run an Irish bar in Philadelphia.",
+        "f1": 0.5321100917431193
+      },
+      "hybrid_plus_rag3": {
+        "answer": "It's \"It's Always Sunny in Philadelphia.\"",
+        "f1": 0.8918918918918919
+      }
+    },
+    {
+      "idx": 25,
+      "question": "High School Confidential, an eight part documentary followed twelve high school teenagers from a high school in Overland Park, Kansas that ranked what in the 2009 Newsweek ranking of the top 1,500 high schools in the United States?",
+      "gold": [
+        "#364"
+      ],
+      "hybrid_only": {
+        "answer": "1,000",
+        "f1": 0
+      },
+      "rag_k1": {
+        "answer": "Blue Valley Southwest High School",
+        "f1": 0
+      },
+      "rag_k3": {
+        "answer": "Blue Valley Northwest High School",
+        "f1": 0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "1,000",
+        "f1": 0
+      },
+      "hybrid_plus_rag3": {
+        "answer": "1,000",
+        "f1": 0
+      }
+    },
+    {
+      "idx": 26,
+      "question": "The large subunit and small subunit that use two types of RNA are major components that make up what?",
+      "gold": [
+        "Ribosomes"
+      ],
+      "hybrid_only": {
+        "answer": "ribosome",
+        "f1": 0.823529411764706
+      },
+      "rag_k1": {
+        "answer": "Ribosomes",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "Ribosomes",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "ribosome",
+        "f1": 0.823529411764706
+      },
+      "hybrid_plus_rag3": {
+        "answer": "ribosome",
+        "f1": 0.823529411764706
+      }
+    },
+    {
+      "idx": 27,
+      "question": "Whiich genus has more species, Dracula or Pistacia?",
+      "gold": [
+        "Dracula"
+      ],
+      "hybrid_only": {
+        "answer": "Dracula",
+        "f1": 1.0
+      },
+      "rag_k1": {
+        "answer": "Dracula has more species than Pistacia.",
+        "f1": 0.30434782608695654
+      },
+      "rag_k3": {
+        "answer": "Dracula has more species than Pistacia.",
+        "f1": 0.30434782608695654
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Dracula",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Dracula",
+        "f1": 1.0
+      }
+    },
+    {
+      "idx": 28,
+      "question": "Band-e-Amir Dragons is named after the lakes in which Afghan national park?",
+      "gold": [
+        "Band-e Amir National Park"
+      ],
+      "hybrid_only": {
+        "answer": "Band-e Amir National Park",
+        "f1": 1.0
+      },
+      "rag_k1": {
+        "answer": "Band-e-Amir",
+        "f1": 0.5555555555555556
+      },
+      "rag_k3": {
+        "answer": "Band-e Amir National Park",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Band-e Amir",
+        "f1": 0.6111111111111112
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Band-e Amir",
+        "f1": 0.6111111111111112
+      }
+    },
+    {
+      "idx": 29,
+      "question": "The 1958 Pro Bowl was played at the California stadium that is the home for which college?",
+      "gold": [
+        "University of Southern California"
+      ],
+      "hybrid_only": {
+        "answer": "University of California, Los Angeles",
+        "f1": 0.8000000000000002
+      },
+      "rag_k1": {
+        "answer": "USC",
+        "f1": 0.16666666666666669
+      },
+      "rag_k3": {
+        "answer": "USC",
+        "f1": 0.16666666666666669
+      },
+      "hybrid_plus_rag1": {
+        "answer": "The 1958 Pro Bowl was played at the Rose Bowl stadium that is the home for the University of Southern California.",
+        "f1": 0.452054794520548
+      },
+      "hybrid_plus_rag3": {
+        "answer": "The 1958 Pro Bowl was played at the Los Angeles Memorial Coliseum, which is the home of the University of Southern California Trojans football team of the Pac-12 Conference.",
+        "f1": 0.3203883495145631
+      }
+    },
+    {
+      "idx": 30,
+      "question": "Yau Ma Tei North is a district of a city with how many citizens?",
+      "gold": [
+        "7.2 million"
+      ],
+      "hybrid_only": {
+        "answer": "1,000,000",
+        "f1": 0
+      },
+      "rag_k1": {
+        "answer": "1",
+        "f1": 0
+      },
+      "rag_k3": {
+        "answer": "12,817",
+        "f1": 0.23529411764705885
+      },
+      "hybrid_plus_rag1": {
+        "answer": "100,000",
+        "f1": 0
+      },
+      "hybrid_plus_rag3": {
+        "answer": "12,817",
+        "f1": 0.23529411764705885
+      }
+    },
+    {
+      "idx": 31,
+      "question": "Spider9 was founded in 2011 by the head of which subsidiary of Wanxiang Group?",
+      "gold": [
+        "A123 Systems, LLC"
+      ],
+      "hybrid_only": {
+        "answer": "Wanxiang Group",
+        "f1": 0.06451612903225808
+      },
+      "rag_k1": {
+        "answer": "A123 Systems",
+        "f1": 0.8275862068965517
+      },
+      "rag_k3": {
+        "answer": "A123 Systems",
+        "f1": 0.8275862068965517
+      },
+      "hybrid_plus_rag1": {
+        "answer": "A123 Systems",
+        "f1": 0.8275862068965517
+      },
+      "hybrid_plus_rag3": {
+        "answer": "A123 Systems, LLC",
+        "f1": 1.0
+      }
+    },
+    {
+      "idx": 32,
+      "question": "What is the population of the city at which the transmitter of WLLZ-LP was placed? ",
+      "gold": [
+        "143,372"
+      ],
+      "hybrid_only": {
+        "answer": "10,000",
+        "f1": 0.30769230769230765
+      },
+      "rag_k1": {
+        "answer": "1,000,000",
+        "f1": 0.25
+      },
+      "rag_k3": {
+        "answer": "1,000,000",
+        "f1": 0.25
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Traverse City, Michigan",
+        "f1": 0.06666666666666667
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Traverse City",
+        "f1": 0
+      }
+    },
+    {
+      "idx": 33,
+      "question": "Charles Haughey held what position when he dissolved the list of members who were elected to the lower house of the Oireachtas of Ireland on 25 May 1989?",
+      "gold": [
+        "Taoiseach of Ireland"
+      ],
+      "hybrid_only": {
+        "answer": "1",
+        "f1": 0
+      },
+      "rag_k1": {
+        "answer": "Taoiseach",
+        "f1": 0.6206896551724138
+      },
+      "rag_k3": {
+        "answer": "Taoiseach",
+        "f1": 0.6206896551724138
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Taoiseach",
+        "f1": 0.6206896551724138
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Taoiseach",
+        "f1": 0.6206896551724138
+      }
+    },
+    {
+      "idx": 34,
+      "question": "What city, located in Lincoln County, Montana, United States, is Vegepet based in?",
+      "gold": [
+        "Troy, Montana"
+      ],
+      "hybrid_only": {
+        "answer": "Libby",
+        "f1": 0.1111111111111111
+      },
+      "rag_k1": {
+        "answer": "Troy, Montana",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "Troy, Montana",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Troy",
+        "f1": 0.47058823529411764
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Troy",
+        "f1": 0.47058823529411764
+      }
+    },
+    {
+      "idx": 35,
+      "question": "McLaren MP4/11 was driven by what Finnish former professional racing driver",
+      "gold": [
+        "Mika H\u00e4kkinen"
+      ],
+      "hybrid_only": {
+        "answer": "Mika H\u00e4kkinen",
+        "f1": 1.0
+      },
+      "rag_k1": {
+        "answer": "Mika H\u00e4kkinen",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "Mika H\u00e4kkinen",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Keke H\u00e4kkinen",
+        "f1": 0.7692307692307693
+      },
+      "hybrid_plus_rag3": {
+        "answer": "H\u00e4kkinen",
+        "f1": 0.761904761904762
+      }
+    },
+    {
+      "idx": 36,
+      "question": "Which of the movie which has Rich Lee 3-D previsualizations was directed by Francis Lawrence?",
+      "gold": [
+        "Constantine"
+      ],
+      "hybrid_only": {
+        "answer": "The Matrix",
+        "f1": 0.380952380952381
+      },
+      "rag_k1": {
+        "answer": "I Am Legend",
+        "f1": 0.18181818181818182
+      },
+      "rag_k3": {
+        "answer": "The Hunger Games: Mockingjay \u2013 Part 1",
+        "f1": 0.33333333333333337
+      },
+      "hybrid_plus_rag1": {
+        "answer": "I Am Legend",
+        "f1": 0.18181818181818182
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Pirates of the Caribbean: Dead Man's Chest",
+        "f1": 0.3773584905660377
+      }
+    },
+    {
+      "idx": 37,
+      "question": "Who choreographed one who is said to be the last muse for the choreographer and starred in the Nutcracker?",
+      "gold": [
+        "George Balanchine"
+      ],
+      "hybrid_only": {
+        "answer": "George Balanchine",
+        "f1": 1.0
+      },
+      "rag_k1": {
+        "answer": "George Balanchine",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "Darci Kistler",
+        "f1": 0.4666666666666667
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Balanchine",
+        "f1": 0.7407407407407407
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Darci Kistler",
+        "f1": 0.4666666666666667
+      }
+    },
+    {
+      "idx": 38,
+      "question": "Which utility holding company did Alfred A. Marcus work as a consultant?",
+      "gold": [
+        "Xcel Energy Inc."
+      ],
+      "hybrid_only": {
+        "answer": "American Electric Power Company",
+        "f1": 0.5106382978723403
+      },
+      "rag_k1": {
+        "answer": "North American Company",
+        "f1": 0.4210526315789474
+      },
+      "rag_k3": {
+        "answer": "North American Company",
+        "f1": 0.4210526315789474
+      },
+      "hybrid_plus_rag1": {
+        "answer": "North American Company",
+        "f1": 0.4210526315789474
+      },
+      "hybrid_plus_rag3": {
+        "answer": "North American Company",
+        "f1": 0.4210526315789474
+      }
+    },
+    {
+      "idx": 39,
+      "question": "Which film was released first, Summer Magic or Around the World in 80 Days?",
+      "gold": [
+        "Summer Magic"
+      ],
+      "hybrid_only": {
+        "answer": "Summer Magic",
+        "f1": 1.0
+      },
+      "rag_k1": {
+        "answer": "Summer Magic",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "Summer Magic was released first.",
+        "f1": 0.5454545454545454
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Summer Magic was released in 1963, while Around the World in 80 Days was released in 1956.",
+        "f1": 0.23529411764705882
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Summer Magic",
+        "f1": 1.0
+      }
+    },
+    {
+      "idx": 40,
+      "question": "The physicist who is responsible for identifying the Rabi cycle won what award?",
+      "gold": [
+        "Nobel Prize"
+      ],
+      "hybrid_only": {
+        "answer": "Nobel Prize in Physics",
+        "f1": 0.6666666666666666
+      },
+      "rag_k1": {
+        "answer": "Nobel Prize",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "Nobel Prize",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "The Nobel Prize in Physics in 1944",
+        "f1": 0.48888888888888893
+      },
+      "hybrid_plus_rag3": {
+        "answer": "The Nobel Prize in Physics in 1944.",
+        "f1": 0.4782608695652174
+      }
+    },
+    {
+      "idx": 41,
+      "question": "For what type of work is the production company for The Year Without a Santa Claus best known?",
+      "gold": [
+        "seasonal television specials, particularly its work in stop motion animation"
+      ],
+      "hybrid_only": {
+        "answer": "The production company for The Year Without a Santa Claus is best known for its work in the field of children's literature.",
+        "f1": 0.6834170854271356
+      },
+      "rag_k1": {
+        "answer": "The Year Without a Santa Claus is a 1974 American Christmas stop-motion animated musical film produced by Rankin/Bass Productions and directed by Jules Bass and Arthur Rankin Jr. It is based on the 1954 children's book of the same name by Phyllis McGinley. The film was released",
+        "f1": 0.4124293785310735
+      },
+      "rag_k3": {
+        "answer": "The Rankin/Bass stop motion animation television specials",
+        "f1": 0.7819548872180451
+      },
+      "hybrid_plus_rag1": {
+        "answer": "The production company for The Year Without a Santa Claus is best known for its work in the genre of fantasy.",
+        "f1": 0.6702702702702703
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Rankin/Bass Productions",
+        "f1": 0.3636363636363636
+      }
+    },
+    {
+      "idx": 42,
+      "question": "Which three-time Olivier Award winning English actress starred in the 1981 BBC television serial, Sons and Lovers?",
+      "gold": [
+        "Dame Eileen June Atkins"
+      ],
+      "hybrid_only": {
+        "answer": "Patricia Routledge",
+        "f1": 0.4390243902439025
+      },
+      "rag_k1": {
+        "answer": "Eileen Atkins",
+        "f1": 0.7222222222222222
+      },
+      "rag_k3": {
+        "answer": "Eileen Atkins",
+        "f1": 0.7222222222222222
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Eileen Atkins",
+        "f1": 0.7222222222222222
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Juliet Aubert",
+        "f1": 0.5
+      }
+    },
+    {
+      "idx": 43,
+      "question": "The historical Nimavar school in the Nimavar Bazaar, or bazar, is located in which country?",
+      "gold": [
+        "Iran"
+      ],
+      "hybrid_only": {
+        "answer": "Iran",
+        "f1": 1.0
+      },
+      "rag_k1": {
+        "answer": "Iran",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "Iran",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Iran",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Iran",
+        "f1": 1.0
+      }
+    },
+    {
+      "idx": 44,
+      "question": "Which name adopted by African-American activist Allen Donaldson co-found Black Power movement of the 1960s and 1970s",
+      "gold": [
+        "Hakim Abdullah Jamal"
+      ],
+      "hybrid_only": {
+        "answer": "Huey P. Newton",
+        "f1": 0.23529411764705882
+      },
+      "rag_k1": {
+        "answer": "Jamal",
+        "f1": 0.4
+      },
+      "rag_k3": {
+        "answer": "Jamal",
+        "f1": 0.4
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Malcolm X",
+        "f1": 0.3448275862068966
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Malcolm X",
+        "f1": 0.3448275862068966
+      }
+    },
+    {
+      "idx": 45,
+      "question": "Which person is known for playing in punk bands, Keith Morris or Rome Ramirez?",
+      "gold": [
+        "Keith Morris"
+      ],
+      "hybrid_only": {
+        "answer": "Keith Morris",
+        "f1": 1.0
+      },
+      "rag_k1": {
+        "answer": "Keith Morris",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "Keith Morris",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Keith Morris",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Keith Morris",
+        "f1": 1.0
+      }
+    },
+    {
+      "idx": 46,
+      "question": "Arnold Richards was the former chair of what organization that is a member of the Center for Jewish History?",
+      "gold": [
+        "YIVO"
+      ],
+      "hybrid_only": {
+        "answer": "American Historical Association.",
+        "f1": 0
+      },
+      "rag_k1": {
+        "answer": "Arnold Richards was the former chair of the New Israel Fund.",
+        "f1": 0.03125
+      },
+      "rag_k3": {
+        "answer": "Arnold Richards was the former chair of the American Jewish Historical Society, which is a member of the Center for Jewish History.",
+        "f1": 0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "The Department of Jewish Studies at the University of Scranton",
+        "f1": 0
+      },
+      "hybrid_plus_rag3": {
+        "answer": "UCLA History Department",
+        "f1": 0
+      }
+    },
+    {
+      "idx": 47,
+      "question": "When was the plaintiff in the 1892 Barbed Wire Patent Case born?",
+      "gold": [
+        "January 18, 1813"
+      ],
+      "hybrid_only": {
+        "answer": "1876",
+        "f1": 0.2
+      },
+      "rag_k1": {
+        "answer": "1837",
+        "f1": 0.3
+      },
+      "rag_k3": {
+        "answer": "1874",
+        "f1": 0.2
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Joseph Glidden",
+        "f1": 0.19999999999999998
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Joseph Glidden",
+        "f1": 0.19999999999999998
+      }
+    },
+    {
+      "idx": 48,
+      "question": "Which mountain is higher, Tongshanjiabu or Himalchuli?",
+      "gold": [
+        "Himalchuli has three main peaks: East (7893 m), West (7540 m) and North (7371 m)"
+      ],
+      "hybrid_only": {
+        "answer": "Tongshanjiabu",
+        "f1": 0.1935483870967742
+      },
+      "rag_k1": {
+        "answer": "Tongshanjiabu is higher than Himalchuli.",
+        "f1": 0.4833333333333334
+      },
+      "rag_k3": {
+        "answer": "Tongshanjiabu",
+        "f1": 0.1935483870967742
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Tongshanjiabu is higher than Himalchuli.",
+        "f1": 0.4833333333333334
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Tongshanjiabu is higher than Himalchuli.",
+        "f1": 0.4833333333333334
+      }
+    },
+    {
+      "idx": 49,
+      "question": "When did the place in Canada where Fran\u00e7ois Beaucourt (1740-1794) was mainly active acquired its present name?",
+      "gold": [
+        "1763"
+      ],
+      "hybrid_only": {
+        "answer": "1763",
+        "f1": 1.0
+      },
+      "rag_k1": {
+        "answer": "1763",
+        "f1": 1.0
+      },
+      "rag_k3": {
+        "answer": "1763",
+        "f1": 1.0
+      },
+      "hybrid_plus_rag1": {
+        "answer": "Quebec",
+        "f1": 0
+      },
+      "hybrid_plus_rag3": {
+        "answer": "Quebec",
+        "f1": 0
+      }
+    }
+  ]
+}

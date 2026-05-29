@@ -1,0 +1,36 @@
+{
+  "model": "qwen2.5-14b",
+  "checkpoint": "./checkpoints/astro_hybrid_qwen2_5-14b_n16_k284_t5000_s42.pt",
+  "n_eval": 100,
+  "seed": 42,
+  "k_real": 284,
+  "n_mem": 16,
+  "attn_dim": 256,
+  "results": {
+    "pos_0": {
+      "pure300": 0.69,
+      "hybrid": 0.8,
+      "delta": 0.1100000000000001
+    },
+    "pos_1": {
+      "pure300": 0.69,
+      "hybrid": 0.8,
+      "delta": 0.1100000000000001
+    },
+    "pos_2": {
+      "pure300": 0.69,
+      "hybrid": 0.8,
+      "delta": 0.1100000000000001
+    },
+    "pos_3": {
+      "pure300": 0.68,
+      "hybrid": 0.83,
+      "delta": 0.1499999999999999
+    }
+  },
+  "average": {
+    "pure300": 0.6875,
+    "hybrid": 0.8075000000000001,
+    "delta": 0.1200000000000001
+  }
+}

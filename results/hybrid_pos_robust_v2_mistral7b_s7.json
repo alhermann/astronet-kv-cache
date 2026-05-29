@@ -1,0 +1,36 @@
+{
+  "model": "mistral-7b-v0.3",
+  "checkpoint": "./checkpoints/astro_hybrid_mistral-7b-v0_3_n16_k284_t5000_s42.pt",
+  "n_eval": 100,
+  "seed": 7,
+  "k_real": 284,
+  "n_mem": 16,
+  "attn_dim": 256,
+  "results": {
+    "pos_0": {
+      "pure300": 0.42,
+      "hybrid": 0.58,
+      "delta": 0.15999999999999998
+    },
+    "pos_1": {
+      "pure300": 0.42,
+      "hybrid": 0.58,
+      "delta": 0.15999999999999998
+    },
+    "pos_2": {
+      "pure300": 0.42,
+      "hybrid": 0.58,
+      "delta": 0.15999999999999998
+    },
+    "pos_3": {
+      "pure300": 0.38,
+      "hybrid": 0.46,
+      "delta": 0.08000000000000002
+    }
+  },
+  "average": {
+    "pure300": 0.41000000000000003,
+    "hybrid": 0.5499999999999999,
+    "delta": 0.1399999999999999
+  }
+}

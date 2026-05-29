@@ -1,0 +1,33 @@
+{
+  "model": "llama-3.1-8b",
+  "n_samples": 100,
+  "seed": 42,
+  "k": 300,
+  "note": "Fact context placed at the position-th non-query window. pos=0 is the default setup; pos>=1 places fact deeper into the prefix. Distractors fill the remaining slots, query is always last.",
+  "results": {
+    "pos_0": {
+      "snapkv": 0.53,
+      "multiplicative": 0.49,
+      "streaming_llm": 0.17,
+      "h2o": 0.42
+    },
+    "pos_1": {
+      "snapkv": 0.53,
+      "multiplicative": 0.49,
+      "streaming_llm": 0.19,
+      "h2o": 0.43
+    },
+    "pos_2": {
+      "snapkv": 0.53,
+      "multiplicative": 0.49,
+      "streaming_llm": 0.58,
+      "h2o": 0.42
+    },
+    "pos_3": {
+      "snapkv": 0.41,
+      "multiplicative": 0.6,
+      "streaming_llm": 0.73,
+      "h2o": 0.53
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "model": "llama-3.1-8b",
+  "checkpoint": "./checkpoints/astro_hybrid_llama-3_1-8b_n16_k284_t5000_s42.pt",
+  "n_eval": 100,
+  "seed": 2024,
+  "k_real": 284,
+  "n_mem": 16,
+  "attn_dim": 256,
+  "results": {
+    "pos_0": {
+      "pure300": 0.61,
+      "hybrid": 0.76,
+      "delta": 0.15000000000000002
+    },
+    "pos_1": {
+      "pure300": 0.61,
+      "hybrid": 0.75,
+      "delta": 0.14
+    },
+    "pos_2": {
+      "pure300": 0.61,
+      "hybrid": 0.76,
+      "delta": 0.15000000000000002
+    },
+    "pos_3": {
+      "pure300": 0.47,
+      "hybrid": 0.58,
+      "delta": 0.10999999999999999
+    }
+  },
+  "average": {
+    "pure300": 0.575,
+    "hybrid": 0.7125,
+    "delta": 0.13750000000000007
+  }
+}
