@@ -392,17 +392,18 @@ attention received during processing and retains a heavy-hitter
 budget together with a window of the most recent tokens. SnapKV\cite{li2024snapkv}
 uses an observation window at the end of the prompt to identify
 positions whose post-softmax attention is locally concentrated,
-applying average-pool smoothing and a recent-token bias before
-selection. StreamingLLM\cite{xiao2024streamingllm} retains a small
-number of initial attention sinks together with a sliding window of
-the most recent tokens. PyramidKV\cite{cai2024pyramidkv} allocates a
-layer-adaptive budget that decreases with depth, motivated by an
-observed concentration of useful attention in shallow layers.
-KIVI\cite{liu2024kivi} compresses the retained cache through
-asymmetric integer quantisation, with per-channel quantisation for
-keys and per-token quantisation for values; we evaluate KIVI at 4
-bits (K4V4) as the operating point matched in cache-byte cost to our
-K8V4 stack.
+applying max-pool smoothing (kernel size 7) and a recent-token
+reservation before selection, with selection performed per
+(layer, head). StreamingLLM\cite{xiao2024streamingllm} retains a
+small number of initial attention sinks together with a sliding
+window of the most recent tokens. PyramidKV\cite{cai2024pyramidkv}
+allocates a layer-adaptive budget that decreases with depth,
+motivated by an observed concentration of useful attention in
+shallow layers. KIVI\cite{liu2024kivi} compresses the retained cache
+through asymmetric integer quantisation, with per-channel
+quantisation for keys and per-token quantisation for values; we
+evaluate KIVI at 4 bits (K4V4) as the operating point matched in
+cache-byte cost to our K8V4 stack.
 
 Two retrieval baselines round out the comparison. RAG~$k{=}1$ and
 RAG~$k{=}3$ encode each fact window with the
@@ -414,16 +415,28 @@ single best-matching window out of four fact windows and RAG~$k{=}3$
 recovers three of four; RAG~$k{=}3$ is intentionally generous and
 serves as an upper bound for in-context retrieval at this scale.
 
-H${}_2$O and SnapKV in their original formulations select tokens
-per attention head. We re-implement them with a global-pooling
-selection rule that scores each token by averaging over heads before
-ranking. This decision is forced by the small per-window budget of
-our setup: at $k=300$ tokens distributed across all layers and
-attention heads, per-head selection scatters the cache so thinly that
-both methods collapse to $\sim$8.5\% accuracy on Qwen 7B, well
-below their global-pooled performance. Global pooling is the variant
-used throughout the main tables; the per-head ablation is reported in
-the Supplementary Information as a methodological transparency point.
+\textcolor{red}{\textbf{[METHODOLOGICAL CORRECTION — IN PROGRESS]}} An
+earlier version of this paper used hand-rolled re-implementations of
+H${}_2$O, SnapKV and StreamingLLM with a global-pooling
+modification (scoring each token by averaging across attention heads
+before ranking) and applied them inside AstroNet's window-streaming
+protocol. On audit those re-implementations were found NOT faithful
+to the published methods: SnapKV uses per-(layer, head) selection
+with a max-pool kernel-7 over an end-of-prompt observation window,
+H${}_2$O accumulates attention across decoding steps, and both
+operate over a single-prompt prefill. The original ``per-head
+collapse to $\sim 8.5\%$'' justification documented in this section
+reflected the limitations of our re-implementation, not of the
+published algorithms. We are re-running all baseline comparisons
+with the upstream KVCache-Factory monkey-patches
+\cite{cai2024pyramidkv} which provide faithful per-(layer, head)
+SnapKV / H${}_2$O / PyramidKV. Two operating regimes are reported in
+the revised tables: single-prompt (the regime the published methods
+target, used as oracle upper bound) and streaming-protocol adaptation
+(matched to AstroNet's protocol). Numbers from the previous
+hand-rolled baseline rows have been withdrawn from
+Tables~\ref{tab:longbench}, \ref{tab:needle}, \ref{tab:ruler}, and
+\ref{tab:latency} pending the upstream re-runs.
 
 
 %-----------------------------------------------------------------------%
