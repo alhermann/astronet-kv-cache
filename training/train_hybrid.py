@@ -177,6 +177,27 @@ class AstroHybrid(nn.Module):
         # Weighted sum over bank values in hidden_dim space: (1, K, hidden_dim)
         self.g = torch.bmm(weights, bank.float())
 
+    def attach_x1(self, x1_module):
+        """Attach a ``GapFillPerInjectLayer`` (from ``astronet.x1_gapfill``)
+        so ``generate_kv`` cross-attends virtual_hidden over selected
+        token hidden states.  Backwards-compatible: if x1 is None, the
+        baseline behaviour is preserved.
+
+        Caller must also call ``set_selected_hidden`` before any
+        ``generate_kv`` invocation per-sample with the per-layer hidden
+        states of the S1-selected tokens.
+        """
+        self._x1 = x1_module
+        self._selected_hidden = {}
+
+    def set_selected_hidden(self, layer_idx: int, h_selected):
+        """Stash the (1, k_real, hidden_dim) hidden states of the
+        S1-selected tokens at ``layer_idx`` so the next call to
+        ``generate_kv(layer_idx, ...)`` can cross-attend over them."""
+        if not hasattr(self, '_selected_hidden'):
+            self._selected_hidden = {}
+        self._selected_hidden[layer_idx] = h_selected
+
     def generate_kv(self, layer_idx, real_kv_sample):
         """Generate K,V pair using the MODEL'S OWN k_proj/v_proj.
 
@@ -203,6 +224,15 @@ class AstroHybrid(nn.Module):
             virtual_hidden = self.layer_up[li_str](F.gelu(self.layer_down[li_str](self.g)))
         else:
             virtual_hidden = self.shared_up(F.gelu(self.shared_down(self.g)))
+
+        # X1 (optional): cross-attend virtual_hidden over the S1-selected
+        # tokens' hidden states at this layer.  Identity at init; trained
+        # to fill the gaps S1 systematically misses.
+        x1 = getattr(self, '_x1', None)
+        if x1 is not None and hasattr(self, '_selected_hidden') \
+                and layer_idx in self._selected_hidden:
+            virtual_hidden = x1(layer_idx, virtual_hidden,
+                                  self._selected_hidden[layer_idx])
 
         # Clamp to prevent NaN from bitsandbytes dequantization
         virtual_hidden = virtual_hidden.clamp(-100, 100)
@@ -706,8 +736,23 @@ def main():
     bnb = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16,
                               bnb_4bit_quant_type='nf4')
     if args.multi_gpu:
+        # Explicit max_memory hints prevent the bnb-4bit quantizer from
+        # rejecting placements when transformers' auto-estimate is too
+        # conservative.  We include only GPUs with >= 16 GiB of memory
+        # to exclude any small display/integrated GPU (e.g. GT 1030)
+        # that PyTorch may enumerate.  Each Titan RTX has 24 GiB;
+        # we reserve 2 GiB for activations and Stage 2 gradients.
+        max_memory = {}
+        for i in range(torch.cuda.device_count()):
+            mem_gib = torch.cuda.get_device_properties(i).total_memory / (1024 ** 3)
+            if mem_gib >= 16:
+                max_memory[i] = "22GiB"
+        if not max_memory:
+            raise RuntimeError("No GPU with >= 16 GiB memory found; multi_gpu requires"
+                               " large-memory cards.")
         model = AutoModelForCausalLM.from_pretrained(args.model_path,
-            quantization_config=bnb, device_map='auto', torch_dtype=torch.float16)
+            quantization_config=bnb, device_map='auto',
+            max_memory=max_memory, torch_dtype=torch.float16)
     else:
         model = AutoModelForCausalLM.from_pretrained(args.model_path,
             quantization_config=bnb, device_map={'': args.device}, torch_dtype=torch.float16)
