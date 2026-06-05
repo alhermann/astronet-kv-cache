@@ -3,8 +3,8 @@
     {
       "tag": "qwen7b",
       "model": "qwen2.5-7b",
-      "pos_robust_pure": 0.6074999999999999,
-      "pos_robust_hybrid": 0.6925,
+      "pos_robust_pure": 0.598,
+      "pos_robust_hybrid": 0.668,
       "needle_n20": {
         "streaming_llm": 0.4,
         "h2o": 0.15,
@@ -96,7 +96,7 @@
       "tag": "mistral7b",
       "model": "mistral-7b-v0.3",
       "pos_robust_pure": 0.4405,
-      "pos_robust_hybrid": 0.5844999999999999,
+      "pos_robust_hybrid": 0.5695,
       "needle_n20": {
         "streaming_llm": 0.25999999999999995,
         "h2o": 0.0,
@@ -120,7 +120,7 @@
       "tag": "mistral24b",
       "model": "mistral-small-24b",
       "pos_robust_pure": 0.599,
-      "pos_robust_hybrid": 0.6295,
+      "pos_robust_hybrid": 0.6355,
       "needle_n20": {
         "streaming_llm": 0.4,
         "h2o": 0.0,
