@@ -13,11 +13,15 @@ from transformers.modeling_outputs import BaseModelOutputWithPast
 from transformers.utils import (
     logging,
 )
-from pyramidkv.pyramidkv_utils import init_pyramidkv,init_snapkv,init_CAM,init_H2O,init_StreamingLLM,init_l2norm, init_adakv, init_headkv
+from .pyramidkv_utils import init_pyramidkv,init_snapkv,init_CAM,init_H2O,init_StreamingLLM,init_l2norm, init_adakv, init_headkv
 import math
-from flash_attn import flash_attn_func, flash_attn_varlen_func
-from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input
-from pyramidkv.pyramidkv_utils import DynamicCacheSplitHeadFlatten
+try:
+    from flash_attn import flash_attn_func, flash_attn_varlen_func
+    from flash_attn.bert_padding import index_first_axis, pad_input, unpad_input
+except ImportError:
+    flash_attn_func = flash_attn_varlen_func = None
+    index_first_axis = pad_input = unpad_input = None
+from .pyramidkv_utils import DynamicCacheSplitHeadFlatten
 
 logger = logging.get_logger(__name__)
 

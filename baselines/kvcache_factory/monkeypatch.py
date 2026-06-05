@@ -1,19 +1,25 @@
 from importlib.metadata import version
 import transformers
 
-from pyramidkv.llama_model import llama_flash_attn2_forward_HeadKV, llama_flash_attn2_forward_AdaKV, llama_flash_attn2_forward_PyramidKV,llama_flash_attn2_forward_CAM,llama_flash_attn2_forward_H2O,llama_flash_attn2_forward_SnapKV,llama_flash_attn2_forward_StreamingLLM, llama_flash_attn2_forward_L2Norm
-from pyramidkv.llama_model import llama_attn_forward_PyramidKV,llama_attn_forward_CAM,llama_attn_forward_H2O,llama_attn_forward_SnapKV,llama_attn_forward_StreamingLLM, llama_attn_forward_L2Norm
-from pyramidkv.llama_model import llama_sdpa_attn_forward_PyramidKV,llama_sdpa_attn_forward_CAM,llama_sdpa_attn_forward_H2O,llama_sdpa_attn_forward_SnapKV,llama_sdpa_attn_forward_StreamingLLM, llama_sdpa_attn_forward_L2Norm
-from pyramidkv.llama_model import adaptive_LlamaModel_forward
-from pyramidkv.llama_model_think import llama_attn_forward_SnapKV_ThinK, think_model_forward
+from .llama_model import llama_flash_attn2_forward_HeadKV, llama_flash_attn2_forward_AdaKV, llama_flash_attn2_forward_PyramidKV,llama_flash_attn2_forward_CAM,llama_flash_attn2_forward_H2O,llama_flash_attn2_forward_SnapKV,llama_flash_attn2_forward_StreamingLLM, llama_flash_attn2_forward_L2Norm
+from .llama_model import llama_attn_forward_PyramidKV,llama_attn_forward_CAM,llama_attn_forward_H2O,llama_attn_forward_SnapKV,llama_attn_forward_StreamingLLM, llama_attn_forward_L2Norm
+from .llama_model import llama_sdpa_attn_forward_PyramidKV,llama_sdpa_attn_forward_CAM,llama_sdpa_attn_forward_H2O,llama_sdpa_attn_forward_SnapKV,llama_sdpa_attn_forward_StreamingLLM, llama_sdpa_attn_forward_L2Norm
+from .llama_model import adaptive_LlamaModel_forward
+from .llama_model_think import llama_attn_forward_SnapKV_ThinK, think_model_forward
 
-from pyramidkv.mistral_model import mistral_flash_attn2_forward_AdaKV, mistral_flash_attn2_forward_HeadKV, mistral_flash_attn2_forward_PyramidKV,mistral_flash_attn2_forward_CAM,mistral_flash_attn2_forward_H2O,mistral_flash_attn2_forward_SnapKV,mistral_flash_attn2_forward_StreamingLLM, mistral_flash_attn2_forward_L2Norm
-from pyramidkv.mistral_model import mistral_attn_forward_PyramidKV,mistral_attn_forward_CAM,mistral_attn_forward_H2O,mistral_attn_forward_SnapKV,mistral_attn_forward_StreamingLLM, mistral_attn_forward_L2Norm
-from pyramidkv.mistral_model import mistral_sdpa_attn_forward_PyramidKV,mistral_sdpa_attn_forward_CAM,mistral_sdpa_attn_forward_H2O,mistral_sdpa_attn_forward_SnapKV,mistral_sdpa_attn_forward_StreamingLLM, mistral_sdpa_attn_forward_L2Norm
-from pyramidkv.mistral_model import adaptive_MistralModel_forward
+from .mistral_model import mistral_flash_attn2_forward_AdaKV, mistral_flash_attn2_forward_HeadKV, mistral_flash_attn2_forward_PyramidKV,mistral_flash_attn2_forward_CAM,mistral_flash_attn2_forward_H2O,mistral_flash_attn2_forward_SnapKV,mistral_flash_attn2_forward_StreamingLLM, mistral_flash_attn2_forward_L2Norm
+from .mistral_model import mistral_attn_forward_PyramidKV,mistral_attn_forward_CAM,mistral_attn_forward_H2O,mistral_attn_forward_SnapKV,mistral_attn_forward_StreamingLLM, mistral_attn_forward_L2Norm
+from .mistral_model import mistral_sdpa_attn_forward_PyramidKV,mistral_sdpa_attn_forward_CAM,mistral_sdpa_attn_forward_H2O,mistral_sdpa_attn_forward_SnapKV,mistral_sdpa_attn_forward_StreamingLLM, mistral_sdpa_attn_forward_L2Norm
+from .mistral_model import adaptive_MistralModel_forward
 
-from pyramidkv.llama_model import prepare_inputs_for_generation_llama, prepare_inputs_for_generation_llama_new
-from pyramidkv.mistral_model import prepare_inputs_for_generation_mistral, prepare_inputs_for_generation_mistral_new
+from .llama_model import prepare_inputs_for_generation_llama, prepare_inputs_for_generation_llama_new
+from .mistral_model import prepare_inputs_for_generation_mistral, prepare_inputs_for_generation_mistral_new
+
+from .qwen2_model import (
+    qwen2_attn_forward_SnapKV, qwen2_sdpa_attn_forward_SnapKV,
+    qwen2_attn_forward_H2O, qwen2_sdpa_attn_forward_H2O,
+    qwen2_attn_forward_PyramidKV, qwen2_sdpa_attn_forward_PyramidKV,
+)
 
 
 def replace_llama(method, model_name=None):
@@ -143,3 +149,33 @@ def replace_mistral(method):
     
     if method not in ["fullkv"]:
         transformers.models.mistral.modeling_mistral.MistralForCausalLM.prepare_inputs_for_generation = prepare_inputs_for_generation_mistral_new
+
+
+def replace_qwen2(method):
+    """Patch transformers.models.qwen2 attention forwards for the given KV
+    compression method.
+
+    Supports: 'snapkv', 'h2o', 'pyramidkv'. Flash-attn variants are NOT
+    patched (this environment has no flash_attn installed); the SDPA and
+    eager forwards cover all our local Qwen2 evaluations.
+    """
+    if method == "snapkv":
+        print("Using SnapKV (Qwen2)!")
+        transformers.models.qwen2.modeling_qwen2.Qwen2Attention.forward = qwen2_attn_forward_SnapKV
+        transformers.models.qwen2.modeling_qwen2.Qwen2SdpaAttention.forward = qwen2_sdpa_attn_forward_SnapKV
+
+    elif method == "h2o":
+        print("Using H2O (Qwen2)!")
+        transformers.models.qwen2.modeling_qwen2.Qwen2Attention.forward = qwen2_attn_forward_H2O
+        transformers.models.qwen2.modeling_qwen2.Qwen2SdpaAttention.forward = qwen2_sdpa_attn_forward_H2O
+
+    elif method == "pyramidkv":
+        print("Using PyramidKV (Qwen2)!")
+        transformers.models.qwen2.modeling_qwen2.Qwen2Attention.forward = qwen2_attn_forward_PyramidKV
+        transformers.models.qwen2.modeling_qwen2.Qwen2SdpaAttention.forward = qwen2_sdpa_attn_forward_PyramidKV
+
+    else:
+        raise ValueError(
+            f"replace_qwen2: unsupported method '{method}'. "
+            "Supported: 'snapkv', 'h2o', 'pyramidkv'."
+        )

@@ -16,8 +16,8 @@ from transformers.utils import (
     logging,
     is_flash_attn_2_available,
 )
-from pyramidkv.pyramidkv_utils import init_pyramidkv,init_snapkv,init_CAM,init_H2O,init_StreamingLLM,init_l2norm, init_adakv, init_headkv
-from pyramidkv.pyramidkv_utils import DynamicCacheSplitHeadFlatten
+from .pyramidkv_utils import init_pyramidkv,init_snapkv,init_CAM,init_H2O,init_StreamingLLM,init_l2norm, init_adakv, init_headkv
+from .pyramidkv_utils import DynamicCacheSplitHeadFlatten
 
 if is_flash_attn_2_available():
     from flash_attn import flash_attn_func, flash_attn_varlen_func
