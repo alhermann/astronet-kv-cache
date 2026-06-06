@@ -234,8 +234,25 @@ class AstroHybrid(nn.Module):
             virtual_hidden = x1(layer_idx, virtual_hidden,
                                   self._selected_hidden[layer_idx])
 
-        # Clamp to prevent NaN from bitsandbytes dequantization
-        virtual_hidden = virtual_hidden.clamp(-100, 100)
+        # Clamp to prevent NaN from bitsandbytes dequantization.
+        # 2026-06-06 critic note (E.i): with the X1 ReZero gate, gamma=0 at
+        # init means residual=0 at init, so virtual_hidden stays in its
+        # baseline range and the clamp is a no-op.  Once gamma grows the
+        # clamp could become a hard wall and silently kill X1's gradient
+        # signal.  We keep the clamp for safety against legacy bnb NaN
+        # but make it a *soft* bound (tanh-shaped) rather than a hard
+        # clamp when X1 is active.  Skip the soft path if X1 is not
+        # attached to preserve exact-bit equivalence with pre-X1 evals.
+        x1_active = (getattr(self, '_x1', None) is not None
+                     and hasattr(self, '_selected_hidden')
+                     and layer_idx in self._selected_hidden)
+        if x1_active:
+            # Soft saturating bound: linear for |x|<100, tanh-shaped beyond.
+            # Still provably bounds the output, but preserves gradient
+            # signal even when X1's residual pushes near the edge.
+            virtual_hidden = 100.0 * torch.tanh(virtual_hidden / 100.0)
+        else:
+            virtual_hidden = virtual_hidden.clamp(-100, 100)
 
         # Use DEQUANTIZED copies of model's k_proj/v_proj (float32, gradient-safe)
         vh = virtual_hidden  # already float32 from AstroNet
