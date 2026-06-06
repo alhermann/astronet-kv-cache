@@ -14,7 +14,9 @@ from collections import defaultdict
 # Two filename forms supported:
 #   1) our sweep output: nd_<backbone>_<method>_k<k>_s<seed>.json
 #   2) hardcoded eval_needle.py output sym-linked into the sweep dir
-CELL_RE = re.compile(r"nd_(?P<backbone>[a-z0-9]+)_(?P<method>[a-z_]+)_k(?P<k>\d+)_s(?P<seed>\d+)\.json$")
+# Method names can contain digits (e.g. "h2o"). [a-z0-9_]+ avoids silent
+# drop of every H2O cell (Bug-10 found 2026-06-06).
+CELL_RE = re.compile(r"nd_(?P<backbone>[a-z0-9]+)_(?P<method>[a-z0-9_]+)_k(?P<k>\d+)_s(?P<seed>\d+)\.json$")
 
 
 def load_cell(path: str) -> dict | None:

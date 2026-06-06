@@ -162,6 +162,10 @@ def main():
                    help='Number of most-recent tokens kept in FP16 alongside '
                         'the quantised cache.  KIVI default 128.  Pass 0 to '
                         'reproduce the prior (under-estimating) behaviour.')
+    p.add_argument('--multi_gpu', action='store_true',
+                   help='Use device_map=auto to split the model across all '
+                        'visible GPUs.  Required for Qwen 32B + Mistral 24B '
+                        'on 24GB Titan cards.')
     args = p.parse_args()
 
     print(f'Loading {args.model_path}', flush=True)
@@ -169,9 +173,23 @@ def main():
     if tokenizer.pad_token is None: tokenizer.pad_token = tokenizer.eos_token
     bnb = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type='nf4',
                              bnb_4bit_compute_dtype=torch.float16)
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model_path, quantization_config=bnb,
-        device_map={'': args.device}, torch_dtype=torch.float16)
+    if args.multi_gpu:
+        # 2026-06-06 fix: large models (Qwen 32B, Mistral-Small 24B) don't fit
+        # on a single 24GB Titan once the 100-sample eval buffer is included.
+        # device_map='auto' splits layers across all visible GPUs.
+        max_memory = {}
+        for i in range(torch.cuda.device_count()):
+            gib = torch.cuda.get_device_properties(i).total_memory / (1024 ** 3)
+            if gib >= 16:
+                max_memory[i] = '22GiB'
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model_path, quantization_config=bnb,
+            device_map='auto', max_memory=max_memory,
+            torch_dtype=torch.float16)
+    else:
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model_path, quantization_config=bnb,
+            device_map={'': args.device}, torch_dtype=torch.float16)
     model.eval()
     device = model.get_input_embeddings().weight.device
 

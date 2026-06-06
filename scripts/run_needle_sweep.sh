@@ -72,18 +72,39 @@ BASELINE_METHODS=(snapkv h2o pyramidkv)
 # at the 384-token window size used throughout the paper.
 N_WINDOWS_LIST=(20 22 44 85)
 
+is_large() {
+    local b=$1
+    for L in "${LARGE_BACKBONES[@]}"; do
+        if [ "$L" = "$b" ]; then return 0; fi
+    done
+    return 1
+}
+
 run_baseline_cell() {
     local backbone=$1 method=$2 k=$3 seed=$4 device=$5
     local out="$SAVE_DIR/nd_${backbone}_${method}_k${k}_s${seed}.json"
     [ -f "$out" ] && { echo "  [skip] $out"; return; }
-    echo "  [run] $backbone/$method k=$k seed_off=$seed on cuda:$device"
-    CUDA_VISIBLE_DEVICES=$device $PY baselines/eval_upstream_needle.py \
-        --model_path "${MODEL_PATH[$backbone]}" \
-        --method "$method" \
-        --k "$k" --n_windows_list "${N_WINDOWS_LIST[@]}" --n_trials 20 \
-        --seed_offset "$seed" \
-        --save_path "$out" \
-        > "logs/training/needle_sweep/nd_${backbone}_${method}_k${k}_s${seed}.log" 2>&1
+    if is_large "$backbone"; then
+        echo "  [run mGPU] $backbone/$method k=$k seed_off=$seed"
+        CUDA_VISIBLE_DEVICES=0,1 $PY baselines/eval_upstream_needle.py \
+            --model_path "${MODEL_PATH[$backbone]}" \
+            --method "$method" --multi_gpu \
+            --k "$k" --n_windows_list "${N_WINDOWS_LIST[@]}" --n_trials 20 \
+            --seed_offset "$seed" \
+            --save_path "$out" \
+            > "logs/training/needle_sweep/nd_${backbone}_${method}_k${k}_s${seed}.log" 2>&1 || \
+            echo "  [WARN] $backbone/$method k=$k s=$seed failed (continuing)"
+    else
+        echo "  [run] $backbone/$method k=$k seed_off=$seed on cuda:$device"
+        CUDA_VISIBLE_DEVICES=$device $PY baselines/eval_upstream_needle.py \
+            --model_path "${MODEL_PATH[$backbone]}" \
+            --method "$method" \
+            --k "$k" --n_windows_list "${N_WINDOWS_LIST[@]}" --n_trials 20 \
+            --seed_offset "$seed" \
+            --save_path "$out" \
+            > "logs/training/needle_sweep/nd_${backbone}_${method}_k${k}_s${seed}.log" 2>&1 || \
+            echo "  [WARN] $backbone/$method k=$k s=$seed failed (continuing)"
+    fi
 }
 
 # AstroHybrid on Needle via baselines/eval_needle.py with the 'hybrid' method.

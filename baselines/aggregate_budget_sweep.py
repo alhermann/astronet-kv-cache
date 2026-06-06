@@ -29,7 +29,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from baselines.memory_accounting import total_bytes_per_request, ARCH
 
 # JSON filenames look like: sq_<backbone>_<method>_k<k>_s<seed>.json
-CELL_RE = re.compile(r"sq_(?P<backbone>[a-z0-9]+)_(?P<method>[a-z_]+)_k(?P<k>\d+)_s(?P<seed>\d+)\.json$")
+# Method names CAN contain digits (e.g. "h2o").  Bug-10 (2026-06-06): the
+# previous [a-z_]+ pattern silently dropped every H2O cell.
+CELL_RE = re.compile(r"sq_(?P<backbone>[a-z0-9]+)_(?P<method>[a-z0-9_]+)_k(?P<k>\d+)_s(?P<seed>\d+)\.json$")
 
 # Map backbone short name -> canonical model name from memory_accounting.ARCH
 BACKBONE_MAP = {
@@ -57,27 +59,51 @@ def load_cell(path: str) -> dict | None:
         return None
     with open(path) as f:
         d = json.load(f)
-    # All eval scripts in the budget sweep emit the same `averages` shape
-    # used by eval_hybrid_swap_selector.py.  AstroHybrid eval has
-    # pure_S1/pure_swap/hybrid_S1/hybrid_swap; baseline eval has just one
-    # accuracy number per position.  Normalise: the headline accuracy is
-    # the across-position mean (computed below).
+    # Three schemas in the wild (2026-06-06 audit):
+    #
+    #   1) eval_hybrid_swap_selector.py:  d["averages"] = {"hybrid_S1": float, ...}
+    #      AstroHybrid with the swap-selector E3 protocol.  Headline = hybrid_S1.
+    #
+    #   2) eval_hybrid_position_robust.py: d["average"] = {"hybrid": float, "pure300": float}
+    #      AND d["results"][pos_X] = {"hybrid": float, "pure300": float}
+    #      AstroHybrid in the budget-sweep flow.  Headline = average.hybrid.
+    #
+    #   3) eval_upstream_baselines.py: d["average"] = float
+    #      AND d["results"][pos_X] = float
+    #      Faithful SnapKV/H2O/PyramidKV.  Headline = average (scalar).
+    #
+    # We support all three.  Order matters: schema 1 has "averages" (plural)
+    # while schemas 2 and 3 have "average" (singular).
     if "averages" in d:
+        # Schema 1: AstroHybrid with swap selector
         acc_field = d["averages"]
-        # AstroHybrid: take hybrid_S1 (the headline = S1+S2)
-        # Baseline: take the single accuracy key
-        if "hybrid_S1" in acc_field:
-            acc = acc_field["hybrid_S1"]
-        elif "accuracy" in acc_field:
-            acc = acc_field["accuracy"]
-        else:
-            # fallback: first numeric value
+        acc = acc_field.get("hybrid_S1") or acc_field.get("accuracy")
+        if acc is None:
             acc = next((v for v in acc_field.values()
-                        if isinstance(v, (int, float))), None)
+                         if isinstance(v, (int, float))), None)
+    elif "average" in d:
+        avg = d["average"]
+        if isinstance(avg, dict):
+            # Schema 2: AstroHybrid pos-robust.  Headline = hybrid (the S1+S2 number).
+            acc = avg.get("hybrid")
+        elif isinstance(avg, (int, float)):
+            # Schema 3: upstream baseline.  Headline = the scalar.
+            acc = avg
+        else:
+            acc = None
     elif "results" in d and isinstance(d["results"], dict):
-        # Baseline scripts may put it under d["results"]
-        per_pos = [v for k, v in d["results"].items()
-                   if k.startswith("pos_") and isinstance(v, (int, float))]
+        # Last-resort: average across pos_* entries, supporting both
+        # dict-typed (schema 2) and float-typed (schema 3) leaves.
+        per_pos = []
+        for k, v in d["results"].items():
+            if not k.startswith("pos_"):
+                continue
+            if isinstance(v, (int, float)):
+                per_pos.append(v)
+            elif isinstance(v, dict):
+                hyb = v.get("hybrid")
+                if isinstance(hyb, (int, float)):
+                    per_pos.append(hyb)
         acc = sum(per_pos) / len(per_pos) if per_pos else None
     else:
         acc = None

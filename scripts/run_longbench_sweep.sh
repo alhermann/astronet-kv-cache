@@ -80,18 +80,39 @@ K_VALUES=(150 300 600)
 BASELINE_METHODS=(snapkv h2o pyramidkv)
 TASKS="multifieldqa_en hotpotqa"
 
+is_large() {
+    local b=$1
+    for L in "${LARGE_BACKBONES[@]}"; do
+        if [ "$L" = "$b" ]; then return 0; fi
+    done
+    return 1
+}
+
 run_baseline_cell() {
     local backbone=$1 method=$2 k=$3 device=$4
     local out="$SAVE_DIR/lb_${backbone}_${method}_k${k}.json"
     [ -f "$out" ] && { echo "  [skip] $out"; return; }
-    echo "  [run] $backbone/$method k=$k on cuda:$device"
-    CUDA_VISIBLE_DEVICES=$device $PY baselines/eval_upstream_longbench.py \
-        --model_path "${MODEL_PATH[$backbone]}" \
-        --method "$method" \
-        --k "$k" --n_samples 100 \
-        --tasks $TASKS \
-        --save_path "$out" \
-        > "logs/training/longbench_sweep/lb_${backbone}_${method}_k${k}.log" 2>&1
+    if is_large "$backbone"; then
+        echo "  [run mGPU] $backbone/$method k=$k"
+        CUDA_VISIBLE_DEVICES=0,1 $PY baselines/eval_upstream_longbench.py \
+            --model_path "${MODEL_PATH[$backbone]}" \
+            --method "$method" --multi_gpu \
+            --k "$k" --n_samples 100 \
+            --tasks $TASKS \
+            --save_path "$out" \
+            > "logs/training/longbench_sweep/lb_${backbone}_${method}_k${k}.log" 2>&1 || \
+            echo "  [WARN] $backbone/$method k=$k failed (continuing)"
+    else
+        echo "  [run] $backbone/$method k=$k on cuda:$device"
+        CUDA_VISIBLE_DEVICES=$device $PY baselines/eval_upstream_longbench.py \
+            --model_path "${MODEL_PATH[$backbone]}" \
+            --method "$method" \
+            --k "$k" --n_samples 100 \
+            --tasks $TASKS \
+            --save_path "$out" \
+            > "logs/training/longbench_sweep/lb_${backbone}_${method}_k${k}.log" 2>&1 || \
+            echo "  [WARN] $backbone/$method k=$k failed (continuing)"
+    fi
 }
 
 # For AstroHybrid on LongBench we reuse training/eval_hybrid_longbench.py

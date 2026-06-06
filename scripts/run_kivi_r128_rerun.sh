@@ -111,6 +111,7 @@ main() {
                 --n_samples 100 --seed "$seed" --k 300 \
                 --configs k2v2 k4v2 k4v4 k8v4 \
                 --residual_length 128 \
+                --multi_gpu \
                 --device cuda:0 \
                 --save_path "$out" \
                 > "logs/training/kivi_r128/kivi_${backbone}_s${seed}.log" 2>&1 || \

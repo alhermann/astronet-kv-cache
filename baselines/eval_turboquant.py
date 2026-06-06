@@ -1,19 +1,25 @@
-"""Evaluate multiplicative KV selection + per-(layer, head) Lloyd-Max K8V4
-quantisation (RoPE-compatible).
+"""DEPRECATED 2026-06-06.
 
-NAMING / FAITHFULNESS NOTE (2026-06-06):
-  Earlier revisions of this script and its result JSONs labelled the method
-  as "adapted TurboQuant K8V4 Lloyd-Max". That label is misleading: the
-  algorithm does NOT include TurboQuant's defining random rotation step (it
-  destroys RoPE structure) and does NOT include TurboQuant's Stage-2 QJL
-  residual correction. What remains is the classical Lloyd-Max scalar
-  quantiser (Lloyd 1957 / Max 1960) applied per (layer, head) after a
-  per-head Gaussianisation. The Lloyd-Max codebook is textbook
-  MMSE-optimal scalar quantisation and predates TurboQuant by ~70 years.
-  We cite TurboQuant in the paper for motivation and for the RoPE-
-  incompatibility observation only. The number (~77-78% on the various
-  backbones) is honest; the algorithm name has been corrected to reflect
-  what the code actually does."""
+This script is retained for reference only.  It actually invokes
+`astronet.turboquant.TurboQuantMSE` which DOES apply the random orthogonal
+rotation (the algorithm that breaks RoPE).  Earlier the saved `method`
+field was relabelled to "per-head Lloyd-Max K8V4 (RoPE-compatible)" but
+the code did not match the label --- a reviewer footgun.
+
+The actual per-head Lloyd-Max K8V4 numbers that appear in the paper's
+tab:compression come from `training/eval_quantized.py`, which does NOT
+apply rotation.  Use that script.
+
+To make this script's misleading label inert, we hard-fail on import.
+If you need TurboQuant-with-rotation for non-RoPE comparison purposes,
+remove the SystemExit below and rename the saved method string to
+something honest like 'turboquant_with_rotation_NOT_RoPE_compatible'."""
+import sys
+print("ERROR: baselines/eval_turboquant.py is DEPRECATED. See the docstring "
+      "for the rationale. Use training/eval_quantized.py for per-head "
+      "Lloyd-Max K8V4 evaluation, which is the algorithm the paper reports.",
+      file=sys.stderr)
+sys.exit(2)
 import sys; sys.path.insert(0, '.')
 import os, json, math, time, argparse
 import torch

@@ -14,7 +14,9 @@ import argparse, glob, json, os, re, sys
 from collections import defaultdict
 
 # LongBench JSON naming: lb_<backbone>_<method>_k<k>.json
-CELL_RE = re.compile(r"lb_(?P<backbone>[a-z0-9]+)_(?P<method>[a-z_]+)_k(?P<k>\d+)\.json$")
+# Method names can contain digits (e.g. "h2o"). [a-z0-9_]+ avoids silent
+# drop of every H2O cell (Bug-10 found 2026-06-06).
+CELL_RE = re.compile(r"lb_(?P<backbone>[a-z0-9]+)_(?P<method>[a-z0-9_]+)_k(?P<k>\d+)\.json$")
 
 
 def load_cell(path: str) -> dict | None:
