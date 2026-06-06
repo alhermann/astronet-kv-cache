@@ -48,13 +48,21 @@ mkdir -p $SAVE_DIR logs/training/budget_sweep
 
 # Wait for X1/X2 training to finish so we have GPUs.  If they're already
 # done this exits immediately.
+# NOTE: pgrep returns exit code 1 when no matches found.  Under `set -e`
+# this aborts the script.  Use `pgrep -c` (count) + `|| true` + default-to-0.
+# Pattern matches ONLY the actual python interpreter running the script,
+# not bash shells that happen to mention "train_hybrid_x1.py" in their
+# command line (e.g. operators ssh-ing in to inspect the queue).
+TRAIN_PATTERN='python3 training/train_hybrid_x1\.py'
 wait_for_training() {
     local procs
-    procs=$(pgrep -f "train_hybrid_x1.py" | wc -l)
+    procs=$(pgrep -fc "$TRAIN_PATTERN" 2>/dev/null || true)
+    procs=${procs:-0}
     while [ "$procs" -gt 0 ]; do
         echo "[$(date +%H:%M)] waiting for $procs X1/X2 training procs to finish..."
         sleep 300
-        procs=$(pgrep -f "train_hybrid_x1.py" | wc -l)
+        procs=$(pgrep -fc "$TRAIN_PATTERN" 2>/dev/null || true)
+        procs=${procs:-0}
     done
     echo "[$(date +%H:%M)] X1/X2 done --- launching budget sweep"
 }
@@ -110,11 +118,17 @@ run_astrohybrid_cell() {
     local k_real=$((k - 16))
     [ "$k_real" -lt 16 ] && return  # skip k<32 where virtual budget dominates
     echo "  [run] $backbone/astrohybrid k=$k (k_real=$k_real, n_mem=16) seed=$seed on $device"
+    # CRITICAL: the baseline AstroHybrid checkpoints were trained at
+    # attn_dim=256, but eval_hybrid_position_robust.py defaults to
+    # attn_dim=512.  Without the explicit override the load_state_dict
+    # would raise a shape mismatch (queries 1x16x256 vs current 1x16x512)
+    # and the bash backbone driver would exit via `set -e`.  Found by
+    # the first qwen7b/astrohybrid k=50 cell of this sweep (2026-06-06).
     CUDA_VISIBLE_DEVICES=$device $PY training/eval_hybrid_position_robust.py \
         --model_path "${MODEL_PATH[$backbone]}" \
         --checkpoint "${AH_CKPT[$backbone]}" \
         --n_eval 100 --seed "$seed" \
-        --k_real "$k_real" --n_mem 16 \
+        --k_real "$k_real" --n_mem 16 --attn_dim 256 \
         --positions 0 1 2 3 \
         --save_path "$out" \
         > "logs/training/budget_sweep/sq_${backbone}_astrohybrid_k${k}_s${seed}.log" 2>&1
