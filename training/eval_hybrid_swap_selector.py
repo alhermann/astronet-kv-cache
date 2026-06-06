@@ -156,7 +156,7 @@ def evaluate_position(model, tokenizer, astro, samples, pos, selector,
     for si, s in enumerate(placed):
         astro.reset_state()
         all_kv = {li: ([], []) for li in range(nl)}
-        all_hidden_inject = {li: [] for li in inject_layers} if using_x1 else None
+        all_hidden_inject = {li: [] for li in inject} if using_x1 else None
         all_attn = []
         for wi in range(len(s.windows) - 1):
             ids = tokenizer(s.windows[wi], return_tensors='pt',
@@ -175,7 +175,7 @@ def evaluate_position(model, tokenizer, astro, samples, pos, selector,
                 all_kv[li][0].append(out.past_key_values[li][0])
                 all_kv[li][1].append(out.past_key_values[li][1])
             if using_x1:
-                for li in inject_layers:
+                for li in inject:
                     all_hidden_inject[li].append(out.hidden_states[li][0])
             hidden = out.hidden_states[sense_layer]
             sensed = astro.sense(hidden)
@@ -240,7 +240,7 @@ def evaluate_position(model, tokenizer, astro, samples, pos, selector,
             # X1: stash per-inject-layer selected hidden states for the
             # cross-attn gap-fill module to consume during generate_kv.
             if attach_S2 and using_x1:
-                for li in inject_layers:
+                for li in inject:
                     full_h = torch.cat(all_hidden_inject[li], dim=0)
                     h_sel = full_h.index_select(0, idx_real).unsqueeze(0)
                     astro.set_selected_hidden(li, h_sel)

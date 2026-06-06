@@ -247,17 +247,29 @@ def main():
     astro.load_state_dict(sd, strict=True)
     astro.extract_model_weights(model, args.device)
 
-    # 2) Attach X1 gap-fill, identity at init
+    # 2) FREEZE AstroNet *before* attaching X1.  ``attach_x1`` registers
+    #    X1 as a submodule of astro (``self._x1 = x1_module``), so
+    #    ``astro.parameters()`` then walks X1 too --- freezing after the
+    #    attach silently froze X1 as well in the first attempt, leaving
+    #    X1 at xavier init and producing eval results byte-identical to
+    #    baseline.  Order matters here: freeze first, then attach.
+    for p in astro.parameters():
+        p.requires_grad = False
     x1 = GapFillPerInjectLayer(inject_layers, hidden_dim=cfg.hidden_size,
                                   attn_dim=args.x1_attn_dim).to(args.device)
-    astro.attach_x1(x1)
+    astro.attach_x1(x1)   # X1 params keep their default requires_grad=True
     print(f'  AstroHybrid params: {astro.parameter_count():,}', flush=True)
     print(f'  X1 params         : {x1.parameter_count():,}', flush=True)
 
-    # 3) Optimiser over AstroHybrid + X1 params
-    train_params = list(astro.parameters()) + list(x1.parameters())
+    # 3) Optimiser over X1 params only --- AstroNet is frozen.
+    train_params = list(x1.parameters())
     optimizer = torch.optim.AdamW(train_params, lr=args.lr,
                                      weight_decay=0.01)
+    n_train_p = sum(p.numel() for p in train_params if p.requires_grad)
+    print(f'  trainable: {n_train_p:,} '
+           f'(X1 only; AstroNet frozen)', flush=True)
+    assert n_train_p == x1.parameter_count(), (
+        f'X1 freeze leak: trainable={n_train_p} vs x1={x1.parameter_count()}')
 
     # 4) Data
     if args.data == 'squad':
