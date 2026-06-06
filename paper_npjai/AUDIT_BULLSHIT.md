@@ -188,3 +188,32 @@ SnapKV".  This will not survive review.
   desk-reject.
 - Experiment 1 (S2 ablation + paired-bootstrap CIs, task #134):
   aggregation of existing numbers + statistical rigor.
+
+**2026-06-06 update — RULER faithful evaluation scoping.** Full RULER
+faithful eval requires pre-generated jsonl files at
+`data/RULER/{context_length}/{task}.jsonl` (11 task variants x 4 lengths)
+which are not in this repo and would take ~1 day to generate via the
+upstream RULER pipeline.  We substitute NiaH (via `baselines/eval_needle.py`)
+at RULER-range `n_windows = {20, 22, 44, 85}` corresponding approximately
+to 5k/8k/16k/32k tokens at the 384-token window size used elsewhere.
+This covers the dominant sub-protocol of RULER but does NOT include the
+`cwe`, `fwe`, `vt` task variants.  The `fig:ruler` claim in
+`paper_npjai/_overleaf_remote/main.tex` will be scoped to
+"NiaH at RULER-range context lengths" rather than the full RULER score,
+or dropped if the rescoping is unsatisfactory.  See
+`baselines/eval_upstream_ruler_note.md` for the full rationale and
+alternatives.
+
+**2026-06-06 update — latency benchmark scoping.** `tab:latency` in the
+paper is currently placeholdered with red [P] markers in every baseline
+cell.  A faithful upstream-baseline latency benchmark would mirror
+`baselines/eval_upstream_baselines.py` but time the prefill and generation
+steps.  Estimated ~2h of code + ~3h GPU.  This is deferred as it is NOT
+on the memory-pivot decision path: the gate-1 / gate-3 acceptance is
+based on accuracy, not latency.  Latency claims in the paper currently
+stand only as: (a) the 1.32x cross-turn cumulative speedup, single-
+backbone proof-of-concept on Qwen 7B (`logs/results/multi_turn_*.json`);
+and (b) qualitative remarks about the cumulative-attention requirement
+precluding memory-efficient kernels.  Both are already in the paper
+without baseline comparisons; `tab:latency` placeholders will be
+deleted from the final table if no faithful runs land in time.

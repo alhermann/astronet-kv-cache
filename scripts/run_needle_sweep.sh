@@ -66,6 +66,11 @@ LARGE_BACKBONES=(qwen32b mistral24b)
 K_VALUES=(150 300)
 SEED_OFFSETS=(0 1 2)
 BASELINE_METHODS=(snapkv h2o pyramidkv)
+# n_windows extended to RULER-range context lengths (substitute for
+# full RULER eval; see baselines/eval_upstream_ruler_note.md for the
+# faithfulness caveats).  n=22 ~= 8k tokens, n=44 ~= 16k, n=85 ~= 32k
+# at the 384-token window size used throughout the paper.
+N_WINDOWS_LIST=(20 22 44 85)
 
 run_baseline_cell() {
     local backbone=$1 method=$2 k=$3 seed=$4 device=$5
@@ -75,7 +80,7 @@ run_baseline_cell() {
     CUDA_VISIBLE_DEVICES=$device $PY baselines/eval_upstream_needle.py \
         --model_path "${MODEL_PATH[$backbone]}" \
         --method "$method" \
-        --k "$k" --n_windows_list 20 --n_trials 20 \
+        --k "$k" --n_windows_list "${N_WINDOWS_LIST[@]}" --n_trials 20 \
         --seed_offset "$seed" \
         --save_path "$out" \
         > "logs/training/needle_sweep/nd_${backbone}_${method}_k${k}_s${seed}.log" 2>&1
