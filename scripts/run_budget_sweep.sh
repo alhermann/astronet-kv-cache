@@ -75,7 +75,14 @@ declare -A AH_NAME=(
 
 K_VALUES=(50 100 150 200 250 300 400 600)
 SEEDS=(42 1234 7)
-BASELINE_METHODS=(snapkv h2o pyramidkv streamingllm)
+# NOTE (2026-06-06, critic audit): StreamingLLM has NO Qwen2 monkey-patch in
+# baselines/kvcache_factory/monkeypatch.py:154-179 (only snapkv/h2o/pyramidkv
+# branches exist).  eval_upstream_baselines.py's argparse also restricts
+# --method to {snapkv, h2o, pyramidkv}.  Including streamingllm here would
+# crash every cell with an argparse error and produce empty JSONs that the
+# aggregator would silently treat as "no streamingllm baseline available",
+# skewing best_baseline selection.  Dropped from this sweep.
+BASELINE_METHODS=(snapkv h2o pyramidkv)
 
 run_baseline_cell() {
     local backbone=$1 method=$2 k=$3 seed=$4 device=$5
@@ -113,24 +120,40 @@ run_astrohybrid_cell() {
         > "logs/training/budget_sweep/sq_${backbone}_astrohybrid_k${k}_s${seed}.log" 2>&1
 }
 
+run_backbone_grid() {
+    # Run the full (method x k x seed) grid for one backbone on the given GPU.
+    # NOTE: critic 2026-06-06 audit: parallelise across the two Titans by
+    # invoking this fn once per backbone in the background, halving wall-time.
+    local backbone=$1 device=$2
+    echo
+    echo "############################################"
+    echo "##  Backbone: $backbone  on cuda:$device"
+    echo "############################################"
+    for seed in "${SEEDS[@]}"; do
+        for k in "${K_VALUES[@]}"; do
+            for method in "${BASELINE_METHODS[@]}"; do
+                run_baseline_cell "$backbone" "$method" "$k" "$seed" "$device"
+            done
+            run_astrohybrid_cell "$backbone" "$k" "$seed" "$device"
+        done
+    done
+}
+
 main() {
     wait_for_training
 
-    for backbone in qwen7b llama8b; do
-        echo
-        echo "############################################"
-        echo "##  Backbone: $backbone"
-        echo "############################################"
-        # SQuAD sweep: baselines + AstroHybrid, all k, all seeds
-        for seed in "${SEEDS[@]}"; do
-            for k in "${K_VALUES[@]}"; do
-                for method in "${BASELINE_METHODS[@]}"; do
-                    run_baseline_cell "$backbone" "$method" "$k" "$seed" 0
-                done
-                run_astrohybrid_cell "$backbone" "$k" "$seed" 0
-            done
-        done
-    done
+    # Parallelise across both Titans: Qwen 7B on cuda:0, Llama 8B on cuda:1.
+    # Each backbone runs its own (method x k x seed) loop independently.
+    run_backbone_grid qwen7b  0 > "logs/training/budget_sweep/qwen7b_driver.log"  2>&1 &
+    pid_qwen=$!
+    run_backbone_grid llama8b 1 > "logs/training/budget_sweep/llama8b_driver.log" 2>&1 &
+    pid_llama=$!
+    echo "[$(date +%H:%M)] launched qwen7b (pid=$pid_qwen) on cuda:0 + llama8b (pid=$pid_llama) on cuda:1"
+    wait $pid_qwen
+    qwen_rc=$?
+    wait $pid_llama
+    llama_rc=$?
+    echo "[$(date +%H:%M)] qwen7b rc=$qwen_rc  llama8b rc=$llama_rc"
 
     echo
     echo "[$(date +%H:%M)] SQuAD budget sweep complete.  Aggregating..."

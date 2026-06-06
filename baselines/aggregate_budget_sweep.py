@@ -126,6 +126,13 @@ def aggregate(in_dir: str) -> dict:
 def evaluate_gates(summary: dict, out_path: str) -> dict:
     """Apply the 5 acceptance gates from the critic review.
 
+    2026-06-06 critic pass tightened:
+      - Gate 2 CI separation uses 95% CI (2 x SE), not 68% CI (1 x SE).
+      - Gate 5 ("param-cost-corrected savings >= 30% at session_length=4k")
+        is now explicit and decoupled from the gate-1 2x crossover test.
+      - Memory ratios reported at session_length in {300, 4096, 16384} so
+        the regime where Stage-2 params dominate is visible to reviewers.
+
     Returns a dict with per-gate verdicts + per-(backbone, baseline) crossover
     points.  Memory pivot is recommended only if gates 1 + 2 + 3 all pass.
     """
@@ -144,7 +151,10 @@ def evaluate_gates(summary: dict, out_path: str) -> dict:
         best_baseline = max(baseline_k300, key=lambda m: baseline_k300[m]["mean"])
         target = baseline_k300[best_baseline]["mean"]
         target_se = baseline_k300[best_baseline]["se"]
-        # Find smallest k where AstroHybrid mean is at least target - 1 SE
+        # Find smallest k where AstroHybrid clears the 95% CI gate against the
+        # best baseline at k=300.  95% CI lower bound = mean - 2 x SE under the
+        # Gaussian-by-CLT approximation (we have only 3 seeds; this is the
+        # weakest assumption the critic would accept).
         ah_ks = sorted({k for (bb, m, k) in summary
                          if bb == b and m == "astrohybrid"})
         crossover = None
@@ -152,9 +162,9 @@ def evaluate_gates(summary: dict, out_path: str) -> dict:
             ah = summary[(b, "astrohybrid", k)]
             if ah["n"] < 3:
                 continue  # conservative: refuse to claim with <3 seeds
-            # CI separation gate: AstroHybrid - 1 SE >= baseline - 1 SE
-            ah_lo = ah["mean"] - ah["se"]
-            target_lo = target - target_se
+            # 95% CI separation: AstroHybrid - 2*SE >= baseline - 2*SE
+            ah_lo = ah["mean"] - 2.0 * ah["se"]
+            target_lo = target - 2.0 * target_se
             if ah_lo >= target_lo:
                 crossover = k
                 break
@@ -163,35 +173,62 @@ def evaluate_gates(summary: dict, out_path: str) -> dict:
                 crossover_budget=None,
                 parity_baseline=best_baseline,
                 parity_anchor_acc=target,
-                reason="no AstroHybrid k clears the CI gate against best baseline at k=300")
+                reason=("no AstroHybrid k clears the 95% CI gate "
+                        "against best baseline at k=300"))
             continue
-        # Compute the memory ratio at the crossover
-        ah_total_4k  = total_bytes_per_request(canonical, "astrohybrid",
+        # Compute the memory ratios at the crossover at multiple session lengths.
+        # Gate 5 (param-corrected savings) uses session_length=4k as the
+        # primary reporting horizon.
+        def _ratio(session_length: int) -> float:
+            ah_total = total_bytes_per_request(canonical, "astrohybrid",
                                                 k=crossover, dtype="fp16",
-                                                session_length=4096).total_bytes
-        bl_total_4k  = total_bytes_per_request(canonical, best_baseline,
+                                                session_length=session_length).total_bytes
+            bl_total = total_bytes_per_request(canonical, best_baseline,
                                                 k=300, dtype="fp16",
-                                                session_length=4096).total_bytes
-        ratio_4k = bl_total_4k / ah_total_4k
+                                                session_length=session_length).total_bytes
+            return bl_total / ah_total
+        ratio_300  = _ratio(300)
+        ratio_4k   = _ratio(4096)
+        ratio_16k  = _ratio(16384)
+        # Gate 5: param-corrected savings >= 30% at session=4k.
+        # Savings fraction = 1 - (ah_total / bl_total) = 1 - 1/ratio.
+        savings_4k = 1.0 - (1.0 / ratio_4k) if ratio_4k > 0 else 0.0
         verdicts[b] = dict(
             crossover_budget=crossover,
             parity_baseline=best_baseline,
             parity_anchor_acc=target,
+            parity_anchor_se=target_se,
             astrohybrid_acc_at_crossover=summary[(b, "astrohybrid", crossover)]["mean"],
-            memory_ratio_at_4k=ratio_4k,
+            astrohybrid_se_at_crossover=summary[(b, "astrohybrid", crossover)]["se"],
+            memory_ratio_at_session_300=ratio_300,   # stress test: params dominate
+            memory_ratio_at_session_4k=ratio_4k,     # primary reporting
+            memory_ratio_at_session_16k=ratio_16k,   # asymptote: params free
             gate_1_crossover_geq_2x=(ratio_4k >= 2.0),
-            gate_2_ci_separated=True,  # implied by crossover discovery rule above
+            gate_2_ci_separated_95pct=True,          # implied by 95% CI discovery rule
+            gate_5_savings_geq_30pct_at_4k=(savings_4k >= 0.30),
         )
     # Overall gate verdict --- requires 2/3 of backbones to clear gate 1
-    n_pass = sum(1 for v in verdicts.values()
-                 if v.get("gate_1_crossover_geq_2x", False))
+    # under 95% CI separation AND gate 5 (param-corrected >= 30%).
+    n_pass_g1 = sum(1 for v in verdicts.values()
+                    if v.get("gate_1_crossover_geq_2x", False))
+    n_pass_g5 = sum(1 for v in verdicts.values()
+                    if v.get("gate_5_savings_geq_30pct_at_4k", False))
+    n_must_pass = (2 if len(verdicts) >= 3 else len(verdicts))
     overall = dict(
         n_backbones_evaluated=len(verdicts),
-        n_backbones_passed_gate_1=n_pass,
+        n_backbones_passed_gate_1=n_pass_g1,
+        n_backbones_passed_gate_5=n_pass_g5,
+        n_must_pass=n_must_pass,
         memory_pivot_recommended=(
-            n_pass >= 2  # >=2/3 of must-run backbones; relax if only 2 backbones
-            if len(verdicts) >= 3 else n_pass == len(verdicts)
+            n_pass_g1 >= n_must_pass and n_pass_g5 >= n_must_pass
         ),
+        kill_criterion_note=(
+            "Memory pivot dies if (a) gate_1 fails on both must-run backbones, "
+            "OR (b) gate_5 fails (param-corrected savings < 30%% at 4k), "
+            "OR (c) the sibling LongBench sweep (separate aggregator) shows "
+            "no CI-separated crossover.  In any of those cases revert to "
+            "the accuracy framing; the +8.5pp tab:squad_main + needle deltas "
+            "+ Lloyd-Max K8V4 numbers are unaffected."),
         per_backbone=verdicts,
     )
     return overall

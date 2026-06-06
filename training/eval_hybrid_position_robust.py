@@ -74,9 +74,23 @@ def main():
         n_kv_heads=nkv, head_dim=hd, n_layers=nl, inject_layers=inject_layers,
     ).to(device)
     astro.extract_model_weights(model, device)
-    astro.load_state_dict(torch.load(args.checkpoint, map_location=device, weights_only=False),
-                           strict=False)
+    # FOOTGUN GUARD (2026-06-06 critic audit): this script does NOT plumb X1.
+    # An X1-wrapped checkpoint is structured `{'astro': sd, 'x1': sd, 'args': dict}`.
+    # If we load that here, the outer dict's keys ('astro', 'x1', 'args') all
+    # mismatch AstroHybrid's parameter names, strict=False silently ignores
+    # them, AstroHybrid stays at random init, and the run silently reports
+    # garbage hybrid numbers.  Reject explicitly with a clear error.
+    raw = torch.load(args.checkpoint, map_location=device, weights_only=False)
+    if isinstance(raw, dict) and 'x1' in raw and 'astro' in raw:
+        raise RuntimeError(
+            f'{args.checkpoint} is an X1-wrapped checkpoint (keys: astro, x1, args).\n'
+            f'eval_hybrid_position_robust.py does NOT plumb X1 hidden states '
+            f'and would silently report baseline numbers.\n'
+            f'Use training/eval_hybrid_swap_selector.py for X1/X2 checkpoints.')
+    astro.load_state_dict(raw, strict=False)
     astro.eval()
+    assert getattr(astro, '_x1', None) is None, (
+        'attach_x1 leaked into this eval path --- X1 plumbing not supported here.')
     print(f'Loaded checkpoint: {args.checkpoint} ({astro.parameter_count():,} params)', flush=True)
 
     base = generate_squad_dataset(n_samples=args.n_eval, n_windows=5,

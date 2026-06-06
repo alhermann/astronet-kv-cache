@@ -79,6 +79,16 @@ def _set_config_hparams(model_config, method: str, k: int) -> None:
         # ``max_capacity_prompt - window_size``.
         model_config.window_size = k // 2
         model_config.max_capacity_prompt = k
+        # NOTE (2026-06-06 critic audit): the upstream KVCache-Factory
+        # H2OCluster reads kernel_size / pooling from config when scoring
+        # heavy hitters via the pooled-attention rule.  Defaults differ
+        # across model families, so we set them explicitly to match the
+        # H2O paper's canonical choice (avg-pool kernel=5).  Without this
+        # the comparison silently inherits upstream defaults that differ
+        # from the published H2O experiments.
+        model_config.kernel_size = 5
+        model_config.pooling = 'avgpool'
+        model_config.merge = None
     elif method == 'pyramidkv':
         # PyramidKV paper: alpha=8 observation window, beta=20 top/bottom
         # ratio, max-pool kernel-5 over avg-pool, max_capacity_prompt is
