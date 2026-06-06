@@ -1,5 +1,11 @@
-"""Cross-model eval: multiplicative KV selection + adapted TurboQuant (K8V4 Lloyd-Max).
-Per-head normalization + Lloyd-Max optimal codebook. No random rotation."""
+"""Cross-model eval: multiplicative KV selection + per-(layer, head) Lloyd-Max
+K8V4 (RoPE-compatible).
+
+Per-head Gaussianisation + classical Lloyd-Max scalar codebook; NO random rotation
+and NO QJL residual stage. See `baselines/eval_turboquant.py` for the full naming
+note (2026-06-06); the algorithm is classical scalar Lloyd-Max with per-head
+normalisation, predating TurboQuant by decades. TurboQuant is cited in the paper
+only for motivation and the RoPE-incompatibility observation."""
 import sys; sys.path.insert(0, '.')
 import os, json, math, time, argparse
 import torch
@@ -229,7 +235,7 @@ def main():
     save_path = f'./logs/turboquant_cross_{model_name}.json'
     save_data = {
         'model': model_name, 'n_samples': args.n_samples, 'seed': args.seed,
-        'k': 300, 'method': 'multiplicative + adapted TurboQuant K8V4 Lloyd-Max',
+        'k': 300, 'method': 'multiplicative + per-head Lloyd-Max K8V4 (RoPE-compatible)',
         'results': results,
     }
     os.makedirs('logs', exist_ok=True)

@@ -1,5 +1,19 @@
-"""Evaluate multiplicative KV selection + TurboQuant compression.
-Uses the actual TurboQuant algorithm (ICLR 2026): random rotation + Lloyd-Max quantization."""
+"""Evaluate multiplicative KV selection + per-(layer, head) Lloyd-Max K8V4
+quantisation (RoPE-compatible).
+
+NAMING / FAITHFULNESS NOTE (2026-06-06):
+  Earlier revisions of this script and its result JSONs labelled the method
+  as "adapted TurboQuant K8V4 Lloyd-Max". That label is misleading: the
+  algorithm does NOT include TurboQuant's defining random rotation step (it
+  destroys RoPE structure) and does NOT include TurboQuant's Stage-2 QJL
+  residual correction. What remains is the classical Lloyd-Max scalar
+  quantiser (Lloyd 1957 / Max 1960) applied per (layer, head) after a
+  per-head Gaussianisation. The Lloyd-Max codebook is textbook
+  MMSE-optimal scalar quantisation and predates TurboQuant by ~70 years.
+  We cite TurboQuant in the paper for motivation and for the RoPE-
+  incompatibility observation only. The number (~77-78% on the various
+  backbones) is honest; the algorithm name has been corrected to reflect
+  what the code actually does."""
 import sys; sys.path.insert(0, '.')
 import os, json, math, time, argparse
 import torch
@@ -178,7 +192,7 @@ def main():
 
     save_data = {
         'model': model_name, 'n_samples': len(samples), 'seed': args.seed,
-        'k': args.k, 'method': 'multiplicative + TurboQuant (ICLR 2026)',
+        'k': args.k, 'method': 'multiplicative + per-head Lloyd-Max K8V4 (RoPE-compatible)',
         'results': results,
     }
     os.makedirs('logs', exist_ok=True)

@@ -69,7 +69,7 @@ w10 Mistral RULER (training log; not in paper):
 ### Tab. compression (results.tex L150–155)
 Memory from `pareto_data.json` (bytes/1024²); accuracy from
 `paper_results_complete.json` →
-`compression.adapted_turboquant_k8v4.squad_n200`. All 24 cells match
+`compression.per_head_lloyd_max_k8v4_rope_compat.squad_n200` (key renamed 2026-06-06; see `AUDIT_BULLSHIT.md` update). All 24 cells match
 (420/16.4/6.2 etc., 74.5/77.5, 75.0/69.5, 78.5/77.0, 78.5/78.5,
 72.5/72.0, 79.5/72.5) ✓.
 

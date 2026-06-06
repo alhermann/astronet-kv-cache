@@ -8,6 +8,38 @@ Source of truth: ruthless review of `paper_npjai/results.tex`,
 `baselines/eval_longbench.py:60–200`, `training/train_hybrid.py:495–656`,
 and the kvcache_factory monkey-patches.
 
+**2026-06-06 update — quantisation naming correction (Phase 0 of memory-pivot
+methodology cleanup).** A second critic flagged that calling our K8V4
+scheme "adapted TurboQuant" was overclaiming: the algorithm has neither
+TurboQuant's random rotation (Stage 1, the paper's defining innovation)
+nor its QJL signed residual (Stage 2). What remains is classical per-
+(layer, head) Lloyd–Max scalar quantisation applied after per-head
+Gaussianisation — a method that predates TurboQuant by ~70 years
+(Lloyd 1957, Max 1960). All paper prose, table captions, result-file
+`method` fields, and `paper_results_complete.json` keys have been
+renamed to "per-head Lloyd–Max K8V4 (RoPE-compatible)". TurboQuant is
+now cited only as the motivation we considered and rejected (for the
+RoPE incompatibility) — not as the algorithm we run. The numbers in
+`logs/results/turboquant_cross_*.json` (now relabelled in their
+`method` field with a `naming_note`) are honest; only the label
+changes. Files touched: `paper_npjai/_overleaf_remote/main.tex` L59,
+L132, L134, L642, L662, L811, L1016, L1042, L1230, L1270;
+`paper_npjai/main.tex`, `methods.tex`, `results.tex`;
+`baselines/eval_turboquant.py` (docstring + saved `method`); five
+`logs/results/turboquant_cross_*.json`;
+`logs/results/paper_results_complete.json`.
+
+**Same risk applies to KVQuant.** `astronet/kvquant_adapter.py`
+docstring already discloses "We do NOT compute Fisher information
+weights", which is the published method's defining feature. Wherever
+the paper cites KVQuant as a comparator, the label must be
+"KVQuant-style (no Fisher)" or analogous. Implementation status: see
+`astronet/kvquant_adapter.py:38-42` for the disclosure; paper-side
+relabel pending once the next budget sweep determines whether KVQuant
+appears as a baseline in the headline figure.
+
+
+
 The headline conclusion: **the SnapKV / H₂O / StreamingLLM columns
 across Tables 2 and 3 (and the Pareto plot derived from them) are
 NOT faithful re-implementations of the published methods.**  They are

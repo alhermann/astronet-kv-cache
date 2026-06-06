@@ -4,7 +4,7 @@
 
 **Old framing (NeurIPS draft):** "From Calcium to Cache: Astrocyte-Inspired KV Memory for Language Models" — bio-first front matter, Ca²⁺ mechanism as the central novelty.
 
-**New framing (npj AI):** Lead with the **Pareto frontier** (Figure 1, 6-panel: KV-cache memory vs accuracy across all baselines for all 6 backbones). Front matter is **deployment economics**: KV cache is the dominant cost of long-context LLM inference; we reduce it by 25.6× FP16 (sources: `logs/results/pareto_data.json`) or 68.27× with adapted TurboQuant K8V4, while matching or beating the strongest KV-eviction baselines.
+**New framing (npj AI):** Lead with the **Pareto frontier** (Figure 1, 6-panel: KV-cache memory vs accuracy across all baselines for all 6 backbones). Front matter is **deployment economics**: KV cache is the dominant cost of long-context LLM inference; we reduce it by 25.6× FP16 (sources: `logs/results/pareto_data.json`) or 68.27× with per-head Lloyd--Max K8V4 (RoPE-compatible), while matching or beating the strongest KV-eviction baselines.
 
 The bio motivation **survives as a one-paragraph footnote in §Methods/Stage 2**, justifying the multiplicative form in Eq. 5 (without it, Eq. 5 is an unjustified design choice and the additive ablation becomes the only defence). Bio-essentiality ablation lands in §Results/Ablations as an honest finding: "EMA dynamics are decorative; mean/last-window pooling matches default on 5/6 models" — this is a **methodological simplification finding**, not a refutation of the work.
 
@@ -22,7 +22,7 @@ Long-context inference on frozen LLMs is bottlenecked by the KV cache. We presen
 1. **Drop-in to any frozen LLM** — no backbone fine-tuning, no architecture changes, applies through standard PyTorch hooks.
 2. **Beats KV-compression SOTA on multi-window QA** — 5-seed CIs across 6 backbones, mean Δ+8.6 pp vs S1-only and +10–22 pp vs KIVI K4V4.
 3. **Survives long-context generalisation up to 16 k** — RULER 8 k / 16 k shows +28/+8 pp on Qwen 14B and +40/+22 pp on Llama 8B over real SnapKV; soft degradation at 32 k OOD.
-4. **Compresses cache 25.6× at FP16, 68.3× with adapted TurboQuant K8V4** — and we fix the silent RoPE-incompatibility bug in vanilla rotation-based quantisation.
+4. **Compresses cache 25.6× at FP16, 68.3× with per-head Lloyd--Max K8V4 (RoPE-compatible)** — and we fix the silent RoPE-incompatibility bug in vanilla rotation-based quantisation.
 5. **Practical: multi-turn cache amortisation** — first published measurement, hybrid cache reuse across chat turns reduces per-turn compute.
 
 ## Narrative arc (Nature-style: Intro → Results → Discussion → Methods)

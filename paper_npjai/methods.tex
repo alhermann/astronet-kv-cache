@@ -309,46 +309,56 @@ scale is held at $0.03$ of the residual norm at every layer.
 \subsection{Quantisation: per-head Lloyd--Max}\label{sec:quant}
 %-----------------------------------------------------------------------%
 
-For additional cache compression we adapt the Lloyd--Max optimal scalar
-quantisation of TurboQuant\cite{zandieh2026turboquant}. TurboQuant has
-two stages: an MSE-optimal stage that applies a random orthogonal
-rotation followed by per-coordinate Lloyd--Max scalar quantisation, and
-a residual-correction stage that uses quantised
-Johnson--Lindenstrauss projections to recover unbiased inner-product
-estimates. The residual-correction stage requires bypassing the
-attention multiply with a JL-based estimator, which is incompatible
-with frozen-attention kernels; we use only the MSE stage, which
-produces dequantised key and value tensors that the standard attention
-path consumes without modification.
+For additional cache compression we use the classical MMSE-optimal
+Lloyd--Max scalar quantiser\cite{lloyd1982least,max1960quantizing},
+which selects codebook levels that minimise expected squared
+reconstruction error against a given source distribution. We
+approached this design via TurboQuant\cite{zandieh2026turboquant}, a
+recent two-stage rotation-based scheme that uses Lloyd--Max as its
+inner step. TurboQuant has two stages: an MSE-optimal stage that
+applies a random orthogonal rotation followed by per-coordinate
+Lloyd--Max scalar quantisation, and a residual-correction stage that
+uses quantised Johnson--Lindenstrauss projections to recover unbiased
+inner-product estimates. The residual-correction stage requires
+bypassing the attention multiply with a JL-based estimator, which is
+incompatible with frozen-attention kernels; the rotation in the MSE
+stage is, as we show next, incompatible with rotary position
+encodings. We therefore retain only Lloyd--Max itself and bring it
+into a RoPE-compatible form, with no rotation and no JL residual.
 
 The random rotation that TurboQuant applies in the MSE stage destroys
 the paired-coordinate structure that rotary position
 encodings\cite{su2024rope} rely on: RoPE rotates pairs of channels by
 position-dependent angles, and an arbitrary orthogonal rotation across
-all channels scrambles this pairing. In our hands, vanilla
-TurboQuant at 4 bits reduces accuracy on Qwen 7B to zero on the
-multi-window SQuAD task. The same failure mode is structurally
-expected on every RoPE-using backbone we evaluate.
+all channels scrambles this pairing. In our hands, TurboQuant at 4
+bits reduces accuracy on Qwen 7B to zero on the multi-window SQuAD
+task. The same failure mode is structurally expected on every
+RoPE-using backbone we evaluate.
 
-Our adapted variant removes the rotation entirely. We instead
-normalise each attention head's key and value coordinates
-independently to zero mean and unit variance using head-level running
-statistics, apply Lloyd--Max scalar quantisation with a codebook tuned
-to the standard normal distribution, and denormalise. We use 8-bit
-keys and 4-bit values (K8V4): keys participate in inner products
-$\mathbf{q}\cdot\mathbf{k}$ that are sensitive to coordinate noise,
-while values enter only through attention-weighted averages that
-tolerate coarser representation. Per token retained, the K8V4
-encoding uses $1.5\times d_h$ bytes versus $4\times d_h$ for FP16,
-a $\sim$2.6$\times$ reduction; combined with the
-$10\times$ selection compression for a 20-window context relative
-to the full cache, the total is $\sim$26$\times$ at FP16 and
-$\sim$68$\times$ with K8V4 (Table~\ref{tab:compression}). The
-per-head normalisation step is
+Our variant removes the rotation entirely. We instead normalise each
+attention head's key and value coordinates independently to zero mean
+and unit variance using head-level running statistics, apply the
+classical Lloyd--Max scalar codebook tuned to the standard normal
+distribution, and denormalise. The resulting scheme is per-(layer,
+head) scalar Lloyd--Max --- a classical method --- with the per-head
+Gaussianisation taking the role that rotation plays in TurboQuant. Our
+contribution in this section is the diagnosis of the RoPE
+incompatibility and the demonstration that the simplest fix (drop the
+rotation, normalise per head) preserves quantisation accuracy on
+Qwen, Llama and Mistral backbones; the codebook itself is not new.
+
+We use 8-bit keys and 4-bit values (K8V4): keys participate in inner
+products $\mathbf{q}\cdot\mathbf{k}$ that are sensitive to coordinate
+noise, while values enter only through attention-weighted averages
+that tolerate coarser representation. Per token retained, the K8V4
+encoding uses $1.5\times d_h$ bytes versus $4\times d_h$ for FP16, a
+$\sim$2.6$\times$ reduction; combined with the $10\times$ selection
+compression for a 20-window context relative to the full cache, the
+total is $\sim$26$\times$ at FP16 and $\sim$68$\times$ with K8V4
+(Table~\ref{tab:compression}). The per-head normalisation step is
 selection-method-agnostic: it can be applied to the KV tensors
 retained by H${}_2$O, SnapKV, StreamingLLM or any other selection
-scheme on a RoPE backbone, and the fix is a general contribution
-usable beyond AstroNet.
+scheme on a RoPE backbone.
 
 
 %-----------------------------------------------------------------------%
