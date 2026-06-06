@@ -22,31 +22,46 @@ PY=/home/alexander/Schreibtisch/AstroNet/venv/bin/python3
 SAVE_DIR=logs/results/needle_sweep
 mkdir -p "$SAVE_DIR" logs/training/needle_sweep
 
-TRAIN_PATTERN='python3 training/train_hybrid_x1\.py'
-SWEEP_PATTERN='bash scripts/run_budget_sweep\.sh'
-LB_PATTERN='bash scripts/run_longbench_sweep\.sh'
+# Wait pattern note: match the actual python worker procs (the bash parents
+# may be inline `bash -c` subshells from the orphan-recovery flow).
+WORKER_PATTERNS=(
+    'python3 training/train_hybrid_x1\.py'
+    'python3 baselines/eval_upstream_baselines\.py'
+    'python3 training/eval_hybrid_position_robust\.py'
+    'python3 baselines/eval_kivi\.py'
+    'python3 baselines/eval_upstream_longbench\.py'
+    'python3 baselines/eval_longbench\.py'
+)
 wait_for_blockers() {
-    for pat in "$TRAIN_PATTERN" "$SWEEP_PATTERN" "$LB_PATTERN"; do
-        local procs
-        procs=$(pgrep -fc "$pat" 2>/dev/null || true)
-        procs=${procs:-0}
-        while [ "$procs" -gt 0 ]; do
-            echo "[$(date +%H:%M)] waiting for: $pat"
-            sleep 600
-            procs=$(pgrep -fc "$pat" 2>/dev/null || true)
-            procs=${procs:-0}
+    while true; do
+        local total=0 c
+        for p in "${WORKER_PATTERNS[@]}"; do
+            c=$(pgrep -fc "$p" 2>/dev/null || true)
+            total=$((total + ${c:-0}))
         done
+        if [ "$total" -eq 0 ]; then break; fi
+        echo "[$(date +%H:%M)] needle waiting: $total upstream worker(s)"
+        sleep 600
     done
 }
 
 declare -A MODEL_PATH=(
     [qwen7b]="./models/qwen2.5-7b"
+    [qwen14b]="./models/qwen2.5-14b"
+    [qwen32b]="./models/qwen2.5-32b"
     [llama8b]="./models/llama-3.1-8b"
+    [mistral7b]="./models/mistral-7b-v0.3"
+    [mistral24b]="./models/mistral-small-24b"
 )
 declare -A AH_CKPT=(
     [qwen7b]="checkpoints/astro_hybrid_qwen2_5-7b_n16_k284_t5000_s42_w10_diverse.pt"
+    [qwen14b]="checkpoints/astro_hybrid_qwen2_5-14b_n16_k284_t5000_s42_w10_diverse.pt"
+    [qwen32b]="checkpoints/astro_hybrid_qwen2_5-32b_n16_k284_t5000_s42_w10_diverse.pt"
     [llama8b]="checkpoints/astro_hybrid_llama-3_1-8b_n16_k284_t5000_s42_w10_diverse.pt"
+    [mistral7b]="checkpoints/astro_hybrid_mistral-7b-v0_3_n16_k284_t5000_s42_w10_diverse.pt"
+    [mistral24b]="checkpoints/astro_hybrid_mistral-small-24b_n16_k284_t5000_s42_w10_diverse.pt"
 )
+LARGE_BACKBONES=(qwen32b mistral24b)
 
 K_VALUES=(150 300)
 SEED_OFFSETS=(0 1 2)
@@ -66,25 +81,39 @@ run_baseline_cell() {
         > "logs/training/needle_sweep/nd_${backbone}_${method}_k${k}_s${seed}.log" 2>&1
 }
 
-# For AstroHybrid on Needle we use baselines/eval_needle.py if it exists,
-# which produced the original AstroNet Needle numbers in the paper.
-# That harness DOES feed AstroNet's selection-plus-summary cache; it's the
-# correct match-protocol for AstroHybrid vs faithful baselines on Needle.
+# AstroHybrid on Needle via baselines/eval_needle.py with the 'hybrid' method.
+# CLI quirks of that script (not the upstream wrapper):
+#   - takes --k (total budget) not --k_real (it does the 16/284 split internally
+#     based on --n_mem)
+#   - takes --n_windows_list (plural) not --n_windows
+#   - has --seed_offset, --attn_dim=256 default (matches the baseline ckpts)
+#   - writes to a hardcoded path; uses --save_suffix instead of --save_path.
+#     We sym-link the hardcoded output into our SAVE_DIR after the run.
 run_astrohybrid_cell() {
     local backbone=$1 k=$2 seed=$3 device=$4
     local out="$SAVE_DIR/nd_${backbone}_astrohybrid_k${k}_s${seed}.json"
     [ -f "$out" ] && { echo "  [skip] $out"; return; }
-    local k_real=$((k - 16))
+    local suffix="_sweep_k${k}_s${seed}"
+    local model_basename
+    case $backbone in
+        qwen7b)  model_basename="qwen2.5-7b" ;;
+        llama8b) model_basename="llama-3.1-8b" ;;
+    esac
+    local hard_path="logs/results/needle_${model_basename}_k${k}${suffix}.json"
     if [ -f baselines/eval_needle.py ]; then
-        echo "  [run] $backbone/astrohybrid k=$k (k_real=$k_real) seed_off=$seed on cuda:$device"
+        echo "  [run] $backbone/astrohybrid k=$k seed_off=$seed on cuda:$device"
         CUDA_VISIBLE_DEVICES=$device $PY baselines/eval_needle.py \
             --model_path "${MODEL_PATH[$backbone]}" \
-            --checkpoint "${AH_CKPT[$backbone]}" \
-            --k_real "$k_real" --n_mem 16 \
-            --n_windows 20 --n_trials 20 \
+            --hybrid_checkpoint "${AH_CKPT[$backbone]}" \
+            --methods hybrid \
+            --k "$k" --n_mem 16 --attn_dim 256 \
+            --n_windows_list 20 --n_trials 20 \
             --seed_offset "$seed" \
-            --save_path "$out" \
-            > "logs/training/needle_sweep/nd_${backbone}_astrohybrid_k${k}_s${seed}.log" 2>&1
+            --save_suffix "$suffix" \
+            > "logs/training/needle_sweep/nd_${backbone}_astrohybrid_k${k}_s${seed}.log" 2>&1 || \
+            echo "  [WARN] $backbone/astrohybrid k=$k s=$seed failed (continuing)"
+        # Sym-link hardcoded output into the sweep dir for the aggregator.
+        [ -f "$hard_path" ] && ln -sf "$(realpath "$hard_path")" "$out"
     else
         echo "  [skip-no-script] $backbone/astrohybrid (no baselines/eval_needle.py)"
     fi

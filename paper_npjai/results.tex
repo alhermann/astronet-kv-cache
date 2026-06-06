@@ -35,6 +35,13 @@ Across the six backbones, adding the learned summary module to Stage~1 selection
 
 The Pareto frontier in \Cref{fig:pareto} places these accuracy numbers against KV-cache memory per request. The Stage~1+2 pipeline at $k{=}300$ FP16 consumes 16--75~MB of KV memory across the six models versus 420~MB--2.0~GB for the full $n{=}20$-window cache; with the K8V4 quantization stack (\cref{sec:compression}), the same pipeline operates at $25.6\times$ FP16 compression of the full cache and reaches $68\times$ when accuracy and memory are jointly considered.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{figs/fig_pos_robust_bar.pdf}
+\caption{\textbf{Per-position SQuAD accuracy decomposition} (companion to \Cref{tab:squad_main}). Bars show Stage~1 and Stage~1+2 five-seed mean$\pm$SE at each of the four answer-bearing positions; pos~3 (fact at the end of context, shaded) is the hardest setting. Annotations report the Stage~1+2 gain over Stage~1 in percentage points. Pure Stage~1 selection collapses at pos~3 across backbones (the heavy-hitter heuristic has no recency support there); the learned summary recovers four to ten points. The averaged number in \cref{tab:squad_main} hides this structure.}
+\label{fig:pos_robust_bar}
+\end{figure}
+
 
 %-----------------------------------------------------------------------%
 \subsection{Transfer to standard long-context benchmarks}\label{sec:longbench}
@@ -160,6 +167,13 @@ Mistral-Small 24B & 1200 & 46.9 & 17.6 & 25.6$\times$ & 68.3$\times$ & 79.5 & 72
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\linewidth]{figs/fig_memory_session_stress.pdf}
+\caption{\textbf{Per-request memory vs session length} (Qwen~7B). The AstroHybrid amortised parameter cost is dominant at short sessions and asymptotically negligible at long sessions, making the Stage-2 parameter overhead trade-off explicit per session-length regime. SnapKV at $k{=}300$ serves as the flat reference. Dotted lines repeat the comparison with the K8V4 quantisation stack; the saving compounds proportionally. The iso-accuracy target line at $k{=}150$ marks the operating point tested by the SQuAD budget sweep.}
+\label{fig:memory_session_stress}
+\end{figure}
 
 The selection stage alone reduces the cache by $25.6\times$ relative to the full $n{=}20$-window cache; appending the quantisation stack reaches $68.3\times$. On four of the six backbones the K8V4 accuracy cost is within $\pm 1.5$\,pp of the FP16 reference, and on Qwen~7B K8V4 in fact improves accuracy by $+3.0$\,pp (the asymmetric 8/4-bit precision suppresses small fluctuations that hurt the FP16 baseline on this model). The two-sided range across all six models is $-7.0$\,pp on Mistral-Small~24B to $+3.0$\,pp on Qwen~7B, comfortably bounded for a $2.6\times$ further compression of the retained cache. The asymmetry between key precision (8 bits) and value precision (4 bits) reflects the different roles the two play in the attention computation: keys appear inside an inner product with the query and are sensitive to small perturbations, while values are weight-averaged and tolerate coarser representations. The same K8V4 setting therefore applies identically across all six backbones in our experiments.
 

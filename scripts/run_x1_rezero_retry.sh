@@ -38,22 +38,27 @@ cd /home/alexander/Schreibtisch/AstroNet
 PYTHONUNBUFFERED=1
 PY=/home/alexander/Schreibtisch/AstroNet/venv/bin/python3
 
-wait_for_pattern() {
-    local desc=$1 pat=$2
-    local procs
-    procs=$(pgrep -fc "$pat" 2>/dev/null || true)
-    procs=${procs:-0}
-    while [ "$procs" -gt 0 ]; do
-        echo "[$(date +%H:%M)] X1-ReZero waiting for $desc ($procs procs)"
-        sleep 600
-        procs=$(pgrep -fc "$pat" 2>/dev/null || true)
-        procs=${procs:-0}
+# Wait for ALL upstream workers (sweep, KIVI, LongBench, Needle, X1/X2).
+WORKER_PATTERNS=(
+    'python3 training/train_hybrid_x1\.py'
+    'python3 baselines/eval_upstream_baselines\.py'
+    'python3 training/eval_hybrid_position_robust\.py'
+    'python3 baselines/eval_kivi\.py'
+    'python3 baselines/eval_upstream_longbench\.py'
+    'python3 baselines/eval_upstream_needle\.py'
+    'python3 baselines/eval_longbench\.py'
+    'python3 baselines/eval_needle\.py'
+)
+while true; do
+    total=0
+    for p in "${WORKER_PATTERNS[@]}"; do
+        c=$(pgrep -fc "$p" 2>/dev/null || true)
+        total=$((total + ${c:-0}))
     done
-}
-
-wait_for_pattern "any prior X1/X2 train"   'python3 training/train_hybrid_x1\.py'
-wait_for_pattern "SQuAD budget sweep"      'bash scripts/run_budget_sweep\.sh'
-wait_for_pattern "KIVI K4V4 R=128 rerun"   'python3 baselines/eval_kivi\.py'
+    if [ "$total" -eq 0 ]; then break; fi
+    echo "[$(date +%H:%M)] X1-ReZero waiting: $total upstream worker(s)"
+    sleep 600
+done
 
 echo "[$(date +%H:%M)] launching X1 ReZero retry on cuda:0"
 mkdir -p logs/training
