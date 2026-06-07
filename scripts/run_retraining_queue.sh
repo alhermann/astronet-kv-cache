@@ -95,18 +95,50 @@ if [ -n "$P1_CKPT" ]; then
 fi
 
 # ----------------------------------------------------------------------
-# P2: same Stage 2 with multi-position fact placement during training.
-# Existing train_hybrid.py uses fact_position=0; this would require a
-# small patch.  Document as TODO and skip if patch not yet applied.
+# P2: multi-position fact placement retrain.
+# Wraps train_hybrid.main via monkey-patch of generate_squad_dataset;
+# each training sample has its fact_window re-shuffled uniformly across
+# the four non-query candidate positions.  Implementation:
+# training/train_hybrid_multipos.py
 # ----------------------------------------------------------------------
-echo "[$(date +%H:%M)] P2 retrain: multi-position fact placement (SKIPPED --- requires patch to train_hybrid.py)"
+wait_for_workers
+echo "[$(date +%H:%M)] P2 retrain: multi-position fact placement"
+CUDA_VISIBLE_DEVICES=0 $PY \
+    training/train_hybrid_multipos.py \
+    --model_path $MODEL \
+    --n_train 5000 --n_eval 100 --epochs 2 \
+    --k_real 284 --n_mem 16 --sense_layer 14 --attn_dim 256 \
+    --train_seed 42 \
+    --device cuda:0 \
+    > logs/training/retraining/P2_train_multipos.log 2>&1 || \
+    echo "[WARN] P2 train failed; continuing"
+# Eval P2 ckpt at k=300
+P2_CKPT=$(ls -t checkpoints/*multipos* 2>/dev/null | head -1)
+if [ -n "$P2_CKPT" ]; then
+    CUDA_VISIBLE_DEVICES=0 $PY \
+        training/eval_hybrid_position_robust.py \
+        --model_path $MODEL --checkpoint "$P2_CKPT" \
+        --n_eval 100 --seed 42 --k_real 284 --n_mem 16 --attn_dim 256 \
+        --positions 0 1 2 3 \
+        --save_path logs/results/retrain_P2_multipos_qwen7b.json \
+        > logs/training/retraining/P2_eval_multipos.log 2>&1 || \
+        echo "[WARN] P2 eval failed"
+fi
 
 # ----------------------------------------------------------------------
 # P3: Stage 2 trained against SnapKV-style scoring (streaming protocol).
-# REQUIRES new training script training/train_hybrid_snapkv_selector.py
-# that swaps our multiplicative selector for max-pool kernel=7 over the
-# end-of-prompt observation window during training.  Document as TODO.
+# DEFERRED: requires either a 2h refactor of train_hybrid.py to make the
+# selection function swappable, OR a parallel ~150-line copy of the
+# train_step_hybrid function with avg_pool1d(kernel=5) replaced by
+# max_pool1d(kernel=7).  Both options are significant code work that
+# risks introducing subtle bugs into the canonical training path.
+#
+# Decision: defer P3 until P0/P1/P2 results land.  If any of those gives
+# a meaningful lift, we know retraining can help and P3 is worth the
+# investment.  If they're all neutral, P3 is unlikely to be different
+# (the selection-rule mismatch is a hyperparameter at the boundary of
+# what data-side retraining can fix).
 # ----------------------------------------------------------------------
-echo "[$(date +%H:%M)] P3 retrain: Stage 2 specialised for SnapKV selector (SKIPPED --- requires new training script)"
+echo "[$(date +%H:%M)] P3 retrain: SnapKV-selector training (DEFERRED --- see comment block)"
 
 echo "[$(date +%H:%M)] retraining queue complete"
