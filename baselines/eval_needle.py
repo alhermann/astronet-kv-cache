@@ -30,6 +30,11 @@ NEEDLES = [
     ("Professor Henderson discovered the high-temperature superconductor in 1987.", "Who discovered the high-temperature superconductor?", "Professor Henderson"),
     ("The population of the island nation is exactly 4,231,567 people.", "What is the population of the island nation?", "4,231,567"),
     ("The antidote requires exactly three drops of the blue serum.", "How many drops of the blue serum does the antidote require?", "three"),
+    ("The lost manuscript was found in the attic of the Whitfield mansion.", "Where was the lost manuscript found?", "the attic of the Whitfield mansion"),
+    ("Dr. Patel's lab uses a laser of wavelength 532 nanometers.", "What wavelength laser does Dr. Patel's lab use?", "532 nanometers"),
+    ("The festival of Solanis is celebrated every seventh year on the autumn equinox.", "How often is the festival of Solanis celebrated?", "every seventh year"),
+    ("The treasure was buried beneath the iron oak at Crescent Bay.", "Where is the treasure buried?", "beneath the iron oak at Crescent Bay"),
+    ("The fastest recorded speed of the dust crab is 47 kilometers per hour.", "What is the fastest recorded speed of the dust crab?", "47 kilometers per hour"),
 ]
 
 
