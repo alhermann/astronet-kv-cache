@@ -171,7 +171,8 @@ class AstroGate(nn.Module):
         Returns: [T_ctx] modulated scores.
         """
         bias = self.gate_logits(ctx_hidden)
-        return snap_scores + self.lam * bias.to(snap_scores.device)
+        scaled_bias = (self.lam * bias).to(snap_scores.device)
+        return snap_scores + scaled_bias
 
     def parameter_count(self):
         return sum(p.numel() for p in self.parameters() if p.requires_grad)

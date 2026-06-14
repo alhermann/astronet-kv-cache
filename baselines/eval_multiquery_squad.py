@@ -346,15 +346,24 @@ def main():
             raw['astro'] if isinstance(raw, dict) and 'astro' in raw else raw,
             strict=False)
         astro.eval()
+        lam_source = 'ckpt-default'
         if args.lam_override is not None:
             import math
-            # Invert softplus: log_lambda = log(exp(λ) - 1)
-            new_log_lam = math.log(math.exp(args.lam_override) - 1.0)
+            new_log_lam = math.log(math.expm1(args.lam_override))
             astro.log_lambda.data.fill_(new_log_lam)
+            lam_source = f'override={args.lam_override:g}'
+        else:
+            sidecar = args.checkpoint + '.lam.json'
+            if os.path.exists(sidecar):
+                import math
+                with open(sidecar) as _f: cal = json.load(_f)
+                lam_cal = float(cal['lambda'])
+                astro.log_lambda.data.fill_(math.log(math.expm1(lam_cal)))
+                lam_source = f'auto-calibrated={lam_cal:g}'
         sl = raw.get('sense_layer', nl // 2) if isinstance(raw, dict) else nl // 2
         sense_cap = SenseCapture(model, sl)
         print(f'Loaded AstroGate ckpt: {args.checkpoint}  sense_layer={sl}  '
-              f'lambda={astro.lam.item():.3f}  '
+              f'lambda={astro.lam.item():.3f}  [{lam_source}]  '
               f'alpha_fast={astro.alpha_fast.item():.3f}  '
               f'alpha_slow={astro.alpha_slow.item():.3f}', flush=True)
 

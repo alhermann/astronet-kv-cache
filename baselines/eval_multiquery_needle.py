@@ -102,6 +102,13 @@ def compress_once(model, tokenizer, capture, sense_cap, astro, method,
         astro.reset_state()
         ctx_hidden_full = torch.cat(hidden_chunks, dim=1) if hidden_chunks else None
         if ctx_hidden_full is not None:
+            # In multi-GPU, sense_cap's pre-hook can capture the hidden tensor
+            # BEFORE accelerate's dispatch hook moves it to the sense layer's
+            # device. Move explicitly to astro's device so sense() and gate
+            # ops don't trip LayerNorm device mismatches.
+            astro_dev = next(astro.parameters()).device
+            if ctx_hidden_full.device != astro_dev:
+                ctx_hidden_full = ctx_hidden_full.to(astro_dev)
             astro.update_state(astro.sense(ctx_hidden_full))
 
     k_keep = k - n_mem if method == 'astrohybrid' else k
@@ -194,6 +201,8 @@ def main():
     p.add_argument('--attn_dim', type=int, default=256)
     p.add_argument('--lam_override', type=float, default=None)
     p.add_argument('--device', default='cuda:0')
+    p.add_argument('--multi_gpu', action='store_true',
+                   help='split model across cuda:0 + cuda:1 (needed for 32B+)')
     p.add_argument('--save_path', required=True)
     args = p.parse_args()
 
@@ -206,9 +215,24 @@ def main():
     if tokenizer.pad_token is None: tokenizer.pad_token = tokenizer.eos_token
     bnb = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_quant_type='nf4',
                               bnb_4bit_compute_dtype=torch.float16)
-    model = AutoModelForCausalLM.from_pretrained(
-        args.model_path, quantization_config=bnb,
-        device_map={'': args.device}, torch_dtype=torch.float16)
+    if args.multi_gpu:
+        # Custom even-split across cuda:0 + cuda:1 (matches train scripts
+        # in the memory; includes model.rotary_emb for Qwen).
+        from transformers import AutoConfig as _AC
+        _cfg = _AC.from_pretrained(args.model_path)
+        nL = _cfg.num_hidden_layers
+        half = nL // 2
+        device_map = {'model.embed_tokens': 0, 'model.norm': 1,
+                      'model.rotary_emb': 0, 'lm_head': 1}
+        for i in range(nL):
+            device_map[f'model.layers.{i}'] = 0 if i < half else 1
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model_path, quantization_config=bnb,
+            device_map=device_map, torch_dtype=torch.float16)
+    else:
+        model = AutoModelForCausalLM.from_pretrained(
+            args.model_path, quantization_config=bnb,
+            device_map={'': args.device}, torch_dtype=torch.float16)
     model.eval()
     device = str(model.get_input_embeddings().weight.device)
     capture = AttentionCapture(model)
@@ -219,33 +243,50 @@ def main():
     astro = None; sense_cap = None
     if args.method in ('astrogate', 'astrogain_e2e'):
         assert args.checkpoint
-        raw = torch.load(args.checkpoint, map_location=device, weights_only=False)
+        raw = torch.load(args.checkpoint, map_location='cpu', weights_only=False)
         saved_cfg = raw.get('config', {}) if isinstance(raw, dict) else {}
+        # In multi-GPU the sense layer can be on a different device than the
+        # embedding (e.g. layer 32 on cuda:1 when embed is on cuda:0). Place
+        # astro on the sense layer's device or gate_logits hits a mismatch.
+        sl_pre = (raw.get('sense_layer', nl // 2)
+                  if isinstance(raw, dict) else nl // 2)
+        astro_dev = next(model.model.layers[sl_pre].parameters()).device
         if args.method == 'astrogate':
             astro = AstroGate(
                 hidden_dim=cfg.hidden_size,
                 n_astro=saved_cfg.get('n_astro', args.n_mem),
                 attn_dim=saved_cfg.get('attn_dim', args.attn_dim),
                 n_patterns=saved_cfg.get('n_patterns', 8),
-            ).to(device)
+            ).to(astro_dev)
         else:
             astro = AstroGainE2E(
                 hidden_dim=cfg.hidden_size,
                 n_astro=saved_cfg.get('n_astro', args.n_mem),
                 attn_dim=saved_cfg.get('attn_dim', args.attn_dim),
                 n_kv_heads=nkv, head_dim=hd, n_layers=nl,
-            ).to(device)
+            ).to(astro_dev)
         astro.load_state_dict(
             raw['astro'] if isinstance(raw, dict) and 'astro' in raw else raw,
             strict=False)
         astro.eval()
+        lam_source = 'ckpt-default'
         if args.lam_override is not None:
             import math
-            new_log_lam = math.log(math.exp(args.lam_override) - 1.0)
+            new_log_lam = math.log(math.expm1(args.lam_override))
             astro.log_lambda.data.fill_(new_log_lam)
+            lam_source = f'override={args.lam_override:g}'
+        else:
+            sidecar = args.checkpoint + '.lam.json'
+            if os.path.exists(sidecar):
+                import math
+                with open(sidecar) as _f: cal = json.load(_f)
+                lam_cal = float(cal['lambda'])
+                astro.log_lambda.data.fill_(math.log(math.expm1(lam_cal)))
+                lam_source = f'auto-calibrated={lam_cal:g} (from {os.path.basename(sidecar)})'
         sl = raw.get('sense_layer', nl // 2) if isinstance(raw, dict) else nl // 2
         sense_cap = SenseCapture(model, sl)
-        print(f'Loaded {args.method} ckpt; λ={astro.lam.item():.4f}', flush=True)
+        print(f'Loaded {args.method} ckpt; λ={astro.lam.item():.4f}  [{lam_source}]',
+              flush=True)
 
     correct = 0
     total = 0
